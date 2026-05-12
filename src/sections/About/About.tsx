@@ -1,3 +1,5 @@
+import Image from "next/image";
+import lakeBackground from "../../assets/lake-bg.png";
 import styles from "./About.module.css";
 
 const skills = [
@@ -18,7 +20,15 @@ export default function About() {
   return (
     <section id="about" className={styles.about} aria-labelledby="about-title">
       <div className={styles.inner}>
-        <div className={styles.profileDrop} aria-label="Profile image placeholder">
+        <div className={styles.profileDrop} aria-label="Landscape image placeholder">
+          <Image
+            className={styles.profileImage}
+            src={lakeBackground}
+            alt=""
+            aria-hidden="true"
+            fill
+            sizes="(max-width: 920px) 220px, 336px"
+          />
           <span className={styles.dropRefraction} aria-hidden="true" />
           <span className={styles.dropDepth} aria-hidden="true" />
           <span className={styles.dropHighlight} aria-hidden="true" />
@@ -40,9 +50,6 @@ export default function About() {
           <div className={styles.stackBlock}>
             <div className={styles.stackIntro}>
               <h3 className={styles.stackTitle}>Technical stacks</h3>
-              <p className={styles.stackDescription}>
-                디자인부터 프론트 구현까지, 화면을 직접 설계하고 만들어본 도구들입니다.
-              </p>
             </div>
 
             <div className={styles.skills} aria-label="Technical stacks">
