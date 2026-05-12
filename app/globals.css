@@ -1,15 +1,26 @@
+@import "pretendard/dist/web/variable/pretendardvariable.css";
+@import "devicon/devicon.min.css";
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-pretendard: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono-stack: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-pretendard);
+  --font-mono: var(--font-mono-stack);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +33,27 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-pretendard);
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  min-height: 100%;
+}
+
+html {
+  overflow: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

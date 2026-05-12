@@ -1,0 +1,66 @@
+.page {
+  display: flex;
+  height: 100vh;
+  height: 100svh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  flex-direction: column;
+  background: #07131a;
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+}
+
+.placeholder {
+  position: relative;
+  height: 100svh;
+  flex-shrink: 0;
+  overflow: hidden;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.placeholder::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.placeholder::after {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 34vh;
+  content: "";
+  pointer-events: none;
+}
+
+.contact {
+  z-index: 4;
+  background:
+    linear-gradient(180deg, #f7f6ee 0%, #f7efd9 34%, #fbefd9 100%);
+}
+
+.contact::before {
+  background:
+    radial-gradient(ellipse at 62% 24%, rgba(255, 248, 214, 0.74), rgba(255, 248, 214, 0) 46%),
+    radial-gradient(ellipse at 48% 66%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 54%),
+    linear-gradient(116deg, rgba(142, 167, 178, 0) 14%, rgba(142, 167, 178, 0.2) 32%, rgba(227, 179, 184, 0.24) 46%, rgba(239, 215, 148, 0.28) 61%, rgba(187, 206, 175, 0.18) 73%, rgba(142, 167, 178, 0) 84%),
+    linear-gradient(180deg, rgba(228, 231, 214, 0.78) 0%, rgba(246, 229, 196, 0) 28%);
+  opacity: 0.94;
+}
+
+.contact::after {
+  background: linear-gradient(180deg, rgba(247, 246, 238, 0.96) 0%, rgba(247, 239, 217, 0.5) 46%, rgba(247, 239, 217, 0) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    scroll-behavior: auto;
+    scroll-snap-type: none;
+  }
+
+  .placeholder {
+    scroll-snap-align: none;
+  }
+}
