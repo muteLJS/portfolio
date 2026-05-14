@@ -79,11 +79,12 @@ export default function About() {
       </video>
 
       <Image
-        className={styles.branchPreview}
-        src="/img/branch/tree-branch-new.png"
+        className={styles.branchHint}
+        src="/img/branch/tree-branch-main.png"
         alt=""
-        width={779}
-        height={352}
+        width={1536}
+        height={1024}
+        sizes="760px"
         aria-hidden="true"
       />
 

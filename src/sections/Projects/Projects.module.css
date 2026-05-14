@@ -5,7 +5,7 @@
   flex-shrink: 0;
   overflow: hidden;
   background: #eef1df;
-  color: #1e2d35;
+  color: #1c302c;
 }
 
 .backgroundImage,
@@ -30,7 +30,7 @@
 .backgroundVeil {
   z-index: 1;
   background:
-    radial-gradient(ellipse at 24% 30%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 42%),
+    radial-gradient(ellipse at 22% 28%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 42%),
     linear-gradient(180deg, rgba(246, 247, 239, 0.08) 0%, rgba(246, 247, 239, 0.03) 58%, rgba(244, 223, 195, 0.08) 100%);
 }
 
@@ -45,197 +45,297 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(310px, 420px) minmax(680px, 1fr);
-  width: min(100% - 84px, 1480px);
+  grid-template-columns: minmax(420px, 0.82fr) minmax(620px, 1.18fr);
+  width: min(100% - 96px, 1500px);
   height: 100%;
   margin: 0 auto;
   align-items: center;
-  gap: clamp(40px, 5vw, 84px);
-  padding: 104px 0 68px;
+  gap: clamp(34px, 5.6vw, 92px);
+  padding: 96px 0 68px;
 }
 
-.sectionCopy {
-  max-width: 430px;
-  align-self: center;
+.leftPane {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 28px;
+  min-height: 540px;
+  align-items: center;
+  align-content: center;
 }
 
-.sectionLabel {
-  margin: 0 0 28px;
-  color: rgba(30, 45, 53, 0.78);
-  font-size: 0.8rem;
+.introCopy {
+  max-width: 620px;
+  animation: paneEnter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sectionLabel,
+.detailType {
+  margin: 0 0 26px;
+  color: rgba(28, 48, 44, 0.76);
+  font-size: 0.82rem;
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.14em;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
 }
 
 .sectionTitle {
   margin: 0;
-  color: #1e2d35;
-  font-size: 3.05rem;
-  font-weight: 500;
-  line-height: 1.32;
+  color: #1c302c;
+  font-family: var(--font-serif-kr), var(--font-sans), serif;
+  font-size: 2.72rem;
+  font-weight: 380;
+  line-height: 1.46;
   letter-spacing: 0;
-  text-shadow: 0 1px 12px rgba(250, 249, 230, 0.45);
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.24);
   word-break: keep-all;
 }
 
 .sectionDescription {
+  max-width: 520px;
   margin: 30px 0 0;
-  color: rgba(36, 54, 63, 0.82);
-  font-size: 1.02rem;
-  font-weight: 500;
-  line-height: 1.82;
-  text-shadow: 0 1px 10px rgba(250, 249, 230, 0.42);
+  color: #263f3a;
+  font-family: var(--font-sans);
+  font-size: 1.08rem;
+  font-weight: 400;
+  line-height: 1.85;
+  text-shadow: 0 1px 7px rgba(255, 255, 255, 0.2);
   word-break: keep-all;
+}
+
+.detailPanel {
+  position: relative;
+  width: min(100%, 540px);
+  max-height: min(44vh, 430px);
+  overflow: auto;
+  padding: 22px 0 0;
+  border-top: 1px solid rgba(28, 48, 44, 0.18);
+  background: transparent;
+  box-shadow: none;
+  animation: paneEnter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.closeButton {
+  position: absolute;
+  top: 22px;
+  right: 0;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(28, 48, 44, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(28, 48, 44, 0.68);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+.closeButton:hover,
+.closeButton:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  opacity: 0.86;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.detailType {
+  margin-bottom: 10px;
+  padding-right: 36px;
+}
+
+.detailTitle {
+  margin: 0;
+  color: #1c302c;
+  font-family: var(--font-serif-kr), var(--font-sans), serif;
+  font-size: 1.72rem;
+  font-weight: 420;
+  line-height: 1.24;
+  letter-spacing: 0;
+}
+
+.detailTagline {
+  margin: 10px 36px 16px 0;
+  color: rgba(38, 63, 58, 0.86);
+  font-size: 0.94rem;
+  font-weight: 500;
+  line-height: 1.62;
+  word-break: keep-all;
+}
+
+.previewLink {
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(28, 48, 44, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+}
+
+.previewImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  opacity: 0.9;
+  transition:
+    opacity 200ms ease,
+    transform 240ms ease;
+}
+
+.previewLink:hover .previewImage,
+.previewLink:focus-visible .previewImage {
+  opacity: 1;
+  transform: scale(1.012);
+}
+
+.detailTextGroup {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.detailBlock h4 {
+  margin: 0 0 6px;
+  color: rgba(28, 48, 44, 0.74);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+}
+
+.detailBlock p {
+  margin: 0;
+  color: rgba(32, 54, 49, 0.8);
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.72;
+  word-break: keep-all;
+}
+
+.stackList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stackList li {
+  padding: 7px 10px;
+  border: 1px solid rgba(30, 45, 53, 0.14);
+  border-radius: 999px;
+  background: rgba(246, 248, 232, 0.12);
+  color: rgba(30, 45, 53, 0.72);
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .branchScene {
   position: relative;
-  height: min(68vh, 620px);
-  min-height: 520px;
+  z-index: 3;
+  height: min(76vh, 720px);
+  min-height: 600px;
+  align-self: center;
 }
 
-.branchScene::before {
+.leafNav {
   position: absolute;
-  top: 32%;
-  right: 4%;
-  z-index: 1;
-  width: 54%;
-  height: 40%;
-  border-radius: 50%;
-  content: "";
-  background: radial-gradient(ellipse at center, rgba(255, 255, 235, 0.22), rgba(255, 255, 235, 0) 68%);
-  pointer-events: none;
+  top: 50%;
+  right: 0;
+  z-index: 8;
+  display: grid;
+  gap: 10px;
+  transform: translateY(-50%);
+}
+
+.branchStage {
+  position: absolute;
+  top: -9%;
+  right: max(-24vw, -360px);
+  z-index: 4;
+  width: clamp(980px, 88vw, 1380px);
+  aspect-ratio: 3 / 2;
+  opacity: 0.24;
+  transform: translateX(18vw);
+  transition:
+    opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.projects:global(.is-revealed) .branchStage {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.branchStage[data-interactive="true"] {
+  cursor: pointer;
 }
 
 .branchImage {
-  position: absolute;
-  right: clamp(-90px, -3vw, -34px);
-  top: 50%;
-  z-index: 2;
-  width: min(62vw, 960px);
+  display: block;
+  width: 100%;
   height: auto;
-  opacity: 0;
   pointer-events: none;
-  transform: translate3d(18%, -42%, 0) rotate(-8deg);
-  transform-origin: 82% 70%;
-  filter: drop-shadow(0 12px 24px rgba(20, 35, 24, 0.18));
 }
 
-.projects:global(.is-revealed) .branchImage {
-  animation: branchSlideIn 1400ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
-}
-
-.projectItems {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-}
-
-.projectItem {
-  position: absolute;
-  width: 190px;
-  opacity: 0;
-  transform: translateY(8px);
-}
-
-.projects:global(.is-revealed) .projectItem {
-  animation: itemEnter 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.projectItem:nth-child(1) {
-  top: 9%;
-  left: 16%;
-  animation-delay: 720ms;
-}
-
-.projectItem:nth-child(2) {
-  top: 27%;
-  right: 2%;
-  animation-delay: 860ms;
-}
-
-.projectItem:nth-child(3) {
-  left: 12%;
-  bottom: 14%;
-  animation-delay: 1000ms;
-}
-
-.projectItem:nth-child(4) {
-  right: 12%;
-  bottom: 4%;
-  animation-delay: 1140ms;
-}
-
-.leafText {
+.leafButton {
   display: grid;
-  gap: 8px;
-  color: #1f3037;
-  text-shadow: 0 1px 10px rgba(250, 249, 230, 0.7);
-  word-break: keep-all;
-}
-
-.projectNumber {
-  margin: 0;
-  color: rgba(31, 48, 55, 0.68);
-  font-size: 0.74rem;
+  width: 150px;
+  height: 78px;
+  padding: 0 20px 3px 28px;
+  place-items: center;
+  border: 0;
+  background-color: transparent;
+  background-image: url("/img/leaf/leaf-nav-idle.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  color: rgba(31, 55, 42, 0.9);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.08em;
-}
-
-.projectName {
-  margin: 0;
-  color: #1f3037;
-  font-size: 1.14rem;
-  font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.12;
   letter-spacing: 0;
-}
-
-.projectDescription {
-  margin: 0;
-  color: rgba(31, 48, 55, 0.76);
-  font-size: 0.82rem;
-  font-weight: 500;
-  line-height: 1.48;
-}
-
-.projectLink {
-  width: fit-content;
-  color: rgba(31, 48, 55, 0.84);
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.2;
-  text-decoration: none;
+  text-align: center;
+  text-shadow: 0 1px 5px rgba(255, 255, 235, 0.38);
+  transform-origin: center;
   transition:
     opacity 180ms ease,
     transform 180ms ease;
 }
 
-.projectLink:hover,
-.projectLink:focus-visible {
-  opacity: 0.72;
+.leafButton:hover,
+.leafButton:focus-visible {
+  background-image: url("/img/leaf/leaf-nav-hover.png");
+  opacity: 0.96;
   outline: none;
-  transform: translateX(2px);
+  transform: translateX(-4px) scale(1.02);
 }
 
-@keyframes branchSlideIn {
-  from {
-    opacity: 0;
-    transform: translate3d(18%, -42%, 0) rotate(-8deg);
-  }
-
-  to {
-    opacity: 0.82;
-    transform: translate3d(0, -42%, 0) rotate(-8deg);
-  }
+.leafButton[aria-pressed="true"] {
+  background-image: url("/img/leaf/leaf-nav-active.png");
+  opacity: 1;
+  color: rgba(22, 44, 33, 0.94);
+  text-shadow: 0 1px 5px rgba(255, 255, 235, 0.42);
 }
 
-@keyframes itemEnter {
+@keyframes paneEnter {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px);
   }
 
   to {
@@ -246,62 +346,96 @@
 
 @media (max-width: 1180px) {
   .inner {
-    grid-template-columns: minmax(280px, 360px) minmax(520px, 1fr);
+    grid-template-columns: minmax(360px, 0.85fr) minmax(500px, 1.15fr);
     width: min(100% - 56px, 1160px);
     gap: 32px;
   }
 
+  .leftPane {
+    min-height: 520px;
+  }
+
   .sectionTitle {
-    font-size: 2.45rem;
+    font-size: 2.36rem;
+  }
+
+  .detailPanel {
+    width: min(100%, 500px);
+    padding-top: 20px;
   }
 
   .branchScene {
-    min-height: 480px;
+    min-height: 520px;
   }
 
-  .branchImage {
-    width: 780px;
+  .branchStage {
+    top: -5%;
+    right: -300px;
+    width: 1040px;
   }
 
-  .projectItem {
-    width: 168px;
+  .leafButton {
+    width: 126px;
+    height: 66px;
+    padding: 0 17px 2px 24px;
+    font-size: 0.76rem;
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .inner {
     grid-template-columns: 1fr;
     align-content: center;
-    gap: 26px;
-    padding: 92px 0 48px;
+    gap: 20px;
+    padding: 86px 0 44px;
   }
 
-  .sectionCopy {
-    max-width: 620px;
+  .leftPane {
+    min-height: auto;
+  }
+
+  .detailPanel {
+    width: min(100%, 620px);
   }
 
   .sectionLabel {
-    margin-bottom: 14px;
+    margin-bottom: 18px;
   }
 
   .sectionTitle {
-    font-size: 2.1rem;
+    font-size: 2.12rem;
+    line-height: 1.42;
   }
 
   .sectionDescription {
     margin-top: 18px;
+    font-size: 1rem;
   }
 
   .branchScene {
     width: 100%;
-    height: 48vh;
-    min-height: 420px;
+    height: 44vh;
+    min-height: 380px;
   }
 
-  .branchImage {
-    right: -130px;
-    width: 740px;
+  .branchStage {
+    top: -2%;
+    right: -240px;
+    width: 820px;
   }
+
+  .leafNav {
+    right: 0;
+    gap: 7px;
+  }
+
+  .leafButton {
+    width: 112px;
+    height: 58px;
+    padding: 0 15px 2px 22px;
+    font-size: 0.68rem;
+  }
+
 }
 
 @media (max-width: 640px) {
@@ -313,68 +447,119 @@
     width: min(100% - 32px, 720px);
     min-height: 100%;
     align-content: start;
-    padding: 96px 0 38px;
+    padding: 88px 0 36px;
   }
 
   .sectionTitle {
-    font-size: 1.72rem;
+    font-size: 1.82rem;
   }
 
   .sectionDescription {
     font-size: 0.9rem;
-    line-height: 1.64;
+    line-height: 1.72;
+  }
+
+  .detailPanel {
+    width: 100%;
+    max-height: none;
+    padding-top: 20px;
+  }
+
+  .detailTitle {
+    font-size: 1.78rem;
+  }
+
+  .detailTagline {
+    margin-right: 34px;
+    font-size: 0.9rem;
+  }
+
+  .detailBlock p {
+    font-size: 0.84rem;
+    line-height: 1.68;
   }
 
   .branchScene {
-    min-height: 360px;
+    height: auto;
+    min-height: 0;
   }
 
-  .branchImage {
-    right: -300px;
-    width: 640px;
-    opacity: 0.34;
-  }
-
-  .projectItem,
-  .projectItem:nth-child(1),
-  .projectItem:nth-child(2),
-  .projectItem:nth-child(3),
-  .projectItem:nth-child(4) {
+  .branchStage {
     position: relative;
     top: auto;
     right: auto;
-    bottom: auto;
-    left: auto;
-    width: min(100%, 250px);
+    width: min(100%, 560px);
+    aspect-ratio: auto;
+    margin-top: 8px;
   }
 
-  .projectItems {
+  .branchImage {
+    position: absolute;
+    right: -300px;
+    bottom: -120px;
+    width: 620px;
+    opacity: 0.28;
+  }
+
+  .leafNav {
     position: relative;
-    display: grid;
-    gap: 16px;
-    padding-top: 18px;
+    top: auto;
+    right: auto;
+    display: flex;
+    max-width: 100%;
+    gap: 10px;
+    overflow-x: auto;
+    padding-top: 10px;
+    transform: none;
   }
 
-  .projectName {
-    font-size: 1.02rem;
-  }
-
-  .projectDescription,
-  .projectLink {
+  .leafButton,
+  .leafButton:hover,
+  .leafButton:focus-visible {
+    flex: 0 0 124px;
+    width: 124px;
+    height: 64px;
+    padding: 0 16px 2px 23px;
     font-size: 0.76rem;
+  }
+
+  .leafButton:hover,
+  .leafButton:focus-visible {
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+
+@media (max-width: 380px) {
+  .inner {
+    padding-top: 98px;
+  }
+
+  .sectionTitle {
+    font-size: 1.64rem;
+  }
+
+  .detailPanel {
+    padding-top: 18px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .projects:global(.is-revealed) .branchImage,
-  .projects:global(.is-revealed) .projectItem,
-  .projectLink {
+  .previewImage,
+  .leafButton,
+  .closeButton {
     animation: none;
     transition: none;
   }
 
-  .branchImage,
-  .projectItem {
-    opacity: 1;
+  .introCopy,
+  .detailPanel {
+    animation: none;
   }
+
+  .branchStage {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
 }
