@@ -2,14 +2,16 @@
 
 import Image from "next/image";
 import type { KeyboardEvent } from "react";
+import type { ReactNode } from "react";
 
 import styles from "./Projects.module.css";
 
 type BranchTransitionProps = {
+  children?: ReactNode;
   onActivate?: () => void;
 };
 
-export default function BranchTransition({ onActivate }: BranchTransitionProps) {
+export default function BranchTransition({ children, onActivate }: BranchTransitionProps) {
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!onActivate || (event.key !== "Enter" && event.key !== " ")) {
       return;
@@ -39,6 +41,7 @@ export default function BranchTransition({ onActivate }: BranchTransitionProps) 
         sizes="(max-width: 640px) 560px, (max-width: 900px) 760px, (max-width: 1180px) 92vw, 88vw"
         aria-hidden="true"
       />
+      {children}
     </div>
   );
 }

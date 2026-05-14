@@ -22,9 +22,7 @@
   background-image: url("/img/background/project-background.png");
   background-position: center;
   background-size: cover;
-  filter: blur(3px) brightness(1.12) saturate(0.72) contrast(0.88);
-  opacity: 0.78;
-  transform: scale(1.016);
+  opacity: 0.82;
 }
 
 .backgroundVeil {
@@ -45,24 +43,22 @@
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(420px, 0.82fr) minmax(620px, 1.18fr);
-  width: min(100% - 96px, 1500px);
+  grid-template-columns: minmax(560px, 1.05fr) minmax(520px, 0.95fr);
+  grid-template-rows: auto auto;
+  width: min(100% - 96px, 1400px);
   height: 100%;
   margin: 0 auto;
   align-items: center;
-  gap: clamp(34px, 5.6vw, 92px);
-  padding: 96px 0 68px;
+  gap: clamp(22px, 3vw, 42px) clamp(34px, 5.6vw, 92px);
+  padding: 78px 0 48px;
 }
 
 .leftPane {
   position: relative;
   z-index: 4;
-  display: grid;
-  grid-template-rows: auto auto;
-  gap: 28px;
-  min-height: 540px;
+  display: flex;
+  min-height: 360px;
   align-items: center;
-  align-content: center;
 }
 
 .introCopy {
@@ -106,64 +102,49 @@
 
 .detailPanel {
   position: relative;
-  width: min(100%, 540px);
-  max-height: min(44vh, 430px);
-  overflow: auto;
-  padding: 22px 0 0;
-  border-top: 1px solid rgba(28, 48, 44, 0.18);
-  background: transparent;
-  box-shadow: none;
+  z-index: 5;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(360px, 0.92fr) minmax(420px, 1.08fr);
+  width: min(100%, 1320px);
+  overflow: visible;
+  gap: clamp(24px, 3vw, 42px);
+  align-items: center;
+  justify-self: center;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 14px 34px rgba(35, 49, 42, 0.06);
   animation: paneEnter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.closeButton {
-  position: absolute;
-  top: 22px;
-  right: 0;
-  display: grid;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  place-items: center;
-  border: 1px solid rgba(28, 48, 44, 0.16);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(28, 48, 44, 0.68);
-  cursor: pointer;
+.detailType {
+  margin-bottom: 6px;
+  padding-right: 0;
+}
+
+.projectNumber {
+  margin: 0 0 8px;
+  color: rgba(28, 48, 44, 0.5);
   font-size: 0.78rem;
   font-weight: 700;
   line-height: 1;
-  transition:
-    opacity 180ms ease,
-    transform 180ms ease,
-    background 180ms ease;
-}
-
-.closeButton:hover,
-.closeButton:focus-visible {
-  background: rgba(255, 255, 255, 0.16);
-  opacity: 0.86;
-  outline: none;
-  transform: translateY(-1px);
-}
-
-.detailType {
-  margin-bottom: 10px;
-  padding-right: 36px;
+  letter-spacing: 0.08em;
 }
 
 .detailTitle {
   margin: 0;
   color: #1c302c;
   font-family: var(--font-serif-kr), var(--font-sans), serif;
-  font-size: 1.72rem;
+  font-size: 1.88rem;
   font-weight: 420;
   line-height: 1.24;
   letter-spacing: 0;
 }
 
 .detailTagline {
-  margin: 10px 36px 16px 0;
+  margin: 9px 0 14px;
   color: rgba(38, 63, 58, 0.86);
   font-size: 0.94rem;
   font-weight: 500;
@@ -175,9 +156,23 @@
   display: block;
   overflow: hidden;
   border: 1px solid rgba(28, 48, 44, 0.12);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
   text-decoration: none;
+}
+
+.previewFallback {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  background:
+    radial-gradient(ellipse at 30% 18%, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 48%),
+    linear-gradient(135deg, rgba(205, 218, 186, 0.28), rgba(122, 150, 127, 0.18));
+  color: rgba(28, 48, 44, 0.56);
+  font-family: var(--font-serif-kr), var(--font-sans), serif;
+  font-size: 1.2rem;
+  font-weight: 420;
+  line-height: 1;
 }
 
 .previewImage {
@@ -198,14 +193,57 @@
   transform: scale(1.012);
 }
 
-.detailTextGroup {
-  display: grid;
-  gap: 12px;
-  margin-top: 16px;
+.detailDescription,
+.detailInsight {
+  margin: 0;
+  color: rgba(32, 54, 49, 0.8);
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.64;
+  word-break: keep-all;
 }
 
-.detailBlock h4 {
-  margin: 0 0 6px;
+.detailInsight {
+  margin-top: 8px;
+  color: rgba(32, 54, 49, 0.68);
+}
+
+.stackList {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(64px, 1fr));
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stackItem {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  justify-items: center;
+  padding: 8px 6px;
+  border: 1px solid rgba(30, 45, 53, 0.1);
+  border-radius: 12px;
+  background: rgba(246, 248, 232, 0.12);
+  color: rgba(30, 45, 53, 0.72);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.stackIcon {
+  font-size: 1.36rem;
+  line-height: 1;
+}
+
+.pagesBlock {
+  margin-top: 14px;
+}
+
+.pagesBlock h4 {
+  margin: 0 0 8px;
   color: rgba(28, 48, 44, 0.74);
   font-size: 0.78rem;
   font-weight: 700;
@@ -213,59 +251,77 @@
   letter-spacing: 0.08em;
 }
 
-.detailBlock p {
-  margin: 0;
-  color: rgba(32, 54, 49, 0.8);
-  font-size: 0.88rem;
-  font-weight: 400;
-  line-height: 1.72;
-  word-break: keep-all;
-}
-
-.stackList {
+.pagesBlock ul {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 16px 0 0;
+  gap: 7px 12px;
+  margin: 0;
   padding: 0;
+  color: rgba(32, 54, 49, 0.72);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.35;
   list-style: none;
 }
 
-.stackList li {
-  padding: 7px 10px;
-  border: 1px solid rgba(30, 45, 53, 0.14);
+.pagesBlock li::before {
+  margin-right: 7px;
+  content: "";
+}
+
+.detailActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.detailActions button,
+.detailActions a {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  padding: 0 13px;
+  border: 1px solid rgba(28, 48, 44, 0.16);
   border-radius: 999px;
-  background: rgba(246, 248, 232, 0.12);
-  color: rgba(30, 45, 53, 0.72);
-  font-size: 0.74rem;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(28, 48, 44, 0.82);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
   line-height: 1;
+  text-decoration: none;
+  transition:
+    background 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.detailActions button:hover,
+.detailActions button:focus-visible,
+.detailActions a:hover,
+.detailActions a:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 0.72;
+  outline: none;
+  transform: translateX(2px);
 }
 
 .branchScene {
   position: relative;
   z-index: 3;
-  height: min(76vh, 720px);
-  min-height: 600px;
+  height: min(58vh, 560px);
+  min-height: 430px;
   align-self: center;
-}
-
-.leafNav {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  z-index: 8;
-  display: grid;
-  gap: 10px;
-  transform: translateY(-50%);
 }
 
 .branchStage {
   position: absolute;
-  top: -9%;
-  right: max(-24vw, -360px);
+  top: -15%;
+  right: max(-20vw, -300px);
   z-index: 4;
-  width: clamp(980px, 88vw, 1380px);
+  width: clamp(840px, 76vw, 1180px);
   aspect-ratio: 3 / 2;
   opacity: 0.24;
   transform: translateX(18vw);
@@ -290,46 +346,89 @@
   pointer-events: none;
 }
 
-.leafButton {
+.leafHotspots {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+.leafHotspot {
+  position: absolute;
+  top: var(--hotspot-top);
+  left: var(--hotspot-left);
   display: grid;
-  width: 150px;
-  height: 78px;
-  padding: 0 20px 3px 28px;
+  width: var(--hotspot-width);
+  height: var(--hotspot-height);
+  padding: 0;
   place-items: center;
-  border: 0;
-  background-color: transparent;
-  background-image: url("/img/leaf/leaf-nav-idle.png");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  color: rgba(31, 55, 42, 0.9);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(22, 44, 33, 0);
   cursor: pointer;
-  font-family: var(--font-sans);
-  font-size: 0.86rem;
-  font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: 0;
-  text-align: center;
-  text-shadow: 0 1px 5px rgba(255, 255, 235, 0.38);
-  transform-origin: center;
+  transform: translate(-50%, -50%);
   transition:
-    opacity 180ms ease,
-    transform 180ms ease;
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
 }
 
-.leafButton:hover,
-.leafButton:focus-visible {
-  background-image: url("/img/leaf/leaf-nav-hover.png");
-  opacity: 0.96;
+.leafHotspot:hover,
+.leafHotspot:focus-visible,
+.leafHotspot[aria-pressed="true"] {
+  border-color: rgba(236, 242, 201, 0.34);
+  background: rgba(246, 250, 218, 0.12);
+  color: rgba(22, 44, 33, 0.62);
   outline: none;
-  transform: translateX(-4px) scale(1.02);
 }
 
-.leafButton[aria-pressed="true"] {
-  background-image: url("/img/leaf/leaf-nav-active.png");
-  opacity: 1;
-  color: rgba(22, 44, 33, 0.94);
-  text-shadow: 0 1px 5px rgba(255, 255, 235, 0.42);
+.leafHotspot.dark {
+  color: rgba(22, 44, 33, 0);
+}
+
+.leafHotspot.light {
+  color: rgba(245, 242, 216, 0);
+}
+
+.leafHotspot.dark:hover,
+.leafHotspot.dark:focus-visible,
+.leafHotspot.dark[aria-pressed="true"] {
+  color: rgba(22, 44, 33, 0.7);
+}
+
+.leafHotspot.light:hover,
+.leafHotspot.light:focus-visible,
+.leafHotspot.light[aria-pressed="true"] {
+  color: rgba(245, 242, 216, 0.78);
+}
+
+.leafHotspot span {
+  max-width: 92%;
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.leafTitle,
+.leafLine {
+  display: block;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leafLine {
+  margin-top: 4px;
+  font-size: 0.52rem;
+  font-weight: 600;
+  opacity: 0.82;
+}
+
+.mobileLeafNumber {
+  display: none;
 }
 
 @keyframes paneEnter {
@@ -346,7 +445,7 @@
 
 @media (max-width: 1180px) {
   .inner {
-    grid-template-columns: minmax(360px, 0.85fr) minmax(500px, 1.15fr);
+    grid-template-columns: minmax(460px, 1fr) minmax(460px, 0.9fr);
     width: min(100% - 56px, 1160px);
     gap: 32px;
   }
@@ -360,7 +459,7 @@
   }
 
   .detailPanel {
-    width: min(100%, 500px);
+    width: min(100% + 6vw, 700px);
     padding-top: 20px;
   }
 
@@ -374,12 +473,6 @@
     width: 1040px;
   }
 
-  .leafButton {
-    width: 126px;
-    height: 66px;
-    padding: 0 17px 2px 24px;
-    font-size: 0.76rem;
-  }
 }
 
 @media (max-width: 900px) {
@@ -424,16 +517,8 @@
     width: 820px;
   }
 
-  .leafNav {
-    right: 0;
-    gap: 7px;
-  }
-
-  .leafButton {
-    width: 112px;
-    height: 58px;
-    padding: 0 15px 2px 22px;
-    font-size: 0.68rem;
+  .detailTextGroup {
+    grid-template-columns: 1fr;
   }
 
 }
@@ -457,12 +542,6 @@
   .sectionDescription {
     font-size: 0.9rem;
     line-height: 1.72;
-  }
-
-  .detailPanel {
-    width: 100%;
-    max-height: none;
-    padding-top: 20px;
   }
 
   .detailTitle {
@@ -501,31 +580,38 @@
     opacity: 0.28;
   }
 
-  .leafNav {
+  .leafHotspots {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .leafHotspot,
+  .leafHotspot:hover,
+  .leafHotspot:focus-visible,
+  .leafHotspot[aria-pressed="true"] {
     position: relative;
     top: auto;
-    right: auto;
-    display: flex;
-    max-width: 100%;
-    gap: 10px;
-    overflow-x: auto;
-    padding-top: 10px;
+    left: auto;
+    width: min(100%, 280px);
+    height: auto;
+    min-height: 42px;
+    justify-items: start;
+    padding: 0 0 0 16px;
+    border-color: rgba(28, 48, 44, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(28, 48, 44, 0.74);
     transform: none;
   }
 
-  .leafButton,
-  .leafButton:hover,
-  .leafButton:focus-visible {
-    flex: 0 0 124px;
-    width: 124px;
-    height: 64px;
-    padding: 0 16px 2px 23px;
-    font-size: 0.76rem;
-  }
-
-  .leafButton:hover,
-  .leafButton:focus-visible {
-    transform: translateY(-2px) scale(1.01);
+  .leafHotspot::after {
+    margin-left: 10px;
+    content: attr(aria-label);
+    font-size: 0.78rem;
+    font-weight: 700;
   }
 }
 
@@ -545,8 +631,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .previewImage,
-  .leafButton,
-  .closeButton {
+  .leafHotspot,
+  .closeButton,
+  .detailLink {
     animation: none;
     transition: none;
   }
