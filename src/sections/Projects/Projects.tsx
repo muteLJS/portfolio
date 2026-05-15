@@ -121,9 +121,9 @@ const stackIconMap: Record<string, string> = {
 };
 
 export default function Projects() {
-  const [selectedProject, setSelectedProject] = useState<Project>(projects[0]);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
-  const selectedIndex = projects.findIndex((project) => project.id === selectedProject.id);
+  const selectedIndex = selectedProject ? projects.findIndex((project) => project.id === selectedProject.id) : 0;
   const previousProject = projects[(selectedIndex - 1 + projects.length) % projects.length];
   const nextProject = projects[(selectedIndex + 1) % projects.length];
 
@@ -137,14 +137,14 @@ export default function Projects() {
           <div className={styles.introCopy}>
             <p className={styles.sectionLabel}>PROJECTS</p>
             <h2 id="projects-title" className={styles.sectionTitle}>
-              사소한 변화는
+              읽어낸 흐름은,
               <br />
-              결과를 만들어 냅니다.
+              여러 결과로 이어집니다.
             </h2>
             <p className={styles.sectionDescription}>
-              각 프로젝트는 작은 문제를 발견하고,
+              이어지는 과정 속에서,
               <br />
-              더 나은 흐름으로 다듬어간 결과입니다.
+              새로운 형태들이 만들어집니다.
             </p>
           </div>
 
@@ -160,7 +160,7 @@ export default function Projects() {
                   type="button"
                   onClick={() => setSelectedProject(project)}
                   aria-label={`${project.title} 프로젝트 보기`}
-                  aria-pressed={selectedProject.id === project.id}
+                  aria-pressed={selectedProject?.id === project.id}
                   style={
                     {
                       "--hotspot-height": project.leaf.height,
@@ -179,61 +179,63 @@ export default function Projects() {
           </BranchTransition>
         </div>
 
-        <article className={styles.detailPanel} aria-live="polite">
-          <a className={styles.previewLink} href={selectedProject.link} aria-label={`${selectedProject.title} 상세 페이지로 이동`}>
-            {brokenImages[selectedProject.id] ? (
-              <span className={styles.previewFallback}>{selectedProject.title}</span>
-            ) : (
-              <Image
-                className={styles.previewImage}
-                src={selectedProject.image}
-                alt={`${selectedProject.title} 메인 화면`}
-                width={960}
-                height={600}
-                sizes="(max-width: 900px) calc(100vw - 64px), 620px"
-                onError={() => setBrokenImages((current) => ({ ...current, [selectedProject.id]: true }))}
-              />
-            )}
-          </a>
+        {selectedProject ? (
+          <article className={styles.detailPanel} aria-live="polite">
+            <a className={styles.previewLink} href={selectedProject.link} aria-label={`${selectedProject.title} 상세 페이지로 이동`}>
+              {brokenImages[selectedProject.id] ? (
+                <span className={styles.previewFallback}>{selectedProject.title}</span>
+              ) : (
+                <Image
+                  className={styles.previewImage}
+                  src={selectedProject.image}
+                  alt={`${selectedProject.title} 메인 화면`}
+                  width={960}
+                  height={600}
+                  sizes="(max-width: 900px) calc(100vw - 64px), 620px"
+                  onError={() => setBrokenImages((current) => ({ ...current, [selectedProject.id]: true }))}
+                />
+              )}
+            </a>
 
-          <div className={styles.detailContent}>
-            <p className={styles.detailType}>SELECTED PROJECT</p>
-            <p className={styles.projectNumber}>{String(selectedIndex + 1).padStart(2, "0")}</p>
-            <h3 className={styles.detailTitle}>{selectedProject.title}</h3>
-            <p className={styles.detailTagline}>{selectedProject.tagline}</p>
+            <div className={styles.detailContent}>
+              <p className={styles.detailType}>SELECTED PROJECT</p>
+              <p className={styles.projectNumber}>{String(selectedIndex + 1).padStart(2, "0")}</p>
+              <h3 className={styles.detailTitle}>{selectedProject.title}</h3>
+              <p className={styles.detailTagline}>{selectedProject.tagline}</p>
 
-            <p className={styles.detailDescription}>{selectedProject.description}</p>
-            <p className={styles.detailInsight}>{selectedProject.insight}</p>
+              <p className={styles.detailDescription}>{selectedProject.description}</p>
+              <p className={styles.detailInsight}>{selectedProject.insight}</p>
 
-            <ul className={styles.stackList} aria-label="사용 기술 스택">
-              {selectedProject.stacks.map((stack) => (
-                <li className={styles.stackItem} key={stack}>
-                  <i className={`${stackIconMap[stack] ?? "devicon-devicon-plain colored"} ${styles.stackIcon}`} aria-hidden="true" />
-                  <span>{stack}</span>
-                </li>
-              ))}
-            </ul>
-
-            <section className={styles.pagesBlock} aria-label="페이지 구성">
-              <h4>Pages</h4>
-              <ul>
-                {selectedProject.pages.map((page) => (
-                  <li key={page}>{page}</li>
+              <ul className={styles.stackList} aria-label="사용 기술 스택">
+                {selectedProject.stacks.map((stack) => (
+                  <li className={styles.stackItem} key={stack}>
+                    <i className={`${stackIconMap[stack] ?? "devicon-devicon-plain colored"} ${styles.stackIcon}`} aria-hidden="true" />
+                    <span>{stack}</span>
+                  </li>
                 ))}
               </ul>
-            </section>
 
-            <div className={styles.detailActions}>
-              <button type="button" onClick={() => setSelectedProject(previousProject)}>
-                Previous
-              </button>
-              <button type="button" onClick={() => setSelectedProject(nextProject)}>
-                Next
-              </button>
-              <a href={selectedProject.link}>View Project</a>
+              <section className={styles.pagesBlock} aria-label="페이지 구성">
+                <h4>Pages</h4>
+                <ul>
+                  {selectedProject.pages.map((page) => (
+                    <li key={page}>{page}</li>
+                  ))}
+                </ul>
+              </section>
+
+              <div className={styles.detailActions}>
+                <button type="button" onClick={() => setSelectedProject(previousProject)}>
+                  Previous
+                </button>
+                <button type="button" onClick={() => setSelectedProject(nextProject)}>
+                  Next
+                </button>
+                <a href={selectedProject.link}>View Project</a>
+              </div>
             </div>
-          </div>
-        </article>
+          </article>
+        ) : null}
       </div>
     </section>
   );

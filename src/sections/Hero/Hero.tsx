@@ -118,9 +118,9 @@ export default function Hero() {
           더 나은 경험으로.
         </h1>
         <p className={styles.subtitle} data-reveal="3">
-          사소한 흐름을 읽고,
+          하나의 움직임이 번지고,
           <br />
-          자연스러운 화면으로 연결합니다.
+          경험의 흐름이 시작됩니다.
         </p>
       </div>
 

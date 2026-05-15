@@ -40,19 +40,6 @@
   pointer-events: none;
 }
 
-.branchHint {
-  position: absolute;
-  right: max(-720px, -48vw);
-  bottom: -72px;
-  z-index: 1;
-  width: min(62vw, 820px);
-  height: auto;
-  opacity: 0.18;
-  pointer-events: none;
-  transform: rotate(-3deg);
-  transform-origin: 82% 58%;
-}
-
 .inner {
   position: relative;
   z-index: 2;
@@ -202,13 +189,6 @@
     margin-left: 0;
   }
 
-  .branchHint {
-    right: -620px;
-    bottom: -42px;
-    width: 780px;
-    opacity: 0.18;
-  }
-
   .sectionMark {
     margin-bottom: 28px;
   }
@@ -247,13 +227,6 @@
   .backgroundVideo {
     object-position: 54% 44%;
     opacity: 0.78;
-  }
-
-  .branchHint {
-    right: -560px;
-    bottom: -60px;
-    width: 680px;
-    opacity: 0.18;
   }
 
   .inner {

@@ -26,14 +26,19 @@ export default function Home() {
             CONTACT
           </p>
           <h2 id="contact-title" className={styles.contactTitle} data-reveal="2">
-            작은 변화는,
+            사소한 흐름들이 모여,
             <br />
-            결국 하나의 풍경이 됩니다.
+            하나의 형태가 됩니다.
           </h2>
           <p className={styles.contactDescription} data-reveal="3">
-            읽어주셔서 감사합니다.
+            그 안에서 사용자의 움직임을 보고,
             <br />
-            함께 더 나은 경험을 만들어갈 수 있다면 좋겠습니다.
+            필요한 경험을 설계합니다.
+            <br />
+            <br />
+            다음 흐름도,
+            <br />
+            좋은 경험으로 이어질 수 있기를 바랍니다.
           </p>
         </div>
       </section>

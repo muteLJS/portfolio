@@ -28,10 +28,16 @@ export default function OneScrollController() {
     }
 
     const syncActiveIndex = () => {
-      const scrollTop = scrollContainer.scrollTop;
+      if (lockedRef.current) {
+        return;
+      }
+
+      const viewportCenter = scrollContainer.scrollTop + scrollContainer.clientHeight * 0.5;
       const nearestIndex = sections.reduce((nearest, section, index) => {
-        const currentDistance = Math.abs(section.offsetTop - scrollTop);
-        const nearestDistance = Math.abs(sections[nearest].offsetTop - scrollTop);
+        const currentCenter = section.offsetTop + section.offsetHeight * 0.5;
+        const nearestCenter = sections[nearest].offsetTop + sections[nearest].offsetHeight * 0.5;
+        const currentDistance = Math.abs(currentCenter - viewportCenter);
+        const nearestDistance = Math.abs(nearestCenter - viewportCenter);
 
         return currentDistance < nearestDistance ? index : nearest;
       }, activeIndexRef.current);
@@ -42,7 +48,14 @@ export default function OneScrollController() {
     const releaseLock = () => {
       window.setTimeout(() => {
         lockedRef.current = false;
-        syncActiveIndex();
+        const targetTop = sections[activeIndexRef.current]?.offsetTop ?? scrollContainer.scrollTop;
+
+        if (Math.abs(scrollContainer.scrollTop - targetTop) > 2) {
+          scrollContainer.scrollTo({
+            top: targetTop,
+            behavior: "auto",
+          });
+        }
       }, scrollLockMs);
     };
 
@@ -149,7 +162,6 @@ export default function OneScrollController() {
     };
 
     const handleResize = () => {
-      syncActiveIndex();
       scrollContainer.scrollTo({
         top: sections[activeIndexRef.current].offsetTop,
         behavior: "auto",
