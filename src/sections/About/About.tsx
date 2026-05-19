@@ -34,7 +34,9 @@ export default function About() {
 
   useEffect(() => {
     const section = document.getElementById("about");
-    const scrollContainer = document.querySelector<HTMLElement>("[data-scroll-container='true']");
+    const scrollContainer = document.querySelector<HTMLElement>(
+      "[data-scroll-container='true']",
+    );
 
     if (!section) {
       return;
@@ -64,7 +66,12 @@ export default function About() {
   }, [pauseAboutVideo, playAboutVideo]);
 
   return (
-    <section id="about" className={styles.about} aria-labelledby="about-title" data-reveal-section="true">
+    <section
+      id="about"
+      className={styles.about}
+      aria-labelledby="about-title"
+      data-reveal-section="true"
+    >
       <video
         ref={aboutVideoRef}
         className={styles.backgroundVideo}
@@ -93,14 +100,17 @@ export default function About() {
 
             <p className={styles.description} data-reveal="3">
               보이지 않던 불편을 살피고,
-              <br />
-              그 안의 결을 찾아 화면으로 옮깁니다.
+              <br />그 흐름을 코드와 화면으로 함께 완성합니다.
             </p>
           </div>
 
           <div className={styles.stacks} aria-label="Stacks" data-reveal="4">
             {stackColumns.map((column) => (
-              <section className={styles.stackColumn} key={column.title} aria-label={column.title}>
+              <section
+                className={styles.stackColumn}
+                key={column.title}
+                aria-label={column.title}
+              >
                 <h3 className={styles.stackTitle}>{column.title}</h3>
                 <ul className={styles.stackList}>
                   {column.items.map((item) => (

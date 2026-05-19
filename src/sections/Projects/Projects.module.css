@@ -4,11 +4,13 @@
   height: 100svh;
   flex-shrink: 0;
   overflow: hidden;
-  background: #eef1df;
+  isolation: isolate;
+  contain: paint;
+  background: #eef1df url("/img/background/project-background.png") center /
+    cover no-repeat;
   color: #1c302c;
 }
 
-.backgroundImage,
 .backgroundVeil,
 .projects::after {
   position: absolute;
@@ -17,45 +19,61 @@
   pointer-events: none;
 }
 
-.backgroundImage {
+.backgroundVideo {
+  position: absolute;
+  inset: 0;
   z-index: 0;
-  background-image: url("/img/background/project-background.png");
-  background-position: center;
-  background-size: cover;
-  opacity: 0.82;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.86;
+  pointer-events: none;
 }
 
 .backgroundVeil {
   z-index: 1;
   background:
-    radial-gradient(ellipse at 22% 28%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 42%),
-    linear-gradient(180deg, rgba(246, 247, 239, 0.08) 0%, rgba(246, 247, 239, 0.03) 58%, rgba(244, 223, 195, 0.08) 100%);
+    radial-gradient(
+      ellipse at 22% 28%,
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0) 42%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(246, 247, 239, 0.08) 0%,
+      rgba(246, 247, 239, 0.03) 58%,
+      rgba(244, 223, 195, 0.08) 100%
+    );
 }
 
 .projects::after {
   inset: auto 0 0;
   z-index: 1;
   height: 26vh;
-  background: linear-gradient(180deg, rgba(238, 233, 214, 0), rgba(248, 223, 190, 0.12));
+  background: linear-gradient(
+    180deg,
+    rgba(238, 233, 214, 0),
+    rgba(248, 223, 190, 0.12)
+  );
 }
 
 .inner {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(500px, 0.9fr) minmax(620px, 1.1fr);
+  grid-template-columns: minmax(500px, 0.94fr) minmax(560px, 1.06fr);
   grid-template-rows: auto auto;
   width: min(100% - 96px, 1400px);
   height: 100%;
   margin: 0 auto;
   align-items: center;
-  gap: clamp(12px, 2vw, 24px) clamp(28px, 4.8vw, 72px);
+  gap: clamp(12px, 2vw, 24px) clamp(54px, 6.4vw, 104px);
   padding: 78px 0 48px;
 }
 
 .leftPane {
   position: relative;
-  z-index: 4;
+  z-index: 6;
   display: flex;
   min-height: 360px;
   align-items: center;
@@ -102,21 +120,26 @@
 
 .detailPanel {
   position: relative;
-  z-index: 5;
+  z-index: 7;
   display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr);
-  width: min(100%, 1320px);
-  margin-top: -18px;
-  overflow: visible;
-  gap: clamp(24px, 3vw, 42px);
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 178px minmax(0, 1fr);
+  width: min(100%, 560px);
+  height: min(680px, calc(100svh - 148px));
+  margin: 0;
+  overflow: hidden;
+  gap: 16px;
   align-items: center;
-  justify-self: center;
-  padding: 16px 18px;
+  align-self: center;
+  justify-self: start;
+  padding: 18px;
   border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.22);
-  box-shadow: 0 14px 34px rgba(35, 49, 42, 0.06);
+  border-radius: 16px;
+  background: rgba(246, 248, 232, 0.72);
+  box-shadow: 0 18px 42px rgba(35, 49, 42, 0.12);
+  backdrop-filter: blur(10px);
   animation: paneEnter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -157,6 +180,8 @@
   display: block;
   overflow: hidden;
   min-width: 0;
+  width: 100%;
+  height: 100%;
   border: 1px solid rgba(28, 48, 44, 0.12);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.12);
@@ -165,11 +190,20 @@
 
 .previewFallback {
   display: grid;
-  min-height: 180px;
+  height: 100%;
+  min-height: 0;
   place-items: center;
   background:
-    radial-gradient(ellipse at 30% 18%, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 48%),
-    linear-gradient(135deg, rgba(205, 218, 186, 0.28), rgba(122, 150, 127, 0.18));
+    radial-gradient(
+      ellipse at 30% 18%,
+      rgba(255, 255, 255, 0.26),
+      rgba(255, 255, 255, 0) 48%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(205, 218, 186, 0.28),
+      rgba(122, 150, 127, 0.18)
+    );
   color: rgba(28, 48, 44, 0.56);
   font-family: var(--font-serif-kr), var(--font-sans), serif;
   font-size: 1.2rem;
@@ -180,7 +214,7 @@
 .previewImage {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   opacity: 0.9;
@@ -196,7 +230,29 @@
 }
 
 .detailContent {
+  display: grid;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  height: 100%;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.detailScroll {
+  min-height: 0;
+  margin-top: 12px;
+  padding-right: 6px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.detailScroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detailScroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(28, 48, 44, 0.18);
 }
 
 .detailDescription,
@@ -283,9 +339,13 @@
 
 .detailActions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(28, 48, 44, 0.1);
+  flex-shrink: 0;
+  overflow-x: auto;
 }
 
 .detailActions button,
@@ -304,6 +364,7 @@
   font-weight: 700;
   line-height: 1;
   text-decoration: none;
+  white-space: nowrap;
   transition:
     background 180ms ease,
     opacity 180ms ease,
@@ -323,73 +384,136 @@
 .branchScene {
   position: relative;
   z-index: 3;
-  width: min(52vw, 740px);
-  height: min(60vh, 600px);
-  min-height: 470px;
+  width: min(52vw, 780px);
+  height: min(66vh, 680px);
+  min-height: 520px;
   align-self: center;
   justify-self: end;
+  overflow: visible;
 }
 
 .branchStage {
-  position: fixed;
-  top: 56%;
-  right: clamp(-180px, -10vw, -96px);
+  position: absolute;
+  top: 50%;
+  right: clamp(-56px, -3.2vw, -28px);
   z-index: 4;
-  width: clamp(820px, 72vw, 1120px);
+  width: clamp(880px, 62vw, 1080px);
   aspect-ratio: 3 / 2;
   opacity: 0;
   pointer-events: none;
-  transform: translate(18vw, -50%) scale(0.985);
+  transform: translateY(-50%) rotate(-1.5deg);
   transform-origin: 100% 56%;
-  transition:
-    opacity 360ms ease,
-    right 840ms cubic-bezier(0.22, 1, 0.36, 1),
-    top 840ms cubic-bezier(0.22, 1, 0.36, 1),
-    width 840ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 840ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 180ms ease;
   will-change: opacity, transform;
-}
-
-.branchStage[data-phase="about"] {
-  top: 58%;
-  right: max(-610px, -40vw);
-  width: min(72vw, 980px);
-  opacity: 1;
-  transform: translateY(-50%) rotate(-3deg) scale(1);
 }
 
 .branchStage[data-phase="projects"] {
   opacity: 1;
-  transform: translate(0, -50%) rotate(0deg) scale(1);
-}
-
-.branchStage[data-phase="projects"] .branchImage {
-  animation: branchSettleThump 520ms cubic-bezier(0.22, 1, 0.36, 1) 520ms both;
+  pointer-events: auto;
+  transform: translateY(-50%) rotate(-1.5deg);
 }
 
 .branchStage[data-interactive="true"] {
   cursor: pointer;
 }
 
-.branchImage {
+.branchBase {
   display: block;
   width: 100%;
   height: auto;
   pointer-events: none;
+  transform-origin: 100% 56%;
 }
 
-.leafHotspots {
+.leafLayers {
   position: absolute;
   inset: 0;
   z-index: 5;
-  opacity: 0;
+  opacity: 1;
   pointer-events: none;
-  transition: opacity 260ms ease 520ms;
+  transition: none;
 }
 
-.branchStage[data-phase="projects"] .leafHotspots {
-  opacity: 1;
+.branchStage[data-phase="projects"] .leafLayers {
   pointer-events: auto;
+}
+
+.leafLayer {
+  position: absolute;
+  inset: 0;
+  z-index: var(--leaf-z, 3);
+  opacity: var(--leaf-opacity, 1);
+  pointer-events: none;
+  transform: translate(var(--leaf-x, 0), var(--leaf-y, 0))
+    rotate(var(--leaf-rotate, 0deg)) scale(var(--leaf-scale, 1));
+  transform-origin: var(--leaf-origin);
+  transition:
+    opacity 320ms ease,
+    filter 280ms ease;
+}
+
+.sproutLeafLayer {
+  z-index: 1;
+}
+
+.inactiveLeafLayer {
+  z-index: var(--leaf-z, 2);
+}
+
+.selectedLeafLayer {
+  z-index: 8;
+  opacity: 1;
+}
+
+.leafImage {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: brightness(1);
+  pointer-events: none;
+  transform: scale(1);
+  transform-origin: var(--leaf-origin);
+  transition:
+    filter 280ms ease,
+    opacity 280ms ease,
+    transform 340ms ease;
+}
+
+.leafLayer:has(.leafHotspot:hover) .leafImage,
+.leafLayer:has(.leafHotspot:focus-visible) .leafImage,
+.leafLayer:has(.leafHotspot[aria-pressed="true"]) .leafImage {
+  filter: brightness(1.08);
+  opacity: 1;
+  transform: scale(var(--leaf-hover-scale, 1.025));
+}
+
+.inactiveLeafLayer .leafImage {
+  filter: brightness(0.98) saturate(0.86);
+  opacity: 0.8;
+}
+
+.inactiveLeafLayer .leafHotspot {
+  color: rgba(22, 44, 33, 0.58);
+  opacity: 0.9;
+}
+
+.sproutLeafLayer .leafHotspot {
+  opacity: 0.72;
+}
+
+.selectedLeafLayer .leafImage {
+  filter: brightness(1.08) saturate(1.02);
+  opacity: 1;
+  transform: scale(var(--leaf-hover-scale, 1.025));
+}
+
+.selectedLeafLayer .leafHotspot {
+  z-index: 6;
+  color: rgba(22, 44, 33, 0.94);
+  opacity: 1;
+  text-shadow: 0 1px 12px rgba(255, 255, 232, 0.38);
 }
 
 .leafHotspot {
@@ -402,14 +526,17 @@
   height: var(--hotspot-height);
   padding: 0;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: rgba(22, 44, 33, 0.72);
   cursor: pointer;
-  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  z-index: 9;
+  text-align: center;
+  transform: none;
   transition:
     background 180ms ease,
     border-color 180ms ease,
@@ -446,8 +573,8 @@
 }
 
 .leafHotspot span {
-  max-width: 168px;
-  font-size: 0.72rem;
+  max-width: 210px;
+  font-size: 0.84rem;
   font-weight: 700;
   line-height: 1.14;
   letter-spacing: 0.04em;
@@ -464,8 +591,8 @@
 }
 
 .leafLine {
-  margin-top: 5px;
-  font-size: 0.58rem;
+  margin-top: 6px;
+  font-size: 0.68rem;
   font-weight: 500;
   line-height: 1.28;
   opacity: 0.86;
@@ -507,9 +634,9 @@
 
 @media (max-width: 1180px) {
   .inner {
-    grid-template-columns: minmax(420px, 0.9fr) minmax(520px, 1.1fr);
+    grid-template-columns: minmax(420px, 0.96fr) minmax(500px, 1.04fr);
     width: min(100% - 56px, 1160px);
-    gap: 18px 32px;
+    gap: 18px 54px;
   }
 
   .leftPane {
@@ -521,28 +648,22 @@
   }
 
   .detailPanel {
-    width: min(100%, 1100px);
-    margin-top: -12px;
+    width: min(100%, 520px);
+    height: min(650px, calc(100svh - 132px));
+    margin: 0;
     padding: 16px;
   }
 
   .branchScene {
-    width: min(54vw, 640px);
-    min-height: 500px;
+    width: min(52vw, 700px);
+    min-height: 520px;
   }
 
   .branchStage {
-    top: 56%;
-    right: -120px;
-    width: 960px;
+    top: 51%;
+    right: clamp(-44px, -3vw, -24px);
+    width: min(72vw, 940px);
   }
-
-  .branchStage[data-phase="about"] {
-    top: 58%;
-    right: -520px;
-    width: 820px;
-  }
-
 }
 
 @media (max-width: 900px) {
@@ -559,6 +680,8 @@
 
   .detailPanel {
     width: min(100%, 620px);
+    height: min(620px, calc(100svh - 170px));
+    grid-template-rows: 160px minmax(0, 1fr);
     margin-top: 0;
     grid-template-columns: 1fr;
   }
@@ -585,15 +708,9 @@
   }
 
   .branchStage {
-    top: 56%;
-    right: -140px;
-    width: 760px;
-  }
-
-  .branchStage[data-phase="about"] {
-    top: 58%;
-    right: -500px;
-    width: 680px;
+    top: 54%;
+    right: clamp(-34px, -3vw, -18px);
+    width: min(98vw, 720px);
   }
 
   .detailTextGroup {
@@ -603,7 +720,6 @@
   .leafHotspot span {
     max-width: 150px;
   }
-
 }
 
 @media (max-width: 640px) {
@@ -631,8 +747,14 @@
     font-size: 1.78rem;
   }
 
+  .detailPanel {
+    width: 100%;
+    height: min(640px, calc(100svh - 136px));
+    grid-template-rows: 138px minmax(0, 1fr);
+    padding: 14px;
+  }
+
   .detailTagline {
-    margin-right: 34px;
     font-size: 0.9rem;
   }
 
@@ -655,20 +777,29 @@
     margin-top: 8px;
   }
 
-  .branchImage {
+  .branchBase {
     position: absolute;
-    right: -300px;
-    bottom: -120px;
-    width: 620px;
+    right: 0;
+    bottom: -84px;
+    width: min(100%, 560px);
     opacity: 0.28;
   }
 
-  .leafHotspots {
+  .leafLayers {
     position: relative;
     display: grid;
     grid-template-columns: 1fr;
     gap: 10px;
     margin-top: 28px;
+  }
+
+  .leafLayer {
+    position: relative;
+    inset: auto;
+  }
+
+  .leafImage {
+    display: none;
   }
 
   .leafHotspot,
@@ -681,17 +812,31 @@
     width: min(100%, 280px);
     height: auto;
     min-height: 42px;
+    align-items: flex-start;
     justify-items: start;
     padding: 0 0 0 16px;
     border: 0;
     border-radius: 999px;
     background: transparent;
     color: rgba(28, 48, 44, 0.74);
+    text-align: left;
     transform: none;
   }
 
   .leafHotspot span {
     max-width: 100%;
+  }
+
+  .detailActions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .detailActions button,
+  .detailActions a {
+    justify-content: center;
+    padding: 0 10px;
   }
 }
 
@@ -710,7 +855,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .backgroundVideo {
+    display: none;
+  }
+
   .previewImage,
+  .leafImage,
   .leafHotspot,
   .closeButton,
   .detailLink {
@@ -724,9 +874,11 @@
   }
 
   .branchStage {
-    opacity: 1;
     transform: none;
     animation: none;
   }
 
+  .branchStage[data-phase="projects"] {
+    opacity: 1;
+  }
 }

@@ -21,8 +21,12 @@ export default function Hero() {
   }, []);
 
   const playHeroVideo = useCallback(() => {
-    const activeVideo = isIntroComplete ? loopVideoRef.current : introVideoRef.current;
-    const inactiveVideo = isIntroComplete ? introVideoRef.current : loopVideoRef.current;
+    const activeVideo = isIntroComplete
+      ? loopVideoRef.current
+      : introVideoRef.current;
+    const inactiveVideo = isIntroComplete
+      ? introVideoRef.current
+      : loopVideoRef.current;
 
     inactiveVideo?.pause();
     activeVideo?.play().catch(() => {
@@ -32,7 +36,9 @@ export default function Hero() {
 
   useEffect(() => {
     const section = document.getElementById("hero");
-    const scrollContainer = document.querySelector<HTMLElement>("[data-scroll-container='true']");
+    const scrollContainer = document.querySelector<HTMLElement>(
+      "[data-scroll-container='true']",
+    );
 
     if (!section) {
       return;
@@ -40,7 +46,9 @@ export default function Hero() {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const isVisible = Boolean(entry?.isIntersecting && entry.intersectionRatio >= 0.55);
+        const isVisible = Boolean(
+          entry?.isIntersecting && entry.intersectionRatio >= 0.55,
+        );
         isHeroVisibleRef.current = isVisible;
 
         if (isVisible) {
@@ -77,8 +85,61 @@ export default function Hero() {
     });
   };
 
+  const handleScrollGuideClick = () => {
+    const aboutSection = document.getElementById("about");
+    const scrollContainer = document.querySelector<HTMLElement>(
+      "[data-scroll-container='true']",
+    );
+
+    if (!aboutSection || !scrollContainer) {
+      return;
+    }
+
+    const originalScrollBehavior = scrollContainer.style.scrollBehavior;
+    let startTop = scrollContainer.scrollTop;
+    const targetTop = aboutSection.offsetTop;
+    let distance = targetTop - startTop;
+    const duration = 2000;
+    const startTime = performance.now();
+    const direction = Math.sign(distance);
+    const easeInOutCubic = (progress: number) =>
+      progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+    scrollContainer.style.scrollBehavior = "auto";
+
+    if (direction !== 0) {
+      scrollContainer.scrollTop = startTop + direction;
+      startTop = scrollContainer.scrollTop;
+      distance = targetTop - startTop;
+    }
+
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      scrollContainer.scrollTop =
+        startTop + distance * easeInOutCubic(progress);
+
+      if (progress < 1) {
+        window.requestAnimationFrame(animateScroll);
+        return;
+      }
+
+      scrollContainer.style.scrollBehavior = originalScrollBehavior;
+    };
+
+    window.requestAnimationFrame(animateScroll);
+  };
+
   return (
-    <section id="hero" className={styles.hero} aria-labelledby="hero-title" data-reveal-section="true">
+    <section
+      id="hero"
+      className={styles.hero}
+      aria-labelledby="hero-title"
+      data-reveal-section="true"
+    >
       <div
         className={`${styles.videoStage} ${isIntroComplete ? styles.loopActive : ""}`}
         data-video-phase={isIntroComplete ? "loop" : "intro"}
@@ -114,20 +175,25 @@ export default function Hero() {
       <div className={styles.content}>
         <h1 id="hero-title" className={styles.title} data-reveal="2">
           작은 변화에서,
-          <br />
-          더 나은 경험으로.
+          <br />더 나은 경험으로.
         </h1>
         <p className={styles.subtitle} data-reveal="3">
-          하나의 움직임이 번지고,
+          디자인의 의도가 코드로 흐르고,
           <br />
-          경험의 흐름이 시작됩니다.
+          사용자의 경험이 완성됩니다.
         </p>
       </div>
 
-      <div className={styles.scrollGuide} aria-hidden="true" data-reveal="4">
+      <button
+        className={styles.scrollGuide}
+        type="button"
+        onClick={handleScrollGuideClick}
+        data-reveal="4"
+        aria-label="About section으로 이동"
+      >
         <span>SCROLL</span>
         <span className={styles.chevron} />
-      </div>
+      </button>
     </section>
   );
 }

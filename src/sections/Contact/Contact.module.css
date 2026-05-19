@@ -1,0 +1,309 @@
+.contact {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  min-height: 100vh;
+  min-height: 100svh;
+  flex-shrink: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: transparent;
+  color: #2f414b;
+}
+
+.contactVideoStage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.contactVideoStage {
+  z-index: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.contactVideo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 1;
+  filter: none;
+  transform: scale(var(--contact-video-scale, 1.06));
+  transform-origin: center;
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.contactContent {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 0.96fr) minmax(260px, 0.64fr);
+  width: min(100% - 96px, 1180px);
+  height: 100%;
+  margin: 0 auto;
+  align-items: center;
+  column-gap: clamp(42px, 8vw, 118px);
+  padding: 104px 0 72px;
+  text-align: left;
+}
+
+.contactCopy {
+  max-width: 620px;
+  justify-self: start;
+}
+
+.contactLabel,
+.contactTitle,
+.contactDescription,
+.contactActions {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.contactProfilePlaceholder {
+  position: relative;
+  width: min(34vw, 360px);
+  min-width: 260px;
+  aspect-ratio: 4 / 5;
+  justify-self: end;
+  border: 1px solid rgba(47, 65, 75, 0.18);
+  background: rgba(255, 250, 235, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 250, 235, 0.14);
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.contactProfilePlaceholder::before,
+.contactProfilePlaceholder::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.contactProfilePlaceholder::before {
+  inset: 14px;
+  border: 1px solid rgba(47, 65, 75, 0.1);
+}
+
+.contactProfilePlaceholder::after {
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  height: 1px;
+  background: rgba(47, 65, 75, 0.12);
+}
+
+.contact[data-revealed="true"] .contactLabel {
+  animation: contactCopyEnter 1.2s cubic-bezier(0.22, 1, 0.36, 1) 80ms forwards;
+}
+
+.contact[data-revealed="true"] .contactTitle {
+  animation: contactCopyEnter 1.45s cubic-bezier(0.22, 1, 0.36, 1) 180ms forwards;
+}
+
+.contact[data-revealed="true"] .contactDescription {
+  animation: contactCopyEnter 1.5s cubic-bezier(0.22, 1, 0.36, 1) 320ms forwards;
+}
+
+.contact[data-revealed="true"] .contactActions {
+  animation: contactCopyEnter 1.35s cubic-bezier(0.22, 1, 0.36, 1) 460ms forwards;
+}
+
+.contact[data-revealed="true"] .contactProfilePlaceholder {
+  animation: contactCopyEnter 1.45s cubic-bezier(0.22, 1, 0.36, 1) 540ms forwards;
+}
+
+.contactLabel {
+  margin: 0 0 28px;
+  color: rgba(47, 65, 75, 0.72);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+}
+
+.contactTitle {
+  margin: 0;
+  color: #2d404a;
+  font-family: var(--font-serif-kr), var(--font-sans), serif;
+  font-size: 2.72rem;
+  font-weight: 380;
+  line-height: 1.46;
+  letter-spacing: 0;
+  word-break: keep-all;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.24);
+}
+
+.contactDescription {
+  margin: 32px 0 0;
+  color: rgba(47, 65, 75, 0.84);
+  font-size: 1.08rem;
+  font-weight: 400;
+  line-height: 1.86;
+  word-break: keep-all;
+  text-shadow: 0 1px 7px rgba(255, 255, 255, 0.2);
+}
+
+.contactActions {
+  display: flex;
+  gap: 28px;
+  margin-top: 42px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.contactAction {
+  position: relative;
+  display: inline-grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  color: rgba(54, 43, 34, 0.84);
+  text-decoration: none;
+}
+
+.contactIcon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid rgba(47, 65, 75, 0.18);
+  border-radius: 50%;
+  background: rgba(255, 250, 235, 0.18);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.contactTooltip {
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(255, 250, 235, 0.62);
+  color: rgba(54, 43, 34, 0.78);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -4px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+  white-space: nowrap;
+}
+
+.contactAction:hover .contactIcon,
+.contactAction:focus-visible .contactIcon {
+  border-color: rgba(47, 65, 75, 0.34);
+  background: rgba(255, 250, 235, 0.34);
+  transform: translateY(-2px);
+}
+
+.contactAction:hover .contactTooltip,
+.contactAction:focus-visible .contactTooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.contactAction:focus-visible {
+  outline: none;
+}
+
+@keyframes contactCopyEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contactVideo {
+    transform: none;
+    transition: none;
+  }
+
+  .contactLabel,
+  .contactTitle,
+  .contactDescription,
+  .contactActions,
+  .contactProfilePlaceholder {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .contactContent {
+    grid-template-columns: 1fr;
+    width: min(100% - 32px, 720px);
+    align-content: center;
+    row-gap: 36px;
+    padding: 96px 0 48px;
+  }
+
+  .contactCopy {
+    max-width: 100%;
+  }
+
+  .contactProfilePlaceholder {
+    width: min(58vw, 260px);
+    min-width: 0;
+    justify-self: start;
+    aspect-ratio: 5 / 3;
+  }
+
+  .contactLabel {
+    margin-bottom: 20px;
+    font-size: 0.72rem;
+  }
+
+  .contactTitle {
+    font-size: 2rem;
+    line-height: 1.42;
+  }
+
+  .contactDescription {
+    margin-top: 22px;
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+
+  .contactActions {
+    gap: 20px;
+    margin-top: 34px;
+  }
+
+  .contactAction {
+    width: 44px;
+    height: 44px;
+  }
+
+  .contactIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 0.76rem;
+  }
+}

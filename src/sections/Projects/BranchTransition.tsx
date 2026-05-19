@@ -13,59 +13,38 @@ type BranchTransitionProps = {
 };
 
 export default function BranchTransition({ children, onActivate }: BranchTransitionProps) {
-  const [phase, setPhase] = useState<"hidden" | "about" | "projects">("hidden");
+  const [phase, setPhase] = useState<"hidden" | "projects">("hidden");
 
   useEffect(() => {
     const scrollContainer = document.querySelector<HTMLElement>("[data-scroll-container='true']");
-    const about = document.getElementById("about");
     const projects = document.getElementById("projects");
 
-    if (!scrollContainer || !about || !projects) {
+    if (!scrollContainer || !projects) {
       return;
     }
 
-    let frame = 0;
-
     const syncPhase = () => {
-      frame = 0;
+      const viewportHeight = scrollContainer.clientHeight || window.innerHeight;
+      const viewportCenter = viewportHeight * 0.5;
+      const projectsRect = projects.getBoundingClientRect();
 
-      const viewportCenter = scrollContainer.scrollTop + scrollContainer.clientHeight * 0.5;
-      const aboutStart = about.offsetTop;
-      const projectsStart = projects.offsetTop;
-      const projectsEnd = projectsStart + projects.offsetHeight;
-
-      if (viewportCenter >= projectsStart && viewportCenter < projectsEnd) {
+      if (projectsRect.top <= viewportCenter && projectsRect.bottom > viewportCenter) {
         setPhase("projects");
-        return;
-      }
-
-      if (viewportCenter >= aboutStart && viewportCenter < projectsStart) {
-        setPhase("about");
         return;
       }
 
       setPhase("hidden");
     };
 
-    const requestSync = () => {
-      if (frame) {
-        return;
-      }
-
-      frame = window.requestAnimationFrame(syncPhase);
-    };
-
     syncPhase();
-    scrollContainer.addEventListener("scroll", requestSync, { passive: true });
-    window.addEventListener("resize", requestSync);
+    scrollContainer.addEventListener("scroll", syncPhase, { passive: true });
+    window.addEventListener("scroll", syncPhase, { passive: true });
+    window.addEventListener("resize", syncPhase);
 
     return () => {
-      if (frame) {
-        window.cancelAnimationFrame(frame);
-      }
-
-      scrollContainer.removeEventListener("scroll", requestSync);
-      window.removeEventListener("resize", requestSync);
+      scrollContainer.removeEventListener("scroll", syncPhase);
+      window.removeEventListener("scroll", syncPhase);
+      window.removeEventListener("resize", syncPhase);
     };
   }, []);
 
@@ -90,8 +69,8 @@ export default function BranchTransition({ children, onActivate }: BranchTransit
       data-phase={phase}
     >
       <Image
-        className={styles.branchImage}
-        src="/img/branch/tree-branch-main.png"
+        className={styles.branchBase}
+        src="/img/branch/project-branch-base.png"
         alt=""
         width={1536}
         height={1024}
