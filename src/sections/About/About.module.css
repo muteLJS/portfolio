@@ -5,7 +5,6 @@
   flex-shrink: 0;
   overflow: hidden;
   isolation: isolate;
-  contain: paint;
   background: #dce8ee;
   color: #173140;
 }

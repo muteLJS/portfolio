@@ -3,9 +3,8 @@
   z-index: 3;
   height: 100svh;
   flex-shrink: 0;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
-  contain: paint;
   background: #eef1df url("/img/background/project-background.png") center /
     cover no-repeat;
   color: #1c302c;
@@ -81,6 +80,7 @@
 
 .introCopy {
   max-width: 620px;
+  margin-top: clamp(18px, 3vh, 30px);
   animation: paneEnter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -127,8 +127,8 @@
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 178px minmax(0, 1fr);
   width: min(100%, 560px);
-  height: min(680px, calc(100svh - 148px));
-  margin: 0;
+  height: min(680px, calc(100svh - 204px));
+  margin: clamp(40px, 5vh, 56px) 0 0;
   overflow: hidden;
   gap: 16px;
   align-items: center;
@@ -144,12 +144,12 @@
 }
 
 .detailType {
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   padding-right: 0;
 }
 
 .projectNumber {
-  margin: 0 0 8px;
+  margin: 0;
   color: rgba(28, 48, 44, 0.5);
   font-size: 0.78rem;
   font-weight: 700;
@@ -231,11 +231,108 @@
 
 .detailContent {
   display: grid;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
   height: 100%;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+}
+
+.detailHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.detailSelector {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.detailMeta {
+  min-width: 0;
+}
+
+.detailStepButton,
+.detailCloseButton {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(28, 48, 44, 0.16);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(28, 48, 44, 0.82);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.detailStepButton {
+  padding: 0 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.detailCloseButton {
+  width: 34px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.detailStepButton:hover,
+.detailStepButton:focus-visible,
+.detailCloseButton:hover,
+.detailCloseButton:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 0.72;
+  outline: none;
+}
+
+.detailStacks {
+  min-height: 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(28, 48, 44, 0.08);
+}
+
+.detailStacks h4 {
+  margin: 0 0 9px;
+  color: rgba(28, 48, 44, 0.7);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.08em;
+}
+
+.detailStacks ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detailStacks li {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid rgba(28, 48, 44, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(32, 54, 49, 0.72);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .detailScroll {
@@ -270,42 +367,6 @@
   color: rgba(32, 54, 49, 0.68);
 }
 
-.stackList {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 7px;
-  margin: 12px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.stackItem {
-  display: grid;
-  min-width: 0;
-  gap: 5px;
-  justify-items: center;
-  padding: 7px 5px;
-  border: 1px solid rgba(30, 45, 53, 0.1);
-  border-radius: 12px;
-  background: rgba(246, 248, 232, 0.12);
-  color: rgba(30, 45, 53, 0.72);
-  font-size: 0.68rem;
-  font-weight: 600;
-  line-height: 1.2;
-  text-align: center;
-  overflow-wrap: anywhere;
-}
-
-.stackItem span {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-.stackIcon {
-  font-size: 1.24rem;
-  line-height: 1;
-}
-
 .pagesBlock {
   margin-top: 12px;
 }
@@ -337,83 +398,81 @@
   content: "";
 }
 
-.detailActions {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 10px;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(28, 48, 44, 0.1);
-  flex-shrink: 0;
-  overflow-x: auto;
-}
-
-.detailActions button,
-.detailActions a {
-  display: inline-flex;
-  min-height: 34px;
-  align-items: center;
-  padding: 0 13px;
-  border: 1px solid rgba(28, 48, 44, 0.16);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(28, 48, 44, 0.82);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1;
-  text-decoration: none;
-  white-space: nowrap;
-  transition:
-    background 180ms ease,
-    opacity 180ms ease,
-    transform 180ms ease;
-}
-
-.detailActions button:hover,
-.detailActions button:focus-visible,
-.detailActions a:hover,
-.detailActions a:focus-visible {
-  background: rgba(255, 255, 255, 0.2);
-  opacity: 0.72;
-  outline: none;
-  transform: translateX(2px);
-}
-
 .branchScene {
-  position: relative;
+  position: fixed;
+  top: 30px;
+  right: -50px;
   z-index: 3;
   width: min(52vw, 780px);
   height: min(66vh, 680px);
   min-height: 520px;
-  align-self: center;
-  justify-self: end;
   overflow: visible;
+  pointer-events: none;
+  /* background-color: crimson; */
 }
 
-.branchStage {
+.branchPosition {
   position: absolute;
-  top: 50%;
-  right: clamp(-56px, -3.2vw, -28px);
+  top: clamp(72px, 9vh, 112px);
+  right: 0;
   z-index: 4;
-  width: clamp(880px, 62vw, 1080px);
+  width: clamp(1120px, 62vw, 1080px);
   aspect-ratio: 3 / 2;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-50%) rotate(-1.5deg);
-  transform-origin: 100% 56%;
+  rotate: 3deg;
+  /* transform: translateY(var(--branch-y, 0)); */
+  /* transform-origin: 100% 56%; */
   transition: opacity 180ms ease;
-  will-change: opacity, transform;
+  /* background-color: gold; */
 }
 
-.branchStage[data-phase="projects"] {
+.branchMotion {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: translateX(var(--branch-enter-x, 220px));
+  transition: none;
+  will-change: transform;
+}
+
+.branchPosition[data-phase="about"],
+.branchPosition[data-phase="projects"] {
+  opacity: 1;
+}
+
+.branchPosition[data-phase="projects"] {
+  pointer-events: auto;
+}
+
+.branchPosition[data-phase="about"] {
+  top: clamp(72px, 9vh, 112px);
+}
+
+.branchPosition[data-phase="projects"] {
+  top: clamp(72px, 9vh, 112px);
+}
+
+.branchPosition[data-phase="projects"] .branchMotion {
+  pointer-events: auto;
+}
+
+.branchPosition[data-phase="about"] .branchMotion,
+.branchPosition[data-phase="projects"] .branchMotion {
+  transform: translateX(var(--branch-enter-x, 0px));
+}
+
+.branchPosition[data-phase="about"] .leafLayers {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.branchPosition[data-phase="projects"] .leafLayers {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(-50%) rotate(-1.5deg);
 }
 
-.branchStage[data-interactive="true"] {
+.branchMotion[data-interactive="true"] {
   cursor: pointer;
 }
 
@@ -422,180 +481,140 @@
   width: 100%;
   height: auto;
   pointer-events: none;
-  transform-origin: 100% 56%;
+  transform: scaleY(-1);
+  transform-origin: center;
+}
+
+.branchPosition[data-phase="about"] .branchBase {
+  clip-path: inset(0 0 0 76%);
+}
+
+.branchPosition[data-phase="projects"] .branchBase {
+  clip-path: none;
 }
 
 .leafLayers {
   position: absolute;
   inset: 0;
   z-index: 5;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   opacity: 1;
   pointer-events: none;
   transition: none;
 }
 
-.branchStage[data-phase="projects"] .leafLayers {
-  pointer-events: auto;
-}
-
-.leafLayer {
+.projectLeaf {
   position: absolute;
-  inset: 0;
+  top: var(--leaf-top);
+  left: var(--leaf-left);
   z-index: var(--leaf-z, 3);
+  width: var(--leaf-width);
+  height: var(--leaf-height);
   opacity: var(--leaf-opacity, 1);
-  pointer-events: none;
   transform: translate(var(--leaf-x, 0), var(--leaf-y, 0))
     rotate(var(--leaf-rotate, 0deg)) scale(var(--leaf-scale, 1));
   transform-origin: var(--leaf-origin);
   transition:
-    opacity 320ms ease,
-    filter 280ms ease;
+    opacity 280ms ease,
+    filter 280ms ease,
+    transform 320ms ease;
 }
 
-.sproutLeafLayer {
-  z-index: 1;
+.projectLeafButton {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(24, 42, 35, 0.82);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  overflow: visible;
+}
+
+.projectLeafImage {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  transition:
+    filter 280ms ease,
+    opacity 280ms ease,
+    transform 320ms ease;
+}
+
+.leaf03 .projectLeafImage {
+  transform: scaleY(-1);
+}
+
+.projectLeafText {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  width: 76%;
+  height: 100%;
+  place-items: center;
+  margin: auto;
+  color: rgba(24, 42, 35, 0.82);
+  text-shadow: 0 1px 9px rgba(255, 255, 232, 0.38);
+  pointer-events: none;
+}
+
+.projectLeafText strong,
+.projectLeafText em {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-style: normal;
+  line-height: 1.16;
+  letter-spacing: 0.04em;
+}
+
+.projectLeafText strong {
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.projectLeafText em {
+  margin-top: 6px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  opacity: 0.86;
+}
+
+.projectLeaf:has(.projectLeafButton:hover),
+.projectLeaf:has(.projectLeafButton:focus-visible),
+.projectLeaf:has(.projectLeafButton[aria-pressed="true"]) {
+  filter: brightness(1.06);
+  opacity: 1;
+  transform: translate(var(--leaf-x, 0), var(--leaf-y, 0))
+    rotate(var(--leaf-rotate, 0deg)) scale(calc(var(--leaf-scale, 1) * 1.025));
+}
+
+.projectLeafButton:focus-visible {
+  outline: none;
 }
 
 .inactiveLeafLayer {
   z-index: var(--leaf-z, 2);
+  opacity: 0.72;
+  filter: saturate(0.9);
 }
 
 .selectedLeafLayer {
   z-index: 8;
   opacity: 1;
-}
-
-.leafImage {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: brightness(1);
-  pointer-events: none;
-  transform: scale(1);
-  transform-origin: var(--leaf-origin);
-  transition:
-    filter 280ms ease,
-    opacity 280ms ease,
-    transform 340ms ease;
-}
-
-.leafLayer:has(.leafHotspot:hover) .leafImage,
-.leafLayer:has(.leafHotspot:focus-visible) .leafImage,
-.leafLayer:has(.leafHotspot[aria-pressed="true"]) .leafImage {
-  filter: brightness(1.08);
-  opacity: 1;
-  transform: scale(var(--leaf-hover-scale, 1.025));
-}
-
-.inactiveLeafLayer .leafImage {
-  filter: brightness(0.98) saturate(0.86);
-  opacity: 0.8;
-}
-
-.inactiveLeafLayer .leafHotspot {
-  color: rgba(22, 44, 33, 0.58);
-  opacity: 0.9;
-}
-
-.sproutLeafLayer .leafHotspot {
-  opacity: 0.72;
-}
-
-.selectedLeafLayer .leafImage {
-  filter: brightness(1.08) saturate(1.02);
-  opacity: 1;
-  transform: scale(var(--leaf-hover-scale, 1.025));
-}
-
-.selectedLeafLayer .leafHotspot {
-  z-index: 6;
-  color: rgba(22, 44, 33, 0.94);
-  opacity: 1;
-  text-shadow: 0 1px 12px rgba(255, 255, 232, 0.38);
-}
-
-.leafHotspot {
-  position: absolute;
-  top: var(--hotspot-top);
-  left: var(--hotspot-left);
-  display: inline-flex;
-  min-width: 128px;
-  width: var(--hotspot-width);
-  height: var(--hotspot-height);
-  padding: 0;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: rgba(22, 44, 33, 0.72);
-  cursor: pointer;
-  pointer-events: auto;
-  z-index: 9;
-  text-align: center;
-  transform: none;
-  transition:
-    background 180ms ease,
-    border-color 180ms ease,
-    color 180ms ease,
-    opacity 180ms ease;
-}
-
-.leafHotspot:hover,
-.leafHotspot:focus-visible,
-.leafHotspot[aria-pressed="true"] {
-  color: rgba(22, 44, 33, 0.9);
-  outline: none;
-}
-
-.leafHotspot.dark {
-  color: rgba(22, 44, 33, 0.72);
-}
-
-.leafHotspot.light {
-  color: rgba(245, 242, 216, 0.84);
-  text-shadow: 0 1px 7px rgba(22, 44, 33, 0.28);
-}
-
-.leafHotspot.dark:hover,
-.leafHotspot.dark:focus-visible,
-.leafHotspot.dark[aria-pressed="true"] {
-  color: rgba(22, 44, 33, 0.92);
-}
-
-.leafHotspot.light:hover,
-.leafHotspot.light:focus-visible,
-.leafHotspot.light[aria-pressed="true"] {
-  color: rgba(245, 242, 216, 0.96);
-}
-
-.leafHotspot span {
-  max-width: 210px;
-  font-size: 0.84rem;
-  font-weight: 700;
-  line-height: 1.14;
-  letter-spacing: 0.04em;
-}
-
-.leafTitle,
-.leafLine {
-  display: block;
-  overflow: visible;
-  max-width: 100%;
-  text-overflow: clip;
-  white-space: normal;
-  word-break: keep-all;
-}
-
-.leafLine {
-  margin-top: 6px;
-  font-size: 0.68rem;
-  font-weight: 500;
-  line-height: 1.28;
-  opacity: 0.86;
 }
 
 .mobileLeafNumber {
@@ -649,19 +668,21 @@
 
   .detailPanel {
     width: min(100%, 520px);
-    height: min(650px, calc(100svh - 132px));
-    margin: 0;
+    height: min(650px, calc(100svh - 188px));
+    margin-top: clamp(40px, 5vh, 52px);
     padding: 16px;
   }
 
   .branchScene {
+    top: 0;
+    right: -72px;
     width: min(52vw, 700px);
     min-height: 520px;
   }
 
-  .branchStage {
-    top: 51%;
-    right: clamp(-44px, -3vw, -24px);
+  .branchPosition {
+    top: clamp(54px, 6vh, 76px);
+    right: 0;
     width: min(72vw, 940px);
   }
 }
@@ -680,9 +701,9 @@
 
   .detailPanel {
     width: min(100%, 620px);
-    height: min(620px, calc(100svh - 170px));
+    height: min(620px, calc(100svh - 198px));
     grid-template-rows: 160px minmax(0, 1fr);
-    margin-top: 0;
+    margin-top: clamp(32px, 4vh, 44px);
     grid-template-columns: 1fr;
   }
 
@@ -701,15 +722,18 @@
   }
 
   .branchScene {
-    width: 100%;
+    top: auto;
+    right: 50%;
+    bottom: 34px;
+    width: min(100%, 720px);
     height: 44vh;
     min-height: 380px;
-    justify-self: center;
+    transform: translateX(50%);
   }
 
-  .branchStage {
-    top: 54%;
-    right: clamp(-34px, -3vw, -18px);
+  .branchPosition {
+    top: clamp(46px, 6vh, 66px);
+    right: 0;
     width: min(98vw, 720px);
   }
 
@@ -717,7 +741,7 @@
     grid-template-columns: 1fr;
   }
 
-  .leafHotspot span {
+  .projectLeafText {
     max-width: 150px;
   }
 }
@@ -749,8 +773,9 @@
 
   .detailPanel {
     width: 100%;
-    height: min(640px, calc(100svh - 136px));
+    height: min(640px, calc(100svh - 172px));
     grid-template-rows: 138px minmax(0, 1fr);
+    margin-top: clamp(28px, 4vh, 40px);
     padding: 14px;
   }
 
@@ -764,17 +789,30 @@
   }
 
   .branchScene {
+    position: relative;
+    inset: auto;
+    transform: none;
     height: auto;
     min-height: 0;
   }
 
-  .branchStage {
+  .branchPosition {
     position: relative;
     top: auto;
     right: auto;
     width: min(100%, 560px);
     aspect-ratio: auto;
     margin-top: 8px;
+    rotate: 3deg;
+  }
+
+  .branchMotion {
+    transform: translateX(var(--branch-enter-x, 220px));
+  }
+
+  .branchPosition[data-phase="about"] .branchMotion,
+  .branchPosition[data-phase="projects"] .branchMotion {
+    transform: translateX(var(--branch-enter-x, 0px));
   }
 
   .branchBase {
@@ -793,50 +831,63 @@
     margin-top: 28px;
   }
 
-  .leafLayer {
-    position: relative;
-    inset: auto;
-  }
-
-  .leafImage {
-    display: none;
-  }
-
-  .leafHotspot,
-  .leafHotspot:hover,
-  .leafHotspot:focus-visible,
-  .leafHotspot[aria-pressed="true"] {
+  .projectLeaf,
+  .leaf01,
+  .leaf02,
+  .leaf03,
+  .leaf04,
+  .leaf05 {
     position: relative;
     top: auto;
     left: auto;
+    right: auto;
+    inset: auto;
     width: min(100%, 280px);
     height: auto;
-    min-height: 42px;
-    align-items: flex-start;
-    justify-items: start;
-    padding: 0 0 0 16px;
-    border: 0;
-    border-radius: 999px;
-    background: transparent;
-    color: rgba(28, 48, 44, 0.74);
-    text-align: left;
+    aspect-ratio: auto;
     transform: none;
   }
 
-  .leafHotspot span {
-    max-width: 100%;
+  .projectLeafImage {
+    display: none;
   }
 
-  .detailActions {
+  .projectLeafButton,
+  .projectLeafButton:hover,
+  .projectLeafButton:focus-visible,
+  .projectLeafButton[aria-pressed="true"] {
+    position: relative;
+    width: min(100%, 280px);
+    height: auto;
+    min-height: 42px;
+    place-items: start;
+    padding: 0 0 0 16px;
+    color: rgba(28, 48, 44, 0.74);
+    text-align: left;
+  }
+
+  .projectLeafText {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .detailSelector {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    overflow: visible;
   }
 
-  .detailActions button,
-  .detailActions a {
-    justify-content: center;
-    padding: 0 10px;
+  .detailMeta {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .detailStepButton {
+    grid-row: 2;
   }
 }
 
@@ -860,10 +911,10 @@
   }
 
   .previewImage,
-  .leafImage,
-  .leafHotspot,
-  .closeButton,
-  .detailLink {
+  .projectLeafImage,
+  .projectLeafButton,
+  .detailStepButton,
+  .detailCloseButton {
     animation: none;
     transition: none;
   }
@@ -873,12 +924,12 @@
     animation: none;
   }
 
-  .branchStage {
+  .branchMotion {
     transform: none;
     animation: none;
   }
 
-  .branchStage[data-phase="projects"] {
+  .branchPosition[data-phase="projects"] {
     opacity: 1;
   }
 }

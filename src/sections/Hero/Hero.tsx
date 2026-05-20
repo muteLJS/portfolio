@@ -96,24 +96,17 @@ export default function Hero() {
     }
 
     const originalScrollBehavior = scrollContainer.style.scrollBehavior;
-    let startTop = scrollContainer.scrollTop;
+    const startTop = scrollContainer.scrollTop;
     const targetTop = aboutSection.offsetTop;
-    let distance = targetTop - startTop;
-    const duration = 2000;
+    const distance = targetTop - startTop;
+    const duration = 900;
     const startTime = performance.now();
-    const direction = Math.sign(distance);
     const easeInOutCubic = (progress: number) =>
       progress < 0.5
         ? 4 * progress * progress * progress
         : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
     scrollContainer.style.scrollBehavior = "auto";
-
-    if (direction !== 0) {
-      scrollContainer.scrollTop = startTop + direction;
-      startTop = scrollContainer.scrollTop;
-      distance = targetTop - startTop;
-    }
 
     const animateScroll = (currentTime: number) => {
       const elapsed = currentTime - startTime;

@@ -54,14 +54,14 @@ const projects: Project[] = [
     pages: ["Main", "Explore", "Player", "Archive"],
     leaf: {
       asset: "/img/branch/project-leaf-main-01.png",
-      left: "24.4%",
-      origin: "39.5% 43.5%",
-      top: "30.8%",
-      width: "39%",
-      height: "25.6%",
-      hoverScale: "1.025",
-      opacity: "0.98",
-      rotate: "0deg",
+      left: "-3%",
+      origin: "100%",
+      top: "29.7%",
+      width: "750px",
+      height: "510px",
+      hoverScale: "1",
+      opacity: "1",
+      rotate: "10deg",
       scale: "1",
       x: "0%",
       y: "0%",
@@ -85,14 +85,14 @@ const projects: Project[] = [
     pages: ["Main", "Product List", "Product Detail", "Wishlist"],
     leaf: {
       asset: "/img/branch/project-leaf-main-02.png",
-      left: "37.8%",
+      left: "18%",
       origin: "57.7% 44.7%",
-      top: "34.6%",
-      width: "31%",
-      height: "18.2%",
-      hoverScale: "1.025",
-      opacity: "0.94",
-      rotate: "0deg",
+      top: "10.8%",
+      width: "640px",
+      height: "450px",
+      hoverScale: "1.0",
+      opacity: "1",
+      rotate: "62deg",
       scale: "1",
       x: "0%",
       y: "0%",
@@ -116,15 +116,15 @@ const projects: Project[] = [
     pages: ["Main", "Archive", "Detail", "Essay"],
     leaf: {
       asset: "/img/branch/project-leaf-main-03.png",
-      left: "40.2%",
+      left: "18.6%",
       origin: "60.3% 44.5%",
-      top: "45.4%",
-      width: "29%",
-      height: "17.4%",
+      top: "35.2%",
+      width: "474px",
+      height: "454px",
       hoverScale: "1.025",
       opacity: "0.92",
-      rotate: "0deg",
-      scale: "1",
+      rotate: "-59.2deg",
+      scale: "0.92",
       x: "0%",
       y: "0%",
       z: "4",
@@ -147,14 +147,14 @@ const projects: Project[] = [
     pages: ["Main", "Book Detail", "Event", "Search"],
     leaf: {
       asset: "/img/branch/project-leaf-small-01.png",
-      left: "58.8%",
+      left: "55.6%",
       origin: "52% 48.5%",
-      top: "31.6%",
-      width: "12.4%",
-      height: "14.2%",
+      top: "27.8%",
+      width: "452px",
+      height: "332px",
       hoverScale: "1.02",
-      opacity: "0.68",
-      rotate: "0deg",
+      opacity: "1",
+      rotate: "-50.6deg",
       scale: "1",
       x: "0%",
       y: "0%",
@@ -178,14 +178,14 @@ const projects: Project[] = [
     pages: ["Hero", "Feature", "Pricing", "Contact"],
     leaf: {
       asset: "/img/branch/project-leaf-small-02.png",
-      left: "64.2%",
+      left: "45.1%",
       origin: "53.4% 47.4%",
-      top: "45.8%",
-      width: "11.4%",
-      height: "12.8%",
+      top: "41.3%",
+      width: "471.8px",
+      height: "364px",
       hoverScale: "1.02",
-      opacity: "0.58",
-      rotate: "0deg",
+      opacity: "1",
+      rotate: "168.6deg",
       scale: "1",
       x: "0%",
       y: "0%",
@@ -194,20 +194,6 @@ const projects: Project[] = [
     accent: "dark",
   },
 ];
-
-const stackIconMap: Record<string, string> = {
-  "CSS Modules": "devicon-css3-plain colored",
-  "Framer Motion": "devicon-react-original colored",
-  HTML: "devicon-html5-plain colored",
-  Interaction: "devicon-javascript-plain colored",
-  JavaScript: "devicon-javascript-plain colored",
-  "Next.js": "devicon-nextjs-plain colored",
-  React: "devicon-react-original colored",
-  "Responsive UI": "devicon-css3-plain colored",
-  Responsive: "devicon-css3-plain colored",
-  Typography: "devicon-figma-plain colored",
-  TypeScript: "devicon-typescript-plain colored",
-};
 
 const projectPlaybackRate = 0.62;
 
@@ -263,10 +249,38 @@ export default function Projects() {
       </a>
 
       <div className={styles.detailContent}>
-        <p className={styles.detailType}>SELECTED PROJECT</p>
-        <p className={styles.projectNumber}>
-          {String(selectedIndex + 1).padStart(2, "0")}
-        </p>
+        <div className={styles.detailHeader}>
+          <div className={styles.detailSelector}>
+            <button
+              className={styles.detailStepButton}
+              type="button"
+              onClick={() => setSelectedProject(previousProject)}
+            >
+              Previous
+            </button>
+            <div className={styles.detailMeta}>
+              <p className={styles.detailType}>SELECTED PROJECT</p>
+              <p className={styles.projectNumber}>
+                {String(selectedIndex + 1).padStart(2, "0")}
+              </p>
+            </div>
+            <button
+              className={styles.detailStepButton}
+              type="button"
+              onClick={() => setSelectedProject(nextProject)}
+            >
+              Next
+            </button>
+          </div>
+          <button
+            className={styles.detailCloseButton}
+            type="button"
+            onClick={() => setSelectedProject(null)}
+            aria-label="Close project detail"
+          >
+            X
+          </button>
+        </div>
         <h3 className={styles.detailTitle}>{selectedProject.title}</h3>
         <p className={styles.detailTagline}>{selectedProject.tagline}</p>
 
@@ -275,18 +289,6 @@ export default function Projects() {
             {selectedProject.description}
           </p>
           <p className={styles.detailInsight}>{selectedProject.insight}</p>
-
-          <ul className={styles.stackList} aria-label="project tech stack">
-            {selectedProject.stacks.map((stack) => (
-              <li className={styles.stackItem} key={stack}>
-                <i
-                  className={`${stackIconMap[stack] ?? "devicon-devicon-plain colored"} ${styles.stackIcon}`}
-                  aria-hidden="true"
-                />
-                <span>{stack}</span>
-              </li>
-            ))}
-          </ul>
 
           <section className={styles.pagesBlock} aria-label="project pages">
             <h4>Pages</h4>
@@ -297,22 +299,17 @@ export default function Projects() {
             </ul>
           </section>
         </div>
-
-        <div className={styles.detailActions}>
-          <button
-            type="button"
-            onClick={() => setSelectedProject(previousProject)}
-          >
-            Previous
-          </button>
-          <button type="button" onClick={() => setSelectedProject(nextProject)}>
-            Next
-          </button>
-          <button type="button" onClick={() => setSelectedProject(null)}>
-            Close
-          </button>
-          <a href={selectedProject.link}>View Project</a>
-        </div>
+        <section
+          className={styles.detailStacks}
+          aria-label="project tech stack"
+        >
+          <h4>STACK</h4>
+          <ul>
+            {selectedProject.stacks.map((stack) => (
+              <li key={stack}>{stack}</li>
+            ))}
+          </ul>
+        </section>
       </div>
     </article>
   ) : null;
@@ -361,17 +358,12 @@ export default function Projects() {
 
         <div className={styles.branchScene} aria-label="프로젝트 선택">
           <BranchTransition>
-            <div className={styles.leafLayers} aria-label="프로젝트 잎 선택">
+            <ul className={styles.leafLayers} aria-label="프로젝트 잎 선택">
               {projects.map((project, index) => (
-                /*
-                 * Each leaf image is a full branch-sized layer. These state
-                 * classes keep active text above neighboring leaf artwork.
-                 */
-                <div
+                <li
                   className={[
-                    styles.leafLayer,
-                    index === 0 ? styles.firstLeafLayer : "",
-                    project.type === "sub" ? styles.sproutLeafLayer : "",
+                    styles.projectLeaf,
+                    styles[`leaf0${index + 1}`],
                     selectedProject?.id === project.id
                       ? styles.selectedLeafLayer
                       : "",
@@ -384,50 +376,48 @@ export default function Projects() {
                   key={project.id}
                   style={
                     {
+                      "--leaf-left": project.leaf.left,
+                      "--leaf-top": project.leaf.top,
+                      "--leaf-width": project.leaf.width,
+                      "--leaf-height": project.leaf.height,
                       "--leaf-origin": project.leaf.origin,
-                      "--leaf-hover-scale": project.leaf.hoverScale,
-                      "--leaf-opacity": project.leaf.opacity,
                       "--leaf-rotate": project.leaf.rotate,
                       "--leaf-scale": project.leaf.scale,
                       "--leaf-x": project.leaf.x,
                       "--leaf-y": project.leaf.y,
+                      "--leaf-opacity": project.leaf.opacity,
                       "--leaf-z": project.leaf.z,
-                      "--hotspot-height": project.leaf.height,
-                      "--hotspot-left": project.leaf.left,
-                      "--hotspot-top": project.leaf.top,
-                      "--hotspot-width": project.leaf.width,
+                      "--leaf-hover-scale": project.leaf.hoverScale,
                     } as CSSProperties
                   }
                 >
-                  <Image
-                    className={styles.leafImage}
-                    src={project.leaf.asset}
-                    alt=""
-                    width={1536}
-                    height={1024}
-                    sizes="(max-width: 640px) 560px, (max-width: 900px) 760px, (max-width: 1180px) 92vw, 88vw"
-                    aria-hidden="true"
-                  />
-                  {project.type === "main" ? (
-                    <button
-                      className={`${styles.leafHotspot} ${styles[project.type]} ${styles[project.accent]}`}
-                      type="button"
-                      onClick={() => setSelectedProject(project)}
-                      aria-label={`${project.title} 프로젝트 보기`}
-                      aria-pressed={selectedProject?.id === project.id}
-                    >
-                      <span className={styles.leafTitle}>{project.title}</span>
-                      <span className={styles.leafLine}>
-                        {project.shortLine}
-                      </span>
+                  <button
+                    className={styles.projectLeafButton}
+                    type="button"
+                    onClick={() => setSelectedProject(project)}
+                    aria-label={`${project.title} 프로젝트 보기`}
+                    aria-pressed={selectedProject?.id === project.id}
+                  >
+                    <Image
+                      className={styles.projectLeafImage}
+                      src={project.leaf.asset}
+                      alt=""
+                      width={1536}
+                      height={1024}
+                      sizes="(max-width: 640px) 220px, (max-width: 900px) 260px, 320px"
+                      aria-hidden="true"
+                    />
+                    <span className={styles.projectLeafText}>
+                      <strong>{project.title}</strong>
+                      <em>{project.shortLine}</em>
                       <span className={styles.mobileLeafNumber}>
                         {String(index + 1).padStart(2, "0")}
                       </span>
-                    </button>
-                  ) : null}
-                </div>
+                    </span>
+                  </button>
+                </li>
               ))}
-            </div>
+            </ul>
           </BranchTransition>
         </div>
       </div>
