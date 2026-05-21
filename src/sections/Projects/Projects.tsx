@@ -5,17 +5,19 @@ import { useEffect, useRef, useState } from "react";
 
 import ProjectBranchScene from "./ProjectBranchScene";
 import type { Project } from "./ProjectBranchScene";
-import { stackIconClassMap } from "./projectStackIcons";
 import styles from "./Projects.module.css";
 
-const getStackFallbackLabel = (stack: string) =>
-  stack
-    .split(/\s+|\.|-/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 3)
-    .toUpperCase();
+const getProjectDisplayTitle = (project: Project) =>
+  project.id === "landing" ? "랜딩페이지" : project.title;
+
+const getShortDescription = (text: string) => {
+  const sentences = text
+    .split(/(?<=[.!?。])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+
+  return sentences.length > 1 ? sentences.slice(0, 2).join(" ") : text;
+};
 
 const projects: Project[] = [
   {
@@ -363,6 +365,9 @@ export default function Projects() {
   const previewImageKey = selectedProject
     ? `${selectedProject.id}:${previewImage}`
     : "";
+  const selectedProjectDisplayTitle = selectedProject
+    ? getProjectDisplayTitle(selectedProject)
+    : "";
 
   const selectProject = (project: Project) => {
     setSelectedProject(project);
@@ -421,7 +426,7 @@ export default function Projects() {
         >
           {brokenImages[previewImageKey] || !previewImage ? (
             <span className={styles.previewFallback}>
-              {selectedProject.title}
+              {selectedProjectDisplayTitle}
             </span>
           ) : (
             <Image
@@ -458,7 +463,7 @@ export default function Projects() {
               <span className={styles.navText}>Prev</span>
             </button>
             <p className={styles.detailKicker}>
-              <span>SELECTED PROJECT</span>
+              <span>PROJECT</span>
               <strong>{String(selectedIndex + 1).padStart(2, "0")}</strong>
             </p>
             <button
@@ -474,24 +479,37 @@ export default function Projects() {
             </button>
           </div>
         </div>
-        <h3 className={styles.detailTitle}>{selectedProject.title}</h3>
+        <h3 className={styles.detailTitle}>{selectedProjectDisplayTitle}</h3>
         <p className={styles.detailTagline}>{selectedProject.tagline}</p>
 
         <div className={styles.detailBody}>
-          <p className={styles.detailProjectMeta}>
-            {[selectedProject.period, selectedProject.team]
-              .filter(Boolean)
-              .join(" / ")}
+          <ul className={styles.detailMetaList}>
+            <li>
+              {[selectedProject.period, selectedProject.team]
+                .filter(Boolean)
+                .join(" / ")}
+            </li>
+            <li>{selectedProject.role ?? selectedProject.projectNature}</li>
+          </ul>
+          <p className={styles.detailSummary}>
+            {getShortDescription(selectedProject.description)}
           </p>
-          <p className={styles.detailProjectMeta}>
-            {selectedProject.role ?? selectedProject.projectNature}
-          </p>
-          <p className={styles.detailSummary}>{selectedProject.description}</p>
         </div>
         <div className={styles.detailMetaArea}>
           <section className={styles.pagesBlock} aria-label="project pages">
             <h4>Pages</h4>
             <ul>
+              {selectedProject.planning ? (
+                <li>
+                  <button
+                    type="button"
+                    className={styles.pageTextButton}
+                    onClick={() => setIsPlanningOpen(true)}
+                  >
+                    {selectedProject.planning.title}
+                  </button>
+                </li>
+              ) : null}
               {selectedProject.pages.map((page) => (
                 <li key={page.name}>
                   <button
@@ -504,17 +522,6 @@ export default function Projects() {
                   </button>
                 </li>
               ))}
-              {selectedProject.planning ? (
-                <li>
-                  <button
-                    type="button"
-                    className={styles.pageTextButton}
-                    onClick={() => setIsPlanningOpen(true)}
-                  >
-                    {selectedProject.planning.title}
-                  </button>
-                </li>
-              ) : null}
             </ul>
           </section>
 
@@ -523,20 +530,12 @@ export default function Projects() {
             aria-label="project tech stack"
           >
             <h4>STACK</h4>
-            <ul>
-              {selectedProject.stacks.map((stack) => {
-                const iconClass = stackIconClassMap[stack];
-
-                return (
-                  <li key={stack} aria-label={stack} title={stack}>
-                    {iconClass ? (
-                      <i className={iconClass} aria-hidden="true" />
-                    ) : (
-                      <span>{getStackFallbackLabel(stack)}</span>
-                    )}
-                  </li>
-                );
-              })}
+            <ul className={styles.stackTextList}>
+              {selectedProject.stacks.map((stack) => (
+                <li key={stack} aria-label={stack} title={stack}>
+                  {stack}
+                </li>
+              ))}
             </ul>
           </section>
         </div>

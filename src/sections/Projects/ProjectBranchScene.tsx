@@ -1,10 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import type { CSSProperties } from "react";
-import { useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 
-import BranchTransition from "./BranchTransition";
 import styles from "./Projects.module.css";
 
 export type Project = {
@@ -62,24 +60,67 @@ type ProjectBranchSceneProps = {
   selectedProject: Project | null;
 };
 
-const branchLabelRotateOffset = 19;
+const PROJECT_LEAF_HIT_AREAS = [
+  {
+    id: "landing",
+    left: "31.00%",
+    top: "40.95%",
+    width: "9.6%",
+    height: "12.2%",
+    rotate: "-36.8deg",
+    clipPath: "ellipse(40% 32% at 52% 50%)",
+    debugColor: "rgba(255, 78, 78, 0.34)",
+  },
+  {
+    id: "ypbooks",
+    left: "40.15%",
+    top: "51.25%",
+    width: "7.8%",
+    height: "19.8%",
+    rotate: "4deg",
+    clipPath: "ellipse(40% 32% at 50% 50%)",
+    debugColor: "rgba(255, 180, 60, 0.34)",
+  },
+  {
+    id: "mute",
+    left: "59.80%",
+    top: "33.15%",
+    width: "20.6%",
+    height: "37.8%",
+    rotate: "13.8deg",
+    clipPath: "ellipse(43% 33% at 50% 50%)",
+    debugColor: "rgba(68, 177, 255, 0.34)",
+  },
+  {
+    id: "goreon",
+    left: "80.05%",
+    top: "17.15%",
+    width: "25.7%",
+    height: "45.6%",
+    rotate: "-5deg",
+    clipPath: "ellipse(44% 32% at 50% 50%)",
+    debugColor: "rgba(104, 255, 132, 0.34)",
+  },
+  {
+    id: "hangeul",
+    left: "62.15%",
+    top: "72.15%",
+    width: "27.6%",
+    height: "41.2%",
+    rotate: "-37.5deg",
+    clipPath: "ellipse(42% 33% at 50% 50%)",
+    debugColor: "rgba(185, 115, 255, 0.34)",
+  },
+];
 
-const leafHitAreaAdjustments: Record<
-  string,
-  { height?: string; width?: string; x?: string; y?: string }
-> = {};
-
-const leafLabelAdjustments: Record<
-  string,
-  { rotate?: string; width?: string; x?: string; y?: string }
-> = {};
-
-const invertRotate = (rotate: string) => {
-  const rotateValue = Number.parseFloat(rotate);
-
-  return Number.isFinite(rotateValue)
-    ? `${-(rotateValue + branchLabelRotateOffset)}deg`
-    : "0deg";
+type HitAreaStyle = CSSProperties & {
+  "--hit-clip": string;
+  "--hit-debug-color": string;
+  "--hit-height": string;
+  "--hit-left": string;
+  "--hit-rotate": string;
+  "--hit-top": string;
+  "--hit-width": string;
 };
 
 export default function ProjectBranchScene({
@@ -87,13 +128,13 @@ export default function ProjectBranchScene({
   projects,
   selectedProject,
 }: ProjectBranchSceneProps) {
-  const [hasPlayedLeafHint, setHasPlayedLeafHint] = useState(false);
-  const [isLeafHintActive, setIsLeafHintActive] = useState(false);
+  const sceneRef = useRef<HTMLDivElement | null>(null);
+  const [isLeafHintEntered, setIsLeafHintEntered] = useState(false);
 
   useEffect(() => {
-    const projectsSection = document.getElementById("projects");
+    const scene = sceneRef.current;
 
-    if (!projectsSection || hasPlayedLeafHint) {
+    if (!scene) {
       return;
     }
 
@@ -102,109 +143,93 @@ export default function ProjectBranchScene({
     );
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) {
-          return;
-        }
-
-        setIsLeafHintActive(true);
-        setHasPlayedLeafHint(true);
-        observer.disconnect();
+        setIsLeafHintEntered(entry.isIntersecting);
       },
       { root: scrollContainer, threshold: 0.42 },
     );
 
-    observer.observe(projectsSection);
+    observer.observe(scene);
 
     return () => {
       observer.disconnect();
     };
-  }, [hasPlayedLeafHint]);
+  }, []);
 
   return (
-    <div className={styles.branchScene} aria-label="프로젝트 선택">
-      <BranchTransition>
-        <ul className={styles.leafLayers} aria-label="프로젝트 잎 선택">
-          {projects.map((project, index) => {
-            const hitArea = leafHitAreaAdjustments[project.id] ?? {};
-            const label = leafLabelAdjustments[project.id] ?? {};
+    <div
+      ref={sceneRef}
+      className={[
+        styles.projectBranchScene,
+        isLeafHintEntered ? styles.projectBranchSceneEntered : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-hidden="true"
+    >
+      <div className={styles.projectBranchObject}>
+        <Image
+          className={styles.projectBranchComposite}
+          src="/img/branch/project-branch-hint.png"
+          alt=""
+          width={2146}
+          height={825}
+          sizes="(max-width: 900px) 112vw, 64vw"
+          aria-hidden="true"
+        />
+        <span className={styles.projectLeafHintPosition}>
+          <Image
+            className={styles.projectLeafHint}
+            src="/img/branch/project-leaf-hint-v2.png"
+            alt=""
+            width={1536}
+            height={1024}
+            sizes="(max-width: 900px) 190px, 26vw"
+            aria-hidden="true"
+          />
+        </span>
+        <div
+          className={styles.projectLeafHitLayer}
+          role="group"
+          aria-label="Project leaves"
+        >
+          {PROJECT_LEAF_HIT_AREAS.map((hit) => {
+            const project = projects.find((item) => item.id === hit.id);
+
+            if (!project) {
+              return null;
+            }
 
             return (
-              <li
-              className={[
-                styles.projectLeaf,
-                styles[`leaf0${index + 1}`],
-                selectedProject?.id === project.id
-                  ? styles.selectedLeafLayer
-                  : "",
-                selectedProject && selectedProject.id !== project.id
-                  ? styles.inactiveLeafLayer
-                  : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              key={project.id}
-              data-entry-hint={
-                index === 0 && isLeafHintActive ? "true" : undefined
-              }
-              onAnimationEnd={
-                index === 0 ? () => setIsLeafHintActive(false) : undefined
-              }
-              style={
-                {
-                  "--leaf-label-rotate":
-                    label.rotate ?? invertRotate(project.leaf.rotate),
-                  "--leaf-label-width": label.width ?? "76%",
-                  "--leaf-label-x": label.x ?? "0px",
-                  "--leaf-label-y": label.y ?? "0px",
-                  "--leaf-hit-width": hitArea.width ?? "72%",
-                  "--leaf-hit-height": hitArea.height ?? "54%",
-                  "--leaf-hit-x": hitArea.x ?? "0px",
-                  "--leaf-hit-y": hitArea.y ?? "0px",
-                  "--leaf-left": project.leaf.left,
-                  "--leaf-top": project.leaf.top,
-                  "--leaf-width": project.leaf.width,
-                  "--leaf-height": project.leaf.height,
-                  "--leaf-origin": project.leaf.origin,
-                  "--leaf-rotate": project.leaf.rotate,
-                  "--leaf-scale": project.leaf.scale,
-                  "--leaf-x": project.leaf.x,
-                  "--leaf-y": project.leaf.y,
-                  "--leaf-opacity": project.leaf.opacity,
-                  "--leaf-z": project.leaf.z,
-                  "--leaf-hover-scale": project.leaf.hoverScale,
-                } as CSSProperties
-              }
-            >
               <button
-                className={styles.projectLeafButton}
+                key={hit.id}
                 type="button"
-                onClick={() => onSelectProject(project)}
+                className={[
+                  styles.projectLeafHitArea,
+                  selectedProject?.id === hit.id
+                    ? styles.projectLeafHitAreaActive
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                style={
+                  {
+                    "--hit-left": hit.left,
+                    "--hit-top": hit.top,
+                    "--hit-width": hit.width,
+                    "--hit-height": hit.height,
+                    "--hit-rotate": hit.rotate,
+                    "--hit-clip": hit.clipPath,
+                    "--hit-debug-color": hit.debugColor,
+                  } as HitAreaStyle
+                }
                 aria-label={`${project.title} 프로젝트 보기`}
-                aria-pressed={selectedProject?.id === project.id}
+                aria-pressed={selectedProject?.id === hit.id}
+                onClick={() => onSelectProject(project)}
               />
-              <span className={styles.projectLeafVisual}>
-                  <Image
-                    className={styles.projectLeafImage}
-                    src={project.leaf.asset}
-                    alt=""
-                    width={1536}
-                    height={1024}
-                    sizes="(max-width: 640px) 220px, (max-width: 900px) 260px, 320px"
-                    aria-hidden="true"
-                  />
-                  <span className={styles.projectLeafLabel}>
-                    <strong>{project.title}</strong>
-                    <em>{project.shortLine}</em>
-                    <span className={styles.mobileLeafNumber}>
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                  </span>
-              </span>
-            </li>
-          );
+            );
           })}
-        </ul>
-      </BranchTransition>
+        </div>
+      </div>
     </div>
   );
 }
