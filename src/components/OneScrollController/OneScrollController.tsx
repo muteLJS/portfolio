@@ -6,6 +6,7 @@ const sectionIds = ["hero", "about", "projects", "contact"] as const;
 const wheelThreshold = 28;
 const touchThreshold = 42;
 const scrollLockMs = 920;
+const clampIndex = (value: number, max: number) => Math.min(Math.max(value, 0), max);
 
 export default function OneScrollController() {
   const activeIndexRef = useRef(0);
@@ -32,12 +33,11 @@ export default function OneScrollController() {
         return;
       }
 
-      const viewportCenter = scrollContainer.scrollTop + scrollContainer.clientHeight * 0.5;
       const nearestIndex = sections.reduce((nearest, section, index) => {
-        const currentCenter = section.offsetTop + section.offsetHeight * 0.5;
-        const nearestCenter = sections[nearest].offsetTop + sections[nearest].offsetHeight * 0.5;
-        const currentDistance = Math.abs(currentCenter - viewportCenter);
-        const nearestDistance = Math.abs(nearestCenter - viewportCenter);
+        const currentDistance = Math.abs(section.offsetTop - scrollContainer.scrollTop);
+        const nearestDistance = Math.abs(
+          sections[nearest].offsetTop - scrollContainer.scrollTop,
+        );
 
         return currentDistance < nearestDistance ? index : nearest;
       }, activeIndexRef.current);
@@ -77,7 +77,7 @@ export default function OneScrollController() {
 
     const moveSection = (direction: 1 | -1) => {
       syncActiveIndex();
-      scrollToIndex(activeIndexRef.current + direction);
+      scrollToIndex(clampIndex(activeIndexRef.current + direction, sections.length - 1));
     };
 
     const isInteractiveTarget = (target: EventTarget | null) =>

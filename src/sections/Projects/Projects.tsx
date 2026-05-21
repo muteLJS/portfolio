@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import ProjectBranchScene from "./ProjectBranchScene";
 import type { Project } from "./ProjectBranchScene";
+import { getProjectStackIcon } from "./projectStackIcons";
 import styles from "./Projects.module.css";
 
 const getProjectDisplayTitle = (project: Project) =>
@@ -479,31 +480,110 @@ const initialDebugProject = DETAIL_DEBUG_PROJECT_ID
 
 const projectPlaybackRate = 0.62;
 
+const getValidPages = (project: Project | null) => {
+  if (!project) {
+    return [];
+  }
+
+  return project.pages.filter(
+    (page) => page.image || page.previewImage || page.externalUrl,
+  );
+};
+
+const getInitialPageName = (project: Project | null) =>
+  getValidPages(project)[0]?.name ?? project?.pages[0]?.name ?? null;
+
+const getReadableTextColor = (index: number, total: number) => {
+  const ratio = total <= 1 ? 0 : index / (total - 1);
+
+  if (ratio < 0.45) {
+    return "rgba(255, 249, 224, 0.8)";
+  }
+
+  if (ratio < 0.75) {
+    return "rgba(204, 210, 188, 0.78)";
+  }
+
+  return "rgba(42, 62, 54, 0.72)";
+};
+
+const getStackShortLabel = (stack: string) => {
+  const labelMap: Record<string, string> = {
+    "React Router": "Router",
+    "Redux Toolkit": "Redux",
+    "Node.js": "Node",
+    "Cloudflare R2": "R2",
+    "OpenAI API": "OpenAI",
+    "Google OAuth": "Google",
+    "Kakao OAuth": "Kakao",
+    "Naver OAuth": "Naver",
+    Photoshop: "Ps",
+    Illustrator: "Ai",
+    "Bcrypt JS": "Bcrypt",
+    MongoDB: "Mongo",
+  };
+
+  return labelMap[stack] ?? stack;
+};
+
+const getStackFallbackLabel = (stack: string) => {
+  if (/[가-힣]/.test(stack)) {
+    return stack.replace(/\s+/g, "").slice(0, 2);
+  }
+
+  return stack
+    .split(/\s+|\.|-/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 3)
+    .toUpperCase();
+};
+
+const projectRoleFallbackMap: Record<string, string> = {
+  landing: "기획 / 디자인 / 구현",
+  ypbooks: "기획 / 디자인 / 구현",
+  mute: "기획 참여 / 로그인 / 퍼블리싱 / 라이브러리",
+  goreon: "개발 담당",
+  hangeul: "기획 / 디자인 / 구현",
+};
+
+const getProjectRoleText = (project: Project) =>
+  project.role ||
+  project.contribution ||
+  projectRoleFallbackMap[project.id] ||
+  project.projectNature ||
+  "";
+
 export default function Projects() {
   const [selectedProject, setSelectedProject] =
     useState<Project | null>(initialDebugProject);
   const [selectedPageName, setSelectedPageName] = useState<string | null>(
-    initialDebugProject?.pages[0]?.name ?? null,
+    getInitialPageName(initialDebugProject),
   );
   const [isPlanningOpen, setIsPlanningOpen] = useState(false);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [isPagesExpanded, setIsPagesExpanded] = useState(false);
+  const [isPagesOpen, setIsPagesOpen] = useState(false);
+  const [isStacksOpen, setIsStacksOpen] = useState(false);
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const [isDescriptionOverflowing, setIsDescriptionOverflowing] = useState(false);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const sectionRef = useRef<HTMLElement | null>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement | null>(null);
+  const summaryRef = useRef<HTMLParagraphElement | null>(null);
   const selectedIndex = selectedProject
     ? projects.findIndex((project) => project.id === selectedProject.id)
     : 0;
   const previousProject =
     projects[(selectedIndex - 1 + projects.length) % projects.length];
   const nextProject = projects[(selectedIndex + 1) % projects.length];
+  const validPages = getValidPages(selectedProject);
   const selectedPage =
-    selectedProject?.pages.find((page) => page.name === selectedPageName) ??
+    validPages.find((page) => page.name === selectedPageName) ??
+    validPages[0] ??
     selectedProject?.pages[0] ??
     null;
   const previewImage = selectedPage?.previewImage ?? selectedPage?.image ?? "";
-  const selectedExternalUrl =
-    selectedPage?.externalUrl ?? selectedProject?.siteUrl ?? null;
+  const previewHref = selectedPage?.externalUrl ?? null;
   const previewImageKey = selectedProject
     ? `${selectedProject.id}:${previewImage}`
     : "";
@@ -511,25 +591,36 @@ export default function Projects() {
     ? getProjectDisplayTitle(selectedProject)
     : "";
   const pagePreviewLimit = selectedProject?.planning ? 4 : 5;
-  const visiblePages = selectedProject
-    ? isPagesExpanded
-      ? selectedProject.pages
-      : selectedProject.pages.slice(0, pagePreviewLimit)
-    : [];
+  const visiblePages = validPages.slice(0, pagePreviewLimit);
+  const hiddenPages = validPages.slice(pagePreviewLimit);
   const hiddenPageCount = selectedProject
-    ? Math.max(selectedProject.pages.length - visiblePages.length, 0)
+    ? Math.max(validPages.length - visiblePages.length, 0)
     : 0;
-  const visibleStacks = selectedProject ? selectedProject.stacks.slice(0, 6) : [];
-  const hiddenStackCount = selectedProject
-    ? Math.max(selectedProject.stacks.length - visibleStacks.length, 0)
-    : 0;
-
+  const shownStacks = selectedProject?.stacks.slice(0, 8) ?? [];
+  const hiddenStacks = selectedProject?.stacks.slice(8) ?? [];
+  const hiddenStackCount = hiddenStacks.length;
   const selectProject = (project: Project) => {
     setSelectedProject(project);
-    setSelectedPageName(project.pages[0]?.name ?? null);
+    setSelectedPageName(getInitialPageName(project));
     setIsPlanningOpen(false);
-    setIsPreviewOpen(false);
-    setIsPagesExpanded(false);
+    setIsPagesOpen(false);
+    setIsStacksOpen(false);
+    setIsDescriptionOpen(false);
+  };
+
+  const handlePlanningClick = () => {
+    setIsPlanningOpen(true);
+    setIsPagesOpen(false);
+    setIsStacksOpen(false);
+    setIsDescriptionOpen(false);
+  };
+
+  const handlePageClick = (pageName: string) => {
+    setSelectedPageName(pageName);
+    setIsPlanningOpen(false);
+    setIsPagesOpen(false);
+    setIsStacksOpen(false);
+    setIsDescriptionOpen(false);
   };
 
   useEffect(() => {
@@ -544,14 +635,13 @@ export default function Projects() {
   }, []);
 
   useEffect(() => {
-    if (!isPlanningOpen && !isPreviewOpen) {
+    if (!isPlanningOpen) {
       return;
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsPlanningOpen(false);
-        setIsPreviewOpen(false);
       }
     };
 
@@ -560,7 +650,45 @@ export default function Projects() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isPlanningOpen, isPreviewOpen]);
+  }, [isPlanningOpen]);
+
+  useEffect(() => {
+    const summary = summaryRef.current;
+
+    const measure = () => {
+      if (!summary) {
+        setIsDescriptionOverflowing(false);
+        return;
+      }
+
+      const computedStyle = window.getComputedStyle(summary);
+      const lineHeight = Number.parseFloat(computedStyle.lineHeight);
+      const collapsedHeight = lineHeight * 3;
+
+      setIsDescriptionOverflowing(summary.scrollHeight > collapsedHeight + 2);
+    };
+
+    const frame = window.requestAnimationFrame(measure);
+
+    if (!summary) {
+      return () => {
+        window.cancelAnimationFrame(frame);
+      };
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      measure();
+    });
+
+    resizeObserver.observe(summary);
+    window.addEventListener("resize", measure);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [selectedProject?.id, selectedProject?.description]);
 
   const previewContent = selectedProject ? (
     brokenImages[previewImageKey] || !previewImage ? (
@@ -586,43 +714,52 @@ export default function Projects() {
 
   const detailPanel = selectedProject ? (
     <article className={styles.detailPanel} aria-live="polite">
-      <button
-        className={styles.detailCloseButton}
-        type="button"
-        onClick={() => {
-          setSelectedProject(null);
-          setIsPlanningOpen(false);
-          setIsPreviewOpen(false);
-        }}
-        aria-label="Close project detail"
-      >
-        ×
-      </button>
-
       <div className={styles.previewFrame}>
         <button
           type="button"
-          className={styles.previewMediaButton}
-          disabled={!previewImage || brokenImages[previewImageKey]}
-          onClick={() => {
-            if (previewImage && !brokenImages[previewImageKey]) {
-              setIsPreviewOpen(true);
-            }
-          }}
-          aria-label={`${selectedPage?.name ?? selectedProject.title} 화면 크게 보기`}
-        >
-          {previewContent}
-        </button>
+          className={`${styles.previewSideNav} ${styles.previewSideNavPrev}`}
+          onClick={() => selectProject(previousProject)}
+          aria-label="이전 프로젝트 보기"
+        />
+
+        {previewHref ? (
+          <a
+            className={styles.previewLink}
+            href={previewHref}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${selectedPage?.name ?? selectedProject.title} preview open in new tab`}
+          >
+            {previewContent}
+          </a>
+        ) : (
+          <div
+            className={styles.previewLink}
+            data-clickable="false"
+            aria-label={`${selectedPage?.name ?? selectedProject.title} preview`}
+          >
+            {previewContent}
+          </div>
+        )}
+
+        <button
+          type="button"
+          className={`${styles.previewSideNav} ${styles.previewSideNavNext}`}
+          onClick={() => selectProject(nextProject)}
+          aria-label="다음 프로젝트 보기"
+        />
+
         <button
           className={styles.detailCloseButton}
           type="button"
           onClick={() => {
             setSelectedProject(null);
             setIsPlanningOpen(false);
-            setIsPreviewOpen(false);
-            setIsPagesExpanded(false);
+            setIsPagesOpen(false);
+            setIsStacksOpen(false);
+            setIsDescriptionOpen(false);
           }}
-          aria-label="Close project detail"
+          aria-label="프로젝트 닫기"
         >
           ×
         </button>
@@ -630,121 +767,244 @@ export default function Projects() {
 
       <div className={styles.detailContent}>
         <div className={styles.detailHeader}>
-          <div className={styles.detailNavRow}>
-            <button
-              className={styles.detailNavButton}
-              type="button"
-              onClick={() => selectProject(previousProject)}
-              aria-label="Previous project"
-            >
-              <span className={styles.navArrow} aria-hidden="true">
-                &lt;
-              </span>
-              <span className={styles.navText}>Prev</span>
-            </button>
-            <p className={styles.detailKicker}>
-              <span>Project</span>
-              <strong>{String(selectedIndex + 1).padStart(2, "0")}</strong>
-            </p>
-            <button
-              className={styles.detailNavButton}
-              type="button"
-              onClick={() => selectProject(nextProject)}
-              aria-label="Next project"
-            >
-              <span className={styles.navText}>Next</span>
-              <span className={styles.navArrow} aria-hidden="true">
-                &gt;
-              </span>
-            </button>
-          </div>
+          <h3 className={styles.detailTitle}>{selectedProjectDisplayTitle}</h3>
+          <p className={styles.detailTagline}>{selectedProject.tagline}</p>
         </div>
-        <h3 className={styles.detailTitle}>{selectedProjectDisplayTitle}</h3>
-        <p className={styles.detailTagline}>{selectedProject.tagline}</p>
 
-        <div className={styles.detailBody}>
+        <div className={`${styles.detailBody} ${styles.detailText}`}>
           <ul className={styles.detailMetaList}>
             <li>
               {[selectedProject.period, selectedProject.team]
                 .filter(Boolean)
                 .join(" / ")}
             </li>
-            <li>{selectedProject.role ?? selectedProject.projectNature}</li>
+            <li>{getProjectRoleText(selectedProject)}</li>
           </ul>
-          <p className={styles.detailSummary}>{selectedProject.description}</p>
-        </div>
-        <div className={styles.detailMetaArea}>
-          <section className={styles.pagesBlock} aria-label="project pages">
-            <div className={styles.pagesHeader}>
-              <h4>Pages</h4>
-              {selectedExternalUrl ? (
-                <a
-                  className={styles.externalPageLink}
-                  href={selectedExternalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${selectedProject.title} ${
-                    selectedPage?.name ?? ""
-                  } page open in new tab`}
-                >
-                  사이트 보기
-                </a>
-              ) : null}
-            </div>
-            <ul>
-              {selectedProject.planning ? (
-                <li>
-                  <button
-                    type="button"
-                    className={styles.pageTextButton}
-                    onClick={() => setIsPlanningOpen(true)}
-                  >
-                    {selectedProject.planning.title}
-                  </button>
-                </li>
-              ) : null}
-              {visiblePages.map((page) => (
-                <li key={page.name}>
-                  <button
-                    type="button"
-                    className={styles.pageTextButton}
-                    data-active={selectedPage?.name === page.name}
-                    onClick={() => setSelectedPageName(page.name)}
-                  >
-                    {page.name}
-                  </button>
-                </li>
-              ))}
-              {hiddenPageCount > 0 ? (
-                <li>
-                  <button
-                    type="button"
-                    className={styles.pageTextButton}
-                    aria-expanded={isPagesExpanded}
-                    onClick={() => setIsPagesExpanded(true)}
-                  >
-                    +{hiddenPageCount}
-                  </button>
-                </li>
-              ) : null}
-            </ul>
-          </section>
-
-          <section
-            className={styles.detailStacks}
-            aria-label="project tech stack"
-          >
-            <h4>STACK</h4>
-            <ul
-              className={styles.stackTextList}
-              title={selectedProject.stacks.join(" / ")}
+          <div className={styles.descriptionBlock}>
+            <p
+              ref={summaryRef}
+              className={styles.detailSummary}
+              data-expanded={isDescriptionOpen ? "true" : "false"}
+              data-overflowing={isDescriptionOverflowing ? "true" : "false"}
             >
-              {visibleStacks.map((stack) => (
-                <li key={stack}>{stack}</li>
-              ))}
-              {hiddenStackCount > 0 ? <li>+{hiddenStackCount}</li> : null}
-            </ul>
-          </section>
+              {selectedProject.description}
+            </p>
+            {isDescriptionOverflowing ? (
+              <button
+                type="button"
+                className={styles.descriptionToggle}
+                onClick={() => {
+                  setIsDescriptionOpen((value) => !value);
+                  setIsPagesOpen(false);
+                  setIsStacksOpen(false);
+                  setIsPlanningOpen(false);
+                }}
+                aria-expanded={isDescriptionOpen}
+                aria-label={isDescriptionOpen ? "설명 접기" : "설명 펼치기"}
+              >
+                <span className={styles.descriptionChevron} aria-hidden="true" />
+              </button>
+            ) : null}
+          </div>
+        </div>
+        <div
+          className={styles.bottomInfo}
+          data-hidden={isDescriptionOpen ? "true" : "false"}
+          aria-hidden={isDescriptionOpen}
+        >
+          <div className={styles.detailMetaArea}>
+            {isPlanningOpen ? (
+            <div className={styles.planningInlinePanel}>
+              <p className={styles.planningInlineEyebrow}>
+                {selectedProject.planning?.title}
+              </p>
+              <p>{selectedProject.planning?.summary}</p>
+              {selectedProject.planning?.image ? (
+                <Image
+                  className={styles.planningInlineImage}
+                  src={selectedProject.planning.image}
+                  alt={`${selectedProject.title} planning document`}
+                  width={1200}
+                  height={800}
+                  sizes="(max-width: 900px) calc(100vw - 64px), 480px"
+                />
+              ) : null}
+              <button
+                type="button"
+                className={styles.planningInlineClose}
+                onClick={() => setIsPlanningOpen(false)}
+              >
+                닫기
+              </button>
+            </div>
+          ) : (
+            <>
+              <section className={styles.pagesBlock} aria-label="project pages">
+                <div className={styles.pagesHeader}>
+                  <h4>Pages</h4>
+                </div>
+                <div className={styles.inlineOverflowRow}>
+                  <ul className={styles.pageQuickList}>
+                    {selectedProject.planning ? (
+                      <li>
+                        <button
+                          type="button"
+                          className={styles.pageTextButton}
+                          onClick={handlePlanningClick}
+                        >
+                          {selectedProject.planning.title}
+                        </button>
+                      </li>
+                    ) : null}
+                    {visiblePages.map((page) => (
+                      <li key={page.name}>
+                        <button
+                          type="button"
+                          className={styles.pageTextButton}
+                          data-active={selectedPage?.name === page.name}
+                          onClick={() => handlePageClick(page.name)}
+                        >
+                          {page.name}
+                        </button>
+                      </li>
+                    ))}
+                    {hiddenPageCount > 0 ? (
+                      <li className={styles.overflowMoreItem}>
+                        <button
+                          type="button"
+                          className={styles.overflowMoreButton}
+                          onClick={() => {
+                            setIsStacksOpen(false);
+                            setIsDescriptionOpen(false);
+                            setIsPagesOpen((value) => !value);
+                          }}
+                        >
+                          +{hiddenPageCount}
+                        </button>
+                        {isPagesOpen && hiddenPages.length > 0 ? (
+                          <div className={styles.sideFlyout}>
+                            {hiddenPages.map((page, index) => (
+                              <button
+                                key={page.name}
+                                type="button"
+                                className={styles.sideFlyoutButton}
+                                style={
+                                  {
+                                    "--i": index,
+                                  } as CSSProperties
+                                }
+                                onClick={() => handlePageClick(page.name)}
+                              >
+                                {page.name}
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
+                      </li>
+                    ) : null}
+                  </ul>
+                </div>
+              </section>
+
+              <section
+                className={styles.detailStacks}
+                aria-label="project tech stack"
+              >
+                <h4>STACK</h4>
+
+                <div className={styles.inlineOverflowRow}>
+                  <ul
+                    className={styles.stackIconList}
+                    title={selectedProject.stacks.join(" / ")}
+                  >
+                    {shownStacks.map((stack, index) => {
+                      const stackIcon = getProjectStackIcon(stack);
+
+                      return (
+                        <li
+                          key={stack}
+                          className={styles.stackIconItem}
+                          title={stack}
+                          style={
+                            {
+                              "--readable-color": getReadableTextColor(
+                                index,
+                                selectedProject.stacks.length,
+                              ),
+                            } as CSSProperties
+                          }
+                        >
+                          {stackIcon ? (
+                            <i
+                              className={`${stackIcon.className} ${styles.stackIcon}`}
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            <span className={styles.stackIconFallback} aria-hidden="true">
+                              {getStackFallbackLabel(stack)}
+                            </span>
+                          )}
+                          <span className={styles.stackIconLabel}>
+                            {getStackShortLabel(stack)}
+                          </span>
+                        </li>
+                      );
+                    })}
+                    {hiddenStackCount > 0 ? (
+                      <li className={`${styles.stackMoreItem} ${styles.overflowMoreItem}`}>
+                        <button
+                          type="button"
+                          className={styles.overflowMoreButton}
+                          onClick={() => {
+                            setIsPagesOpen(false);
+                            setIsDescriptionOpen(false);
+                            setIsStacksOpen((value) => !value);
+                          }}
+                        >
+                          +{hiddenStackCount}
+                        </button>
+                        {isStacksOpen && hiddenStacks.length > 0 ? (
+                          <div className={`${styles.sideFlyout} ${styles.stackSideFlyout}`}>
+                            {hiddenStacks.map((stack, index) => {
+                              const stackIcon = getProjectStackIcon(stack);
+
+                              return (
+                                <div
+                                  key={stack}
+                                  className={styles.stackFlyoutItem}
+                                  title={stack}
+                                  style={
+                                    {
+                                      "--i": index,
+                                    } as CSSProperties
+                                  }
+                                >
+                                  {stackIcon ? (
+                                    <i
+                                      className={`${stackIcon.className} ${styles.stackIcon}`}
+                                      aria-hidden="true"
+                                    />
+                                  ) : (
+                                    <span className={styles.stackIconFallback} aria-hidden="true">
+                                      {getStackFallbackLabel(stack)}
+                                    </span>
+                                  )}
+                                  <span className={styles.stackIconLabel}>
+                                    {getStackShortLabel(stack)}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : null}
+                      </li>
+                    ) : null}
+                  </ul>
+                </div>
+              </section>
+            </>
+          )}
+          </div>
         </div>
       </div>
     </article>
@@ -799,81 +1059,6 @@ export default function Projects() {
         selectedProject={selectedProject}
         onSelectProject={selectProject}
       />
-
-      {isPreviewOpen && previewImage ? (
-        <div
-          className={styles.previewViewerOverlay}
-          role="dialog"
-          aria-modal="true"
-          aria-label="프로젝트 화면 미리보기"
-          onClick={() => setIsPreviewOpen(false)}
-        >
-          <div
-            className={styles.previewViewer}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              type="button"
-              className={styles.previewViewerClose}
-              onClick={() => setIsPreviewOpen(false)}
-              aria-label="미리보기 닫기"
-            >
-              ×
-            </button>
-            <Image
-              className={styles.previewViewerImage}
-              src={previewImage}
-              alt={`${selectedProject?.title ?? "Project"} ${
-                selectedPage?.name ?? ""
-              } preview`}
-              width={1440}
-              height={900}
-              sizes="80vw"
-            />
-          </div>
-        </div>
-      ) : null}
-
-      {selectedProject?.planning && isPlanningOpen ? (
-        <div
-          className={styles.planningOverlay}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="planning-title"
-          onClick={() => setIsPlanningOpen(false)}
-        >
-          <div
-            className={styles.planningViewer}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              className={styles.planningCloseButton}
-              type="button"
-              onClick={() => setIsPlanningOpen(false)}
-              aria-label="Close planning viewer"
-            >
-              ×
-            </button>
-            <p className={styles.planningEyebrow}>{selectedProject.title}</p>
-            <h3 id="planning-title">{selectedProject.planning.title}</h3>
-            <p>{selectedProject.planning.summary}</p>
-            {selectedProject.planning.image ? (
-              <Image
-                className={styles.planningImage}
-                src={selectedProject.planning.image}
-                alt={`${selectedProject.title} planning document`}
-                width={1200}
-                height={800}
-                sizes="80vw"
-              />
-            ) : (
-              <div className={styles.planningFallback}>
-                기획안 이미지는 추후 추가 예정입니다.
-              </div>
-            )}
-          </div>
-        </div>
-      ) : null}
     </section>
   );
 }

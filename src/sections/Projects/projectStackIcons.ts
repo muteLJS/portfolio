@@ -39,3 +39,9 @@ export const stackIconClassMap: Record<string, string> = {
   Vue: "devicon-vuejs-plain colored",
   "추후 정리": "",
 };
+
+export const getProjectStackIcon = (stack: string) => {
+  const className = stackIconClassMap[stack];
+
+  return className ? { className } : null;
+};
