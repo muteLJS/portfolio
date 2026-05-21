@@ -4,7 +4,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import type { KeyboardEvent } from "react";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import styles from "./Projects.module.css";
 
@@ -17,11 +17,11 @@ export default function BranchTransition({
   children,
   onActivate,
 }: BranchTransitionProps) {
-  const [branchState, setBranchState] = useState({
-    phase: "hidden" as "hidden" | "about" | "projects",
-    x: 220,
-    y: 100,
-  });
+  const branchRef = useRef<HTMLDivElement | null>(null);
+  const phaseRef = useRef<"hidden" | "about" | "projects">("hidden");
+  const [phase, setPhase] = useState<"hidden" | "about" | "projects">(
+    "hidden",
+  );
 
   useEffect(() => {
     const scrollContainer = document.querySelector<HTMLElement>(
@@ -33,38 +33,62 @@ export default function BranchTransition({
       return;
     }
 
+    let frameId: number | null = null;
+
     const syncPhase = () => {
+      frameId = null;
       const viewportHeight = scrollContainer.clientHeight || window.innerHeight;
       const projectsRect = projects.getBoundingClientRect();
       const progress = Math.min(
         1,
         Math.max(0, 1 - projectsRect.top / viewportHeight),
       );
-      const nextX = Math.round(220 - progress * 220);
-      const nextY = Math.round(100 + progress * 140);
+      const nextX = 220 - progress * 220;
+      const nextY = 100 + progress * 140;
+      let nextPhase: "hidden" | "about" | "projects" = "hidden";
+      let x = 220;
+      let y = 100;
 
       if (projectsRect.top <= 0 && projectsRect.bottom > 0) {
-        setBranchState({ phase: "projects", x: 0, y: 240 });
+        nextPhase = "projects";
+        x = 0;
+        y = 240;
+      } else if (projectsRect.top > 0 && projectsRect.top <= viewportHeight) {
+        nextPhase = "about";
+        x = nextX;
+        y = nextY;
+      }
+
+      branchRef.current?.style.setProperty("--branch-enter-x", `${x}px`);
+      branchRef.current?.style.setProperty("--branch-y", `${y}px`);
+
+      if (phaseRef.current !== nextPhase) {
+        phaseRef.current = nextPhase;
+        setPhase(nextPhase);
+      }
+    };
+
+    const scheduleSync = () => {
+      if (frameId !== null) {
         return;
       }
 
-      if (projectsRect.top > 0 && projectsRect.top <= viewportHeight) {
-        setBranchState({ phase: "about", x: nextX, y: nextY });
-        return;
-      }
-
-      setBranchState({ phase: "hidden", x: 220, y: 100 });
+      frameId = window.requestAnimationFrame(syncPhase);
     };
 
     syncPhase();
-    scrollContainer.addEventListener("scroll", syncPhase, { passive: true });
-    window.addEventListener("scroll", syncPhase, { passive: true });
-    window.addEventListener("resize", syncPhase);
+    scrollContainer.addEventListener("scroll", scheduleSync, { passive: true });
+    window.addEventListener("scroll", scheduleSync, { passive: true });
+    window.addEventListener("resize", scheduleSync);
 
     return () => {
-      scrollContainer.removeEventListener("scroll", syncPhase);
-      window.removeEventListener("scroll", syncPhase);
-      window.removeEventListener("resize", syncPhase);
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      scrollContainer.removeEventListener("scroll", scheduleSync);
+      window.removeEventListener("scroll", scheduleSync);
+      window.removeEventListener("resize", scheduleSync);
     };
   }, []);
 
@@ -79,13 +103,14 @@ export default function BranchTransition({
 
   return (
     <div
+      ref={branchRef}
       className={styles.branchPosition}
       data-interactive={onActivate ? "true" : "false"}
-      data-phase={branchState.phase}
+      data-phase={phase}
       style={
         {
-          "--branch-enter-x": `${branchState.x}px`,
-          "--branch-y": `${branchState.y}px`,
+          "--branch-enter-x": "220px",
+          "--branch-y": "100px",
         } as CSSProperties
       }
     >

@@ -1,57 +1,74 @@
 "use client";
 
 import Image from "next/image";
-import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import BranchTransition from "./BranchTransition";
+import ProjectBranchScene from "./ProjectBranchScene";
+import type { Project } from "./ProjectBranchScene";
+import { stackIconClassMap } from "./projectStackIcons";
 import styles from "./Projects.module.css";
 
-type Project = {
-  accent: "dark" | "light";
-  id: string;
-  image: string;
-  leaf: {
-    asset: string;
-    left: string;
-    origin: string;
-    top: string;
-    height: string;
-    hoverScale: string;
-    opacity: string;
-    rotate: string;
-    scale: string;
-    x: string;
-    y: string;
-    z: string;
-    width: string;
-  };
-  link: string;
-  pages: string[];
-  shortLine: string;
-  tagline: string;
-  title: string;
-  type: "main" | "sub";
-  description: string;
-  insight: string;
-  stacks: string[];
-};
+const getStackFallbackLabel = (stack: string) =>
+  stack
+    .split(/\s+|\.|-/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 3)
+    .toUpperCase();
 
 const projects: Project[] = [
   {
     id: "mute",
-    title: "MUTE",
+    title: "Mute",
     type: "main",
     shortLine: "AI Music Platform",
-    tagline: "감각을 덜어내고 본질에 집중한 인터랙션 프로젝트",
+    tagline: "AI 채팅과 음악 경험을 연결한 팀 프로젝트",
+    period: "2026.02.03 ~ 2026.03.20",
+    team: "팀 프로젝트 / 3인",
+    role: "기획 전반 참여 / 로그인 기능 / 페이지 퍼블리싱 / 라이브러리 기능 구현",
+    contribution:
+      "Naver 로그인 / Kakao 로그인 / Google 로그인 / AI 채팅 / 음악 데이터 연동 / 이미지 관리 / DB 연동",
     description:
-      "불필요한 장식을 줄이고 사용자의 선택 흐름이 조용히 드러나도록 설계한 웹 경험입니다.",
-    insight:
-      "작은 전환 속도와 여백의 차이가 화면의 온도를 크게 바꾼다는 점을 다시 확인했습니다.",
-    stacks: ["Next.js", "TypeScript", "CSS Modules", "Framer Motion"],
+      "첫 팀프로젝트로 기획을 전반적으로 담당하여, 기획안 작성에 큰 기여도를 담당하고, 디자인과 개발에서도 역할 분담을 통해 로그인 기능, 페이지 퍼블리싱, 라이브러리 기능 등을 주요적으로 담당했습니다. 팀 프로젝트를 진행하며 소통이라는 부분이 가장 중요하다고 생각됩니다. 같은 기획안을 보고, 같은 페이지를 만들더라도 각자의 개성이 반영되기 때문에 모두가 공통의 방향을 설정할 수 있도록 소통에 가장 노력을 많이 하고, 배웠습니다. 또한 팀원들 모두 각자의 역량이 다른 것을 보고 배울 점이 많은 팀원들과 함께하여, 많은 것을 배우고, 생각하고, 구현까지 마무리 할 수 있었던 프로젝트입니다.",
+    insight: "",
+    skills: [
+      "Vue",
+      "JavaScript",
+      "jQuery",
+      "PHP",
+      "MySQL",
+      "OpenAI API",
+      "Cloudinary",
+      "Figma",
+    ],
+    stacks: [
+      "Vue",
+      "JavaScript",
+      "jQuery",
+      "PHP",
+      "MySQL",
+      "OpenAI API",
+      "Cloudinary",
+      "Figma",
+    ],
+    deploy: "Dothome",
     image: "/img/projects/mute-main.png",
     link: "/projects/mute",
-    pages: ["Main", "Explore", "Player", "Archive"],
+    pages: [
+      { name: "Main", image: null },
+      { name: "Login", image: null },
+      { name: "AI Chat", image: null },
+      { name: "Music Detail", image: null },
+      { name: "Library", image: null },
+      { name: "My Page", image: null },
+    ],
+    planning: {
+      title: "기획안",
+      summary:
+        "음악 경험과 AI 채팅 흐름을 연결하기 위해 서비스 구조와 팀 작업 방향을 정리한 기획 자료입니다.",
+      image: null,
+    },
     leaf: {
       asset: "/img/branch/project-leaf-main-01.png",
       left: "-3%",
@@ -74,15 +91,80 @@ const projects: Project[] = [
     title: "GOREON",
     type: "main",
     shortLine: "AI Commerce Platform",
-    tagline: "브랜드의 결을 자연스럽게 이어가는 커머스 UI",
+    tagline: "AI 상품 탐색과 PC 견적 경험을 연결한 커머스 플랫폼",
+    period: "2026.03.30 ~ 2026.04.30",
+    team: "팀 프로젝트 / 5인",
+    role: "개발 담당",
+    contribution:
+      "GitHub 세팅 / 프로젝트 초기 세팅 / 라우터 구조 설정 / 공통 레이아웃 구성 / 헤더·푸터 / 메인 페이지 / 검색창·네비바 / 로그인 기능 / 배포 / 반응형 구현 / 기획 일부 참여 / 견적 리스트 페이지 디자인 / 조립 견적 페이지 디자인",
     description:
-      "상품 탐색, 위시리스트, 상세 흐름을 하나의 차분한 쇼핑 경험으로 정리했습니다.",
-    insight:
-      "정보량이 많은 화면일수록 시선의 순서를 먼저 설계해야 사용자가 덜 피로해진다는 것을 배웠습니다.",
-    stacks: ["React", "Next.js", "CSS Modules", "Responsive UI"],
+      "숙련자와 초보자가 제일 많이 나뉘는 곳이 전문성을 요구하는 사이트라고 생각됩니다. 구입에 어려움이 없도록 AI 채팅을 통해 원하는 결과를 찾고, 구입할 수 있게 자연스러운 연결을 구현한 사이트입니다. 리액트 그리고 다양한 툴들을 사용하게 되는 시작이었고, 팀원들에게 도움을 정말 많이 받았습니다. 개발 담당이었지만 저보다 더 잘 아는 그리고 부담감 없이 도와주는 팀원들에게 많이 배웠습니다. 이전의 팀프로젝트 경험이 협업에 더욱 도움이 될 수 있었던 것 같습니다.",
+    insight: "",
+    skills: [
+      "React",
+      "Vite",
+      "React Router",
+      "Redux Toolkit",
+      "Axios",
+      "Sass",
+      "Swiper",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "JWT",
+      "Bcrypt JS",
+      "Cloudflare R2",
+      "OpenAI API",
+      "Render",
+      "Google OAuth",
+      "Kakao OAuth",
+      "Naver OAuth",
+      "GitHub",
+      "Figma",
+    ],
+    stacks: [
+      "React",
+      "Vite",
+      "React Router",
+      "Redux Toolkit",
+      "Axios",
+      "Sass",
+      "Swiper",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "JWT",
+      "Bcrypt JS",
+      "Cloudflare R2",
+      "OpenAI API",
+      "Render",
+      "Google OAuth",
+      "Kakao OAuth",
+      "Naver OAuth",
+      "GitHub",
+      "Figma",
+    ],
+    deploy: "Render",
     image: "/img/projects/goreon-main.png",
     link: "/projects/goreon",
-    pages: ["Main", "Product List", "Product Detail", "Wishlist"],
+    pages: [
+      { name: "Main", image: null },
+      { name: "Search", image: null },
+      { name: "Category", image: null },
+      { name: "Product Detail", image: null },
+      { name: "Cart", image: null },
+      { name: "Wishlist", image: null },
+      { name: "Login", image: null },
+      { name: "My Page", image: null },
+      { name: "PC Assembly", image: null },
+      { name: "Payment", image: null },
+    ],
+    planning: {
+      title: "기획안",
+      summary:
+        "AI를 활용한 상품 탐색과 구매 흐름을 설계하고, PC 견적 경험까지 연결한 서비스 기획 자료입니다.",
+      image: null,
+    },
     leaf: {
       asset: "/img/branch/project-leaf-main-02.png",
       left: "18%",
@@ -104,16 +186,32 @@ const projects: Project[] = [
     id: "hangeul",
     title: "한-글",
     type: "main",
-    shortLine: "Typography Archive",
-    tagline: "글자의 리듬을 화면 안에서 다시 관찰한 프로젝트",
+    shortLine: "Writing Growth Service",
+    tagline: "읽고 생각해 쓰는 힘을 위한 에듀테크 서비스",
+    period: "2026.05.01 ~ 진행 중",
+    team: "개인 프로젝트",
+    projectNature: "에듀테크 서비스 / 글쓰기 성장 서비스 / 개인 기준 기반 학습 플랫폼",
+    role: "기획 / 디자인 / 구현",
     description:
-      "한글의 조형성과 읽기 흐름을 중심에 두고 타이포그래피 기반 인터페이스를 구성했습니다.",
-    insight:
-      "문자는 정보이면서 동시에 분위기라는 사실을 인터페이스 안에서 섬세하게 다루고 싶었습니다.",
-    stacks: ["TypeScript", "CSS Modules", "Typography", "Interaction"],
+      "다양한 프로젝트를 경험한 후 기획부터 디자인, 구현한 에듀테크 서비스입니다. 현재 시장 조사, 그리고 만들어야 할 서비스의 시장성, 현대 사회의 문제 등을 고려하여 만들어낸 서비스로, 최근 AI의 도움을 통해 발전이 이루어지지만 한 가지 허점, 글을 직접 읽고, 생각해서 작성하는 사고적 능력이 부족해지는 부분이 있는 것을 보완하고자 기획하였습니다. 에듀테크 서비스의 목적을 이룸과 동시에 글, 그리고 문장에는 절대적인 평가기준이 없다는 것을 고려하여 현재 사용되고 있는 에듀테크 앱들에서 참고하여 서비스를 제공하고자 하였고, 그에 맞는 디자인과 기능을 추가함으로서 사용자들로 하여금 더욱 쉽고 편하게 그리고 목적에 맞게 이용할 수 있도록 하였습니다.",
+    insight: "",
+    skills: ["추후 정리"],
+    stacks: ["추후 정리"],
     image: "/img/projects/hangeul-main.png",
     link: "/projects/hangeul",
-    pages: ["Main", "Archive", "Detail", "Essay"],
+    pages: [
+      { name: "Main", image: null },
+      { name: "Writing", image: null },
+      { name: "Feedback", image: null },
+      { name: "Growth", image: null },
+      { name: "My Page", image: null },
+    ],
+    planning: {
+      title: "기획안",
+      summary:
+        "AI 시대에 직접 읽고 생각해 쓰는 사고 능력을 보완하기 위한 에듀테크 서비스 기획 자료입니다.",
+      image: null,
+    },
     leaf: {
       asset: "/img/branch/project-leaf-main-03.png",
       left: "18.6%",
@@ -133,18 +231,51 @@ const projects: Project[] = [
   },
   {
     id: "ypbooks",
-    title: "영풍문고",
+    title: "영풍문고 리디자인",
     type: "sub",
     shortLine: "Bookstore Redesign",
-    tagline: "서점의 탐색감을 정돈한 리디자인",
+    tagline: "서점의 탐색 흐름을 다시 정리한 리디자인",
+    period: "2025.12.26 ~ 2026.02.02",
+    team: "개인 프로젝트",
     description:
-      "도서 정보와 탐색 경로를 더 명확하게 읽히도록 화면 구조를 다듬었습니다.",
-    insight:
-      "익숙한 서비스일수록 변화는 작게, 개선의 이유는 분명하게 만드는 편이 좋았습니다.",
-    stacks: ["HTML", "CSS", "JavaScript"],
+      "기존 영풍문고 페이지를 보고, 사용자들이 불편함을 느끼거나 기존의 획일화된 틀을 사용하는 것이 아닌 다양한 페이지들과 레이아웃을 참고하여 저만의 기준으로 한 단계 성장시킨 페이지입니다. 두 번째 작업물로, 이전과 다르게 JavaScript와 jQuery를 활용하여 한결 더 동적인 페이지를 만들 수 있었습니다. 특히 차트 부분을 3일 정도 노력하며 만들었던 기억이 인상에 남습니다.",
+    insight: "",
+    skills: [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "jQuery",
+      "PHP",
+      "MySQL",
+      "Photoshop",
+      "Illustrator",
+    ],
+    stacks: [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "jQuery",
+      "PHP",
+      "MySQL",
+      "Photoshop",
+      "Illustrator",
+    ],
+    deploy: "Dothome",
     image: "/img/projects/ypbooks-main.png",
     link: "/projects/ypbooks",
-    pages: ["Main", "Book Detail", "Event", "Search"],
+    pages: [
+      { name: "Main", image: null },
+      { name: "Login", image: null },
+      { name: "Book Detail", image: null },
+      { name: "Chart", image: null },
+      { name: "Board", image: null },
+    ],
+    planning: {
+      title: "기획안",
+      summary:
+        "기존 서점 페이지의 정보 구조와 사용자 흐름을 다시 정리한 리디자인 기획 자료입니다.",
+      image: null,
+    },
     leaf: {
       asset: "/img/branch/project-leaf-small-01.png",
       left: "55.6%",
@@ -164,18 +295,32 @@ const projects: Project[] = [
   },
   {
     id: "landing",
-    title: "랜딩페이지",
+    title: "랜딩페이지 : ON하면 혜택이 온다",
     type: "sub",
     shortLine: "Landing UI Study",
-    tagline: "짧은 설득 흐름을 실험한 랜딩 UI",
+    tagline: "첫 개인 페이지로 구현 기준을 익힌 랜딩페이지",
+    period: "2025.12.04 ~ 2025.12.22",
+    team: "개인 프로젝트",
     description:
-      "첫 화면의 문장, 이미지, 행동 유도를 하나의 흐름으로 연결한 페이지입니다.",
-    insight:
-      "랜딩은 화려함보다 사용자가 다음 행동을 자연스럽게 이해하는지가 더 중요했습니다.",
-    stacks: ["HTML", "CSS", "JavaScript", "Responsive"],
+      "첫 개인 페이지로 부족함이 많이 보이지만, 배운 기술을 최대한 활용해서 동일하게 구현하기 위해 노력한 페이지입니다. 다양한 시선에서 볼 수 있게 되는 시작이었습니다.",
+    insight: "",
+    skills: ["HTML", "CSS", "Photoshop", "Illustrator"],
+    stacks: ["HTML", "CSS", "Photoshop", "Illustrator"],
+    deploy: "Dothome",
     image: "/img/projects/landing-main.png",
     link: "/projects/landing",
-    pages: ["Hero", "Feature", "Pricing", "Contact"],
+    pages: [
+      { name: "Main", image: null },
+      { name: "Event", image: null },
+      { name: "Benefit", image: null },
+      { name: "Guide", image: null },
+    ],
+    planning: {
+      title: "기획안",
+      summary:
+        "첫 개인 페이지 제작 과정에서 구조와 시각 구현 기준을 정리한 기획 자료입니다.",
+      image: null,
+    },
     leaf: {
       asset: "/img/branch/project-leaf-small-02.png",
       left: "45.1%",
@@ -199,6 +344,8 @@ const projectPlaybackRate = 0.62;
 
 export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedPageName, setSelectedPageName] = useState<string | null>(null);
+  const [isPlanningOpen, setIsPlanningOpen] = useState(false);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const sectionRef = useRef<HTMLElement | null>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -208,6 +355,20 @@ export default function Projects() {
   const previousProject =
     projects[(selectedIndex - 1 + projects.length) % projects.length];
   const nextProject = projects[(selectedIndex + 1) % projects.length];
+  const selectedPage =
+    selectedProject?.pages.find((page) => page.name === selectedPageName) ??
+    selectedProject?.pages[0] ??
+    null;
+  const previewImage = selectedPage?.image ?? selectedProject?.image ?? "";
+  const previewImageKey = selectedProject
+    ? `${selectedProject.id}:${previewImage}`
+    : "";
+
+  const selectProject = (project: Project) => {
+    setSelectedProject(project);
+    setSelectedPageName(project.pages[0]?.name ?? null);
+    setIsPlanningOpen(false);
+  };
 
   useEffect(() => {
     const video = backgroundVideoRef.current;
@@ -219,97 +380,166 @@ export default function Projects() {
     video.playbackRate = projectPlaybackRate;
     void video.play();
   }, []);
+
+  useEffect(() => {
+    if (!isPlanningOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsPlanningOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isPlanningOpen]);
+
   const detailPanel = selectedProject ? (
     <article className={styles.detailPanel} aria-live="polite">
-      <a
-        className={styles.previewLink}
-        href={selectedProject.link}
-        aria-label={`${selectedProject.title} project detail`}
+      <button
+        className={styles.detailCloseButton}
+        type="button"
+        onClick={() => {
+          setSelectedProject(null);
+          setIsPlanningOpen(false);
+        }}
+        aria-label="Close project detail"
       >
-        {brokenImages[selectedProject.id] ? (
-          <span className={styles.previewFallback}>
-            {selectedProject.title}
-          </span>
-        ) : (
-          <Image
-            className={styles.previewImage}
-            src={selectedProject.image}
-            alt={`${selectedProject.title} main screen`}
-            width={960}
-            height={600}
-            sizes="(max-width: 900px) calc(100vw - 64px), 560px"
-            onError={() =>
-              setBrokenImages((current) => ({
-                ...current,
-                [selectedProject.id]: true,
-              }))
-            }
-          />
-        )}
-      </a>
+        ×
+      </button>
+
+      <div className={styles.previewFrame}>
+        <a
+          className={styles.previewLink}
+          href={selectedProject.link}
+          aria-label={`${selectedProject.title} project detail`}
+        >
+          {brokenImages[previewImageKey] || !previewImage ? (
+            <span className={styles.previewFallback}>
+              {selectedProject.title}
+            </span>
+          ) : (
+            <Image
+              key={previewImage}
+              className={styles.previewImage}
+              src={previewImage}
+              alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
+              width={960}
+              height={600}
+              sizes="(max-width: 900px) calc(100vw - 64px), 560px"
+              onError={() =>
+                setBrokenImages((current) => ({
+                  ...current,
+                  [previewImageKey]: true,
+                }))
+              }
+            />
+          )}
+        </a>
+      </div>
 
       <div className={styles.detailContent}>
         <div className={styles.detailHeader}>
-          <div className={styles.detailSelector}>
+          <div className={styles.detailNavRow}>
             <button
-              className={styles.detailStepButton}
+              className={styles.detailNavButton}
               type="button"
-              onClick={() => setSelectedProject(previousProject)}
+              onClick={() => selectProject(previousProject)}
+              aria-label="Previous project"
             >
-              Previous
+              <span className={styles.navArrow} aria-hidden="true">
+                &larr;
+              </span>
+              <span className={styles.navText}>Prev</span>
             </button>
-            <div className={styles.detailMeta}>
-              <p className={styles.detailType}>SELECTED PROJECT</p>
-              <p className={styles.projectNumber}>
-                {String(selectedIndex + 1).padStart(2, "0")}
-              </p>
-            </div>
+            <p className={styles.detailKicker}>
+              <span>SELECTED PROJECT</span>
+              <strong>{String(selectedIndex + 1).padStart(2, "0")}</strong>
+            </p>
             <button
-              className={styles.detailStepButton}
+              className={styles.detailNavButton}
               type="button"
-              onClick={() => setSelectedProject(nextProject)}
+              onClick={() => selectProject(nextProject)}
+              aria-label="Next project"
             >
-              Next
+              <span className={styles.navText}>Next</span>
+              <span className={styles.navArrow} aria-hidden="true">
+                &rarr;
+              </span>
             </button>
           </div>
-          <button
-            className={styles.detailCloseButton}
-            type="button"
-            onClick={() => setSelectedProject(null)}
-            aria-label="Close project detail"
-          >
-            X
-          </button>
         </div>
         <h3 className={styles.detailTitle}>{selectedProject.title}</h3>
         <p className={styles.detailTagline}>{selectedProject.tagline}</p>
 
-        <div className={styles.detailScroll}>
-          <p className={styles.detailDescription}>
-            {selectedProject.description}
+        <div className={styles.detailBody}>
+          <p className={styles.detailProjectMeta}>
+            {[selectedProject.period, selectedProject.team]
+              .filter(Boolean)
+              .join(" / ")}
           </p>
-          <p className={styles.detailInsight}>{selectedProject.insight}</p>
-
+          <p className={styles.detailProjectMeta}>
+            {selectedProject.role ?? selectedProject.projectNature}
+          </p>
+          <p className={styles.detailSummary}>{selectedProject.description}</p>
+        </div>
+        <div className={styles.detailMetaArea}>
           <section className={styles.pagesBlock} aria-label="project pages">
             <h4>Pages</h4>
             <ul>
               {selectedProject.pages.map((page) => (
-                <li key={page}>{page}</li>
+                <li key={page.name}>
+                  <button
+                    type="button"
+                    className={styles.pageTextButton}
+                    data-active={selectedPage?.name === page.name}
+                    onClick={() => setSelectedPageName(page.name)}
+                  >
+                    {page.name}
+                  </button>
+                </li>
               ))}
+              {selectedProject.planning ? (
+                <li>
+                  <button
+                    type="button"
+                    className={styles.pageTextButton}
+                    onClick={() => setIsPlanningOpen(true)}
+                  >
+                    {selectedProject.planning.title}
+                  </button>
+                </li>
+              ) : null}
+            </ul>
+          </section>
+
+          <section
+            className={styles.detailStacks}
+            aria-label="project tech stack"
+          >
+            <h4>STACK</h4>
+            <ul>
+              {selectedProject.stacks.map((stack) => {
+                const iconClass = stackIconClassMap[stack];
+
+                return (
+                  <li key={stack} aria-label={stack} title={stack}>
+                    {iconClass ? (
+                      <i className={iconClass} aria-hidden="true" />
+                    ) : (
+                      <span>{getStackFallbackLabel(stack)}</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         </div>
-        <section
-          className={styles.detailStacks}
-          aria-label="project tech stack"
-        >
-          <h4>STACK</h4>
-          <ul>
-            {selectedProject.stacks.map((stack) => (
-              <li key={stack}>{stack}</li>
-            ))}
-          </ul>
-        </section>
       </div>
     </article>
   ) : null;
@@ -356,71 +586,53 @@ export default function Projects() {
           )}
         </div>
 
-        <div className={styles.branchScene} aria-label="프로젝트 선택">
-          <BranchTransition>
-            <ul className={styles.leafLayers} aria-label="프로젝트 잎 선택">
-              {projects.map((project, index) => (
-                <li
-                  className={[
-                    styles.projectLeaf,
-                    styles[`leaf0${index + 1}`],
-                    selectedProject?.id === project.id
-                      ? styles.selectedLeafLayer
-                      : "",
-                    selectedProject && selectedProject.id !== project.id
-                      ? styles.inactiveLeafLayer
-                      : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  key={project.id}
-                  style={
-                    {
-                      "--leaf-left": project.leaf.left,
-                      "--leaf-top": project.leaf.top,
-                      "--leaf-width": project.leaf.width,
-                      "--leaf-height": project.leaf.height,
-                      "--leaf-origin": project.leaf.origin,
-                      "--leaf-rotate": project.leaf.rotate,
-                      "--leaf-scale": project.leaf.scale,
-                      "--leaf-x": project.leaf.x,
-                      "--leaf-y": project.leaf.y,
-                      "--leaf-opacity": project.leaf.opacity,
-                      "--leaf-z": project.leaf.z,
-                      "--leaf-hover-scale": project.leaf.hoverScale,
-                    } as CSSProperties
-                  }
-                >
-                  <button
-                    className={styles.projectLeafButton}
-                    type="button"
-                    onClick={() => setSelectedProject(project)}
-                    aria-label={`${project.title} 프로젝트 보기`}
-                    aria-pressed={selectedProject?.id === project.id}
-                  >
-                    <Image
-                      className={styles.projectLeafImage}
-                      src={project.leaf.asset}
-                      alt=""
-                      width={1536}
-                      height={1024}
-                      sizes="(max-width: 640px) 220px, (max-width: 900px) 260px, 320px"
-                      aria-hidden="true"
-                    />
-                    <span className={styles.projectLeafText}>
-                      <strong>{project.title}</strong>
-                      <em>{project.shortLine}</em>
-                      <span className={styles.mobileLeafNumber}>
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </BranchTransition>
-        </div>
+        <ProjectBranchScene
+          projects={projects}
+          selectedProject={selectedProject}
+          onSelectProject={selectProject}
+        />
       </div>
+
+      {selectedProject?.planning && isPlanningOpen ? (
+        <div
+          className={styles.planningOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="planning-title"
+          onClick={() => setIsPlanningOpen(false)}
+        >
+          <div
+            className={styles.planningViewer}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className={styles.planningCloseButton}
+              type="button"
+              onClick={() => setIsPlanningOpen(false)}
+              aria-label="Close planning viewer"
+            >
+              ×
+            </button>
+            <p className={styles.planningEyebrow}>{selectedProject.title}</p>
+            <h3 id="planning-title">{selectedProject.planning.title}</h3>
+            <p>{selectedProject.planning.summary}</p>
+            {selectedProject.planning.image ? (
+              <Image
+                className={styles.planningImage}
+                src={selectedProject.planning.image}
+                alt={`${selectedProject.title} planning document`}
+                width={1200}
+                height={800}
+                sizes="80vw"
+              />
+            ) : (
+              <div className={styles.planningFallback}>
+                기획안 이미지는 추후 추가 예정입니다.
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
