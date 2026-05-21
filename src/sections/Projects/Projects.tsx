@@ -10,15 +10,6 @@ import styles from "./Projects.module.css";
 const getProjectDisplayTitle = (project: Project) =>
   project.id === "landing" ? "랜딩페이지" : project.title;
 
-const getShortDescription = (text: string) => {
-  const sentences = text
-    .split(/(?<=[.!?。])\s+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean);
-
-  return sentences.length > 1 ? sentences.slice(0, 2).join(" ") : text;
-};
-
 const projects: Project[] = [
   {
     id: "mute",
@@ -57,13 +48,89 @@ const projects: Project[] = [
     deploy: "Dothome",
     image: "/img/projects/mute-main.png",
     link: "/projects/mute",
+    siteUrl: "https://teammute.dothome.co.kr/",
     pages: [
-      { name: "Main", image: null },
-      { name: "Login", image: null },
-      { name: "AI Chat", image: null },
-      { name: "Music Detail", image: null },
-      { name: "Library", image: null },
-      { name: "My Page", image: null },
+      {
+        name: "Main",
+        image: null,
+        previewImage: "/img/web_imgs/mute/main.png",
+        externalUrl: "https://teammute.dothome.co.kr/main",
+      },
+      {
+        name: "Splash",
+        image: null,
+        previewImage: "/img/web_imgs/mute/splash.png",
+        externalUrl: "https://teammute.dothome.co.kr/",
+      },
+      {
+        name: "Onboarding",
+        image: null,
+        previewImage: "/img/web_imgs/mute/onboarding_main.png",
+        externalUrl: "https://teammute.dothome.co.kr/welcome",
+      },
+      { name: "Login", image: null, previewImage: "/img/web_imgs/mute/login.png" },
+      {
+        name: "Register",
+        image: null,
+        previewImage: "/img/web_imgs/mute/register.png",
+        externalUrl: "https://teammute.dothome.co.kr/signup",
+      },
+      {
+        name: "Artist Select",
+        image: null,
+        previewImage: "/img/web_imgs/mute/artist_select.png",
+        externalUrl: "https://teammute.dothome.co.kr/artist-select",
+      },
+      {
+        name: "Personalization",
+        image: null,
+        previewImage: "/img/web_imgs/mute/personalization.png",
+        externalUrl: "https://teammute.dothome.co.kr/signup-info",
+      },
+      {
+        name: "AI Chat",
+        image: null,
+        previewImage: "/img/web_imgs/mute/ai_chat.png",
+        externalUrl: "https://teammute.dothome.co.kr/main/ai",
+      },
+      {
+        name: "Chart",
+        image: null,
+        previewImage: "/img/web_imgs/mute/chart.png",
+        externalUrl: "https://teammute.dothome.co.kr/main/chart",
+      },
+      {
+        name: "Library",
+        image: null,
+        previewImage: "/img/web_imgs/mute/library.png",
+        externalUrl: "https://teammute.dothome.co.kr/main/library",
+      },
+      {
+        name: "Library Detail",
+        image: null,
+        previewImage: "/img/web_imgs/mute/library_detail.png",
+        externalUrl: "https://teammute.dothome.co.kr/main/video-detail/1",
+      },
+      {
+        name: "Player",
+        image: null,
+        previewImage: "/img/web_imgs/mute/player.png",
+        externalUrl: "https://teammute.dothome.co.kr/main/player/0",
+      },
+      {
+        name: "Search",
+        image: null,
+        previewImage: "/img/web_imgs/mute/search.png",
+        externalUrl: "https://teammute.dothome.co.kr/main/search",
+      },
+      {
+        name: "Search Result",
+        image: null,
+        previewImage: "/img/web_imgs/mute/search_result.png",
+        externalUrl:
+          "https://teammute.dothome.co.kr/main/search-result?term=%ED%95%98%EB%8A%98%EC%83%89%20%ED%92%8D%EC%84%A0",
+      },
+      { name: "My Page", image: null, previewImage: "/img/web_imgs/mute/mypage.png" },
     ],
     planning: {
       title: "기획안",
@@ -149,17 +216,61 @@ const projects: Project[] = [
     deploy: "Render",
     image: "/img/projects/goreon-main.png",
     link: "/projects/goreon",
+    siteUrl: "https://goreon-0x90.onrender.com/",
     pages: [
-      { name: "Main", image: null },
-      { name: "Search", image: null },
+      {
+        name: "Main",
+        image: null,
+        previewImage: "/img/web_imgs/goreon/main.png",
+        externalUrl: "https://goreon-0x90.onrender.com/",
+      },
+      {
+        name: "Search",
+        image: null,
+        externalUrl:
+          "https://goreon-0x90.onrender.com/search?q=%EC%9C%A0%ED%8A%9C%EB%B8%8C%20%ED%8E%B8%EC%A7%91%EC%9A%A9%20%EB%85%B8%ED%8A%B8%EB%B6%81",
+      },
+      {
+        name: "Search Result",
+        image: null,
+        previewImage: "/img/web_imgs/goreon/search_result.png",
+        externalUrl:
+          "https://goreon-0x90.onrender.com/search?q=%EC%9C%A0%ED%8A%9C%EB%B8%8C%20%ED%8E%B8%EC%A7%91%EC%9A%A9%20%EB%85%B8%ED%8A%B8%EB%B6%81",
+      },
       { name: "Category", image: null },
-      { name: "Product Detail", image: null },
-      { name: "Cart", image: null },
-      { name: "Wishlist", image: null },
+      {
+        name: "Product List",
+        image: null,
+        previewImage: "/img/web_imgs/goreon/product_list.png",
+        externalUrl: "https://goreon-0x90.onrender.com/list?group=pc",
+      },
+      {
+        name: "Product Detail",
+        image: null,
+        previewImage: "/img/web_imgs/goreon/product_detail.png",
+      },
+      { name: "Cart", image: null, previewImage: "/img/web_imgs/goreon/cart.png" },
+      { name: "Wishlist", image: null, previewImage: "/img/web_imgs/goreon/like.png" },
       { name: "Login", image: null },
-      { name: "My Page", image: null },
-      { name: "PC Assembly", image: null },
-      { name: "Payment", image: null },
+      { name: "My Page", image: null, previewImage: "/img/web_imgs/goreon/mypage.png" },
+      {
+        name: "Order List",
+        image: null,
+        previewImage: "/img/web_imgs/goreon/orderlist.png",
+      },
+      {
+        name: "PC Assembly",
+        image: null,
+        previewImage: "/img/web_imgs/goreon/pc_assembly.png",
+        externalUrl: "https://goreon-0x90.onrender.com/pc-assembly",
+      },
+      {
+        name: "PC Assembly Quote",
+        image: null,
+        previewImage: "/img/web_imgs/goreon/pc_assembly_quote.png",
+      },
+      { name: "Payment", image: null, previewImage: "/img/web_imgs/goreon/payment.png" },
+      { name: "Popup", image: null, previewImage: "/img/web_imgs/goreon/popup.png" },
     ],
     planning: {
       title: "기획안",
@@ -265,8 +376,20 @@ const projects: Project[] = [
     deploy: "Dothome",
     image: "/img/projects/ypbooks-main.png",
     link: "/projects/ypbooks",
+    siteUrl: "https://ajrqh1030.dothome.co.kr/",
     pages: [
-      { name: "Main", image: null },
+      {
+        name: "Main",
+        image: null,
+        previewImage: "/img/web_imgs/yeongpoong/main.png",
+        externalUrl: "https://ajrqh1030.dothome.co.kr/",
+      },
+      {
+        name: "Best",
+        image: null,
+        previewImage: "/img/web_imgs/yeongpoong/best.png",
+        externalUrl: "https://ajrqh1030.dothome.co.kr/best.php",
+      },
       { name: "Login", image: null },
       { name: "Book Detail", image: null },
       { name: "Chart", image: null },
@@ -311,8 +434,14 @@ const projects: Project[] = [
     deploy: "Dothome",
     image: "/img/projects/landing-main.png",
     link: "/projects/landing",
+    siteUrl: "https://ajrqh10301.dothome.co.kr/",
     pages: [
-      { name: "Main", image: null },
+      {
+        name: "Main",
+        image: null,
+        previewImage: "/img/web_imgs/landing/main.png",
+        externalUrl: "https://ajrqh10301.dothome.co.kr/",
+      },
       { name: "Event", image: null },
       { name: "Benefit", image: null },
       { name: "Guide", image: null },
@@ -342,12 +471,23 @@ const projects: Project[] = [
   },
 ];
 
+const DETAIL_DEBUG_PROJECT_ID: string | null = "ypbooks";
+
+const initialDebugProject = DETAIL_DEBUG_PROJECT_ID
+  ? projects.find((project) => project.id === DETAIL_DEBUG_PROJECT_ID) ?? null
+  : null;
+
 const projectPlaybackRate = 0.62;
 
 export default function Projects() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [selectedPageName, setSelectedPageName] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] =
+    useState<Project | null>(initialDebugProject);
+  const [selectedPageName, setSelectedPageName] = useState<string | null>(
+    initialDebugProject?.pages[0]?.name ?? null,
+  );
   const [isPlanningOpen, setIsPlanningOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isPagesExpanded, setIsPagesExpanded] = useState(false);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const sectionRef = useRef<HTMLElement | null>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -361,18 +501,35 @@ export default function Projects() {
     selectedProject?.pages.find((page) => page.name === selectedPageName) ??
     selectedProject?.pages[0] ??
     null;
-  const previewImage = selectedPage?.image ?? selectedProject?.image ?? "";
+  const previewImage = selectedPage?.previewImage ?? selectedPage?.image ?? "";
+  const selectedExternalUrl =
+    selectedPage?.externalUrl ?? selectedProject?.siteUrl ?? null;
   const previewImageKey = selectedProject
     ? `${selectedProject.id}:${previewImage}`
     : "";
   const selectedProjectDisplayTitle = selectedProject
     ? getProjectDisplayTitle(selectedProject)
     : "";
+  const pagePreviewLimit = selectedProject?.planning ? 4 : 5;
+  const visiblePages = selectedProject
+    ? isPagesExpanded
+      ? selectedProject.pages
+      : selectedProject.pages.slice(0, pagePreviewLimit)
+    : [];
+  const hiddenPageCount = selectedProject
+    ? Math.max(selectedProject.pages.length - visiblePages.length, 0)
+    : 0;
+  const visibleStacks = selectedProject ? selectedProject.stacks.slice(0, 6) : [];
+  const hiddenStackCount = selectedProject
+    ? Math.max(selectedProject.stacks.length - visibleStacks.length, 0)
+    : 0;
 
   const selectProject = (project: Project) => {
     setSelectedProject(project);
     setSelectedPageName(project.pages[0]?.name ?? null);
     setIsPlanningOpen(false);
+    setIsPreviewOpen(false);
+    setIsPagesExpanded(false);
   };
 
   useEffect(() => {
@@ -387,13 +544,14 @@ export default function Projects() {
   }, []);
 
   useEffect(() => {
-    if (!isPlanningOpen) {
+    if (!isPlanningOpen && !isPreviewOpen) {
       return;
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsPlanningOpen(false);
+        setIsPreviewOpen(false);
       }
     };
 
@@ -402,7 +560,29 @@ export default function Projects() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isPlanningOpen]);
+  }, [isPlanningOpen, isPreviewOpen]);
+
+  const previewContent = selectedProject ? (
+    brokenImages[previewImageKey] || !previewImage ? (
+      <span className={styles.previewFallback}>{selectedProjectDisplayTitle}</span>
+    ) : (
+      <Image
+        key={previewImage}
+        className={styles.previewImage}
+        src={previewImage}
+        alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
+        width={960}
+        height={600}
+        sizes="(max-width: 900px) calc(100vw - 64px), 560px"
+        onError={() =>
+          setBrokenImages((current) => ({
+            ...current,
+            [previewImageKey]: true,
+          }))
+        }
+      />
+    )
+  ) : null;
 
   const detailPanel = selectedProject ? (
     <article className={styles.detailPanel} aria-live="polite">
@@ -412,6 +592,7 @@ export default function Projects() {
         onClick={() => {
           setSelectedProject(null);
           setIsPlanningOpen(false);
+          setIsPreviewOpen(false);
         }}
         aria-label="Close project detail"
       >
@@ -419,33 +600,32 @@ export default function Projects() {
       </button>
 
       <div className={styles.previewFrame}>
-        <a
-          className={styles.previewLink}
-          href={selectedProject.link}
-          aria-label={`${selectedProject.title} project detail`}
+        <button
+          type="button"
+          className={styles.previewMediaButton}
+          disabled={!previewImage || brokenImages[previewImageKey]}
+          onClick={() => {
+            if (previewImage && !brokenImages[previewImageKey]) {
+              setIsPreviewOpen(true);
+            }
+          }}
+          aria-label={`${selectedPage?.name ?? selectedProject.title} 화면 크게 보기`}
         >
-          {brokenImages[previewImageKey] || !previewImage ? (
-            <span className={styles.previewFallback}>
-              {selectedProjectDisplayTitle}
-            </span>
-          ) : (
-            <Image
-              key={previewImage}
-              className={styles.previewImage}
-              src={previewImage}
-              alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
-              width={960}
-              height={600}
-              sizes="(max-width: 900px) calc(100vw - 64px), 560px"
-              onError={() =>
-                setBrokenImages((current) => ({
-                  ...current,
-                  [previewImageKey]: true,
-                }))
-              }
-            />
-          )}
-        </a>
+          {previewContent}
+        </button>
+        <button
+          className={styles.detailCloseButton}
+          type="button"
+          onClick={() => {
+            setSelectedProject(null);
+            setIsPlanningOpen(false);
+            setIsPreviewOpen(false);
+            setIsPagesExpanded(false);
+          }}
+          aria-label="Close project detail"
+        >
+          ×
+        </button>
       </div>
 
       <div className={styles.detailContent}>
@@ -458,12 +638,12 @@ export default function Projects() {
               aria-label="Previous project"
             >
               <span className={styles.navArrow} aria-hidden="true">
-                &larr;
+                &lt;
               </span>
               <span className={styles.navText}>Prev</span>
             </button>
             <p className={styles.detailKicker}>
-              <span>PROJECT</span>
+              <span>Project</span>
               <strong>{String(selectedIndex + 1).padStart(2, "0")}</strong>
             </p>
             <button
@@ -474,7 +654,7 @@ export default function Projects() {
             >
               <span className={styles.navText}>Next</span>
               <span className={styles.navArrow} aria-hidden="true">
-                &rarr;
+                &gt;
               </span>
             </button>
           </div>
@@ -491,13 +671,26 @@ export default function Projects() {
             </li>
             <li>{selectedProject.role ?? selectedProject.projectNature}</li>
           </ul>
-          <p className={styles.detailSummary}>
-            {getShortDescription(selectedProject.description)}
-          </p>
+          <p className={styles.detailSummary}>{selectedProject.description}</p>
         </div>
         <div className={styles.detailMetaArea}>
           <section className={styles.pagesBlock} aria-label="project pages">
-            <h4>Pages</h4>
+            <div className={styles.pagesHeader}>
+              <h4>Pages</h4>
+              {selectedExternalUrl ? (
+                <a
+                  className={styles.externalPageLink}
+                  href={selectedExternalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${selectedProject.title} ${
+                    selectedPage?.name ?? ""
+                  } page open in new tab`}
+                >
+                  사이트 보기
+                </a>
+              ) : null}
+            </div>
             <ul>
               {selectedProject.planning ? (
                 <li>
@@ -510,7 +703,7 @@ export default function Projects() {
                   </button>
                 </li>
               ) : null}
-              {selectedProject.pages.map((page) => (
+              {visiblePages.map((page) => (
                 <li key={page.name}>
                   <button
                     type="button"
@@ -522,6 +715,18 @@ export default function Projects() {
                   </button>
                 </li>
               ))}
+              {hiddenPageCount > 0 ? (
+                <li>
+                  <button
+                    type="button"
+                    className={styles.pageTextButton}
+                    aria-expanded={isPagesExpanded}
+                    onClick={() => setIsPagesExpanded(true)}
+                  >
+                    +{hiddenPageCount}
+                  </button>
+                </li>
+              ) : null}
             </ul>
           </section>
 
@@ -530,12 +735,14 @@ export default function Projects() {
             aria-label="project tech stack"
           >
             <h4>STACK</h4>
-            <ul className={styles.stackTextList}>
-              {selectedProject.stacks.map((stack) => (
-                <li key={stack} aria-label={stack} title={stack}>
-                  {stack}
-                </li>
+            <ul
+              className={styles.stackTextList}
+              title={selectedProject.stacks.join(" / ")}
+            >
+              {visibleStacks.map((stack) => (
+                <li key={stack}>{stack}</li>
               ))}
+              {hiddenStackCount > 0 ? <li>+{hiddenStackCount}</li> : null}
             </ul>
           </section>
         </div>
@@ -585,12 +792,47 @@ export default function Projects() {
           )}
         </div>
 
-        <ProjectBranchScene
-          projects={projects}
-          selectedProject={selectedProject}
-          onSelectProject={selectProject}
-        />
       </div>
+
+      <ProjectBranchScene
+        projects={projects}
+        selectedProject={selectedProject}
+        onSelectProject={selectProject}
+      />
+
+      {isPreviewOpen && previewImage ? (
+        <div
+          className={styles.previewViewerOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label="프로젝트 화면 미리보기"
+          onClick={() => setIsPreviewOpen(false)}
+        >
+          <div
+            className={styles.previewViewer}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className={styles.previewViewerClose}
+              onClick={() => setIsPreviewOpen(false)}
+              aria-label="미리보기 닫기"
+            >
+              ×
+            </button>
+            <Image
+              className={styles.previewViewerImage}
+              src={previewImage}
+              alt={`${selectedProject?.title ?? "Project"} ${
+                selectedPage?.name ?? ""
+              } preview`}
+              width={1440}
+              height={900}
+              sizes="80vw"
+            />
+          </div>
+        </div>
+      ) : null}
 
       {selectedProject?.planning && isPlanningOpen ? (
         <div

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 
 import styles from "./Projects.module.css";
 
@@ -33,6 +33,7 @@ export type Project = {
   projectNature?: string;
   role?: string;
   shortLine: string;
+  siteUrl?: string;
   skills?: string[];
   tagline: string;
   team?: string;
@@ -44,8 +45,10 @@ export type Project = {
 };
 
 export type ProjectPage = {
+  externalUrl?: string;
   image: string | null;
   name: string;
+  previewImage?: string;
 };
 
 export type ProjectPlanning = {
@@ -60,62 +63,186 @@ type ProjectBranchSceneProps = {
   selectedProject: Project | null;
 };
 
-const PROJECT_LEAF_HIT_AREAS = [
+const BRANCH_PIECES = [
   {
-    id: "landing",
-    left: "31.00%",
-    top: "40.95%",
-    width: "9.6%",
-    height: "12.2%",
-    rotate: "-36.8deg",
-    clipPath: "ellipse(40% 32% at 52% 50%)",
-    debugColor: "rgba(255, 78, 78, 0.34)",
+    name: "left",
+    src: "/img/branch_new/left.png",
+    left: "0%",
+    top: "28.5%",
+    width: "23%",
+    intrinsicWidth: 378,
+    intrinsicHeight: 101,
   },
   {
-    id: "ypbooks",
-    left: "40.15%",
-    top: "51.25%",
-    width: "7.8%",
-    height: "19.8%",
-    rotate: "4deg",
-    clipPath: "ellipse(40% 32% at 50% 50%)",
-    debugColor: "rgba(255, 180, 60, 0.34)",
+    name: "left_top_1",
+    src: "/img/branch_new/left_top_1.png",
+    left: "18.2%",
+    top: "8.6%",
+    width: "26%",
+    intrinsicWidth: 430,
+    intrinsicHeight: 219,
   },
   {
-    id: "mute",
-    left: "59.80%",
-    top: "33.15%",
-    width: "20.6%",
-    height: "37.8%",
-    rotate: "13.8deg",
-    clipPath: "ellipse(43% 33% at 50% 50%)",
-    debugColor: "rgba(68, 177, 255, 0.34)",
+    name: "left_top_2",
+    src: "/img/branch_new/left_top_2.png",
+    left: "50%",
+    top: "12%",
+    width: "24%",
+    intrinsicWidth: 402,
+    intrinsicHeight: 208,
   },
   {
-    id: "goreon",
-    left: "80.05%",
-    top: "17.15%",
-    width: "25.7%",
-    height: "45.6%",
-    rotate: "-5deg",
-    clipPath: "ellipse(44% 32% at 50% 50%)",
-    debugColor: "rgba(104, 255, 132, 0.34)",
+    name: "left_bottom_1",
+    src: "/img/branch_new/left_bottom_1.png",
+    left: "7%",
+    top: "46%",
+    width: "24%",
+    intrinsicWidth: 395,
+    intrinsicHeight: 205,
   },
   {
-    id: "hangeul",
-    left: "62.15%",
-    top: "72.15%",
-    width: "27.6%",
-    height: "41.2%",
-    rotate: "-37.5deg",
-    clipPath: "ellipse(42% 33% at 50% 50%)",
-    debugColor: "rgba(185, 115, 255, 0.34)",
+    name: "left_bottom_1_side",
+    src: "/img/branch_new/left_bottom_1_side.png",
+    left: "31%",
+    top: "54%",
+    width: "2%",
+    intrinsicWidth: 30,
+    intrinsicHeight: 56,
+  },
+  {
+    name: "left_bottom_2",
+    src: "/img/branch_new/left_bottom_2.png",
+    left: "48.4%",
+    top: "54.6%",
+    width: "23%",
+    intrinsicWidth: 385,
+    intrinsicHeight: 223,
+  },
+  {
+    name: "left_bottom_2_side",
+    src: "/img/branch_new/left_bottom_2_side.png",
+    left: "67.8%",
+    top: "57%",
+    width: "6%",
+    intrinsicWidth: 104,
+    intrinsicHeight: 192,
+  },
+  {
+    name: "left_bottom_small_1",
+    src: "/img/branch_new/left_bottom_small_1.png",
+    left: "28.4%",
+    top: "76%",
+    width: "11%",
+    intrinsicWidth: 180,
+    intrinsicHeight: 140,
+  },
+  {
+    name: "left_bottom_small_1_side",
+    src: "/img/branch_new/left_bottom_small_1_side.png",
+    left: "32.5%",
+    top: "65.9%",
+    width: "14%",
+    intrinsicWidth: 233,
+    intrinsicHeight: 126,
+  },
+  {
+    name: "left_bottom_small_2",
+    src: "/img/branch_new/left_bottom_small_2.png",
+    left: "72.7%",
+    top: "71%",
+    width: "9%",
+    intrinsicWidth: 148,
+    intrinsicHeight: 197,
+  },
+  {
+    name: "branch",
+    src: "/img/branch_new/branch.png",
+    left: "0%",
+    top: "0%",
+    width: "100%",
+    intrinsicWidth: 1646,
+    intrinsicHeight: 689,
+    isBranch: true,
   },
 ];
 
-type HitAreaStyle = CSSProperties & {
-  "--hit-clip": string;
-  "--hit-debug-color": string;
+type BranchPieceStyle = CSSProperties & {
+  "--piece-left": string;
+  "--piece-top": string;
+  "--piece-width": string;
+};
+
+const BRANCH_DEBUG_HIT_AREAS = [
+  {
+    id: "hangeul",
+    label: "hangeul",
+    type: "project",
+    left: "31.8%",
+    top: "24%",
+    width: "23%",
+    height: "28%",
+    rotate: "12deg",
+    color: "rgba(255, 86, 86, 0.32)",
+  },
+  {
+    id: "mute",
+    label: "mute",
+    type: "project",
+    left: "62%",
+    top: "26.3%",
+    width: "20%",
+    height: "27.2%",
+    rotate: "8deg",
+    color: "rgba(255, 146, 64, 0.32)",
+  },
+  {
+    id: "goreon",
+    label: "goreon",
+    type: "project",
+    left: "19%",
+    top: "60.8%",
+    width: "19.6%",
+    height: "28.8%",
+    rotate: "-10deg",
+    color: "rgba(74, 163, 255, 0.32)",
+  },
+  {
+    id: "continue",
+    label: "continue",
+    type: "continue",
+    left: "59.7%",
+    top: "71%",
+    width: "18%",
+    height: "24.7%",
+    rotate: "-22deg",
+    color: "rgba(96, 220, 118, 0.32)",
+  },
+  {
+    id: "landing",
+    label: "landing",
+    type: "project",
+    left: "77%",
+    top: "85%",
+    width: "10.5%",
+    height: "16%",
+    rotate: "-57deg",
+    color: "rgba(178, 104, 255, 0.32)",
+  },
+  {
+    id: "ypbooks",
+    label: "ypbooks",
+    type: "project",
+    left: "33.8%",
+    top: "86%",
+    width: "10%",
+    height: "14%",
+    rotate: "-32deg",
+    color: "rgba(255, 216, 74, 0.32)",
+  },
+];
+
+type BranchDebugHitAreaStyle = CSSProperties & {
+  "--hit-color": string;
   "--hit-height": string;
   "--hit-left": string;
   "--hit-rotate": string;
@@ -128,71 +255,53 @@ export default function ProjectBranchScene({
   projects,
   selectedProject,
 }: ProjectBranchSceneProps) {
-  const sceneRef = useRef<HTMLDivElement | null>(null);
-  const [isLeafHintEntered, setIsLeafHintEntered] = useState(false);
-
-  useEffect(() => {
-    const scene = sceneRef.current;
-
-    if (!scene) {
-      return;
-    }
-
-    const scrollContainer = document.querySelector<HTMLElement>(
-      "[data-scroll-container='true']",
-    );
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsLeafHintEntered(entry.isIntersecting);
-      },
-      { root: scrollContainer, threshold: 0.42 },
-    );
-
-    observer.observe(scene);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  const getHitAreaStyle = (hit: (typeof BRANCH_DEBUG_HIT_AREAS)[number]) =>
+    ({
+      "--hit-left": hit.left,
+      "--hit-top": hit.top,
+      "--hit-width": hit.width,
+      "--hit-height": hit.height,
+      "--hit-rotate": hit.rotate,
+      "--hit-color": hit.color,
+    }) as BranchDebugHitAreaStyle;
 
   return (
-    <div
-      ref={sceneRef}
-      className={[
-        styles.projectBranchScene,
-        isLeafHintEntered ? styles.projectBranchSceneEntered : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      aria-hidden="true"
-    >
-      <div className={styles.projectBranchObject}>
-        <Image
-          className={styles.projectBranchComposite}
-          src="/img/branch/project-branch-hint.png"
-          alt=""
-          width={2146}
-          height={825}
-          sizes="(max-width: 900px) 112vw, 64vw"
-          aria-hidden="true"
-        />
-        <span className={styles.projectLeafHintPosition}>
+    <div className={styles.projectBranchScene}>
+      <div className={styles.branchScene}>
+        {BRANCH_PIECES.map((piece) => (
           <Image
-            className={styles.projectLeafHint}
-            src="/img/branch/project-leaf-hint-v2.png"
+            key={piece.name}
+            className={[
+              styles.branchPiece,
+              piece.isBranch ? styles.branchBasePiece : styles.branchLeafPiece,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            src={piece.src}
             alt=""
-            width={1536}
-            height={1024}
-            sizes="(max-width: 900px) 190px, 26vw"
+            width={piece.intrinsicWidth}
+            height={piece.intrinsicHeight}
+            sizes="(max-width: 900px) 92vw, min(92vw, 1646px)"
+            style={
+              {
+                "--piece-left": piece.left,
+                "--piece-top": piece.top,
+                "--piece-width": piece.width,
+              } as BranchPieceStyle
+            }
             aria-hidden="true"
           />
-        </span>
+        ))}
+
         <div
-          className={styles.projectLeafHitLayer}
-          role="group"
-          aria-label="Project leaves"
+          className={styles.branchDebugHitLayer}
+          aria-label="Project hit area debug"
         >
-          {PROJECT_LEAF_HIT_AREAS.map((hit) => {
+          {BRANCH_DEBUG_HIT_AREAS.map((hit) => {
+            if (hit.type === "continue") {
+              return null;
+            }
+
             const project = projects.find((item) => item.id === hit.id);
 
             if (!project) {
@@ -203,29 +312,14 @@ export default function ProjectBranchScene({
               <button
                 key={hit.id}
                 type="button"
-                className={[
-                  styles.projectLeafHitArea,
-                  selectedProject?.id === hit.id
-                    ? styles.projectLeafHitAreaActive
-                    : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                style={
-                  {
-                    "--hit-left": hit.left,
-                    "--hit-top": hit.top,
-                    "--hit-width": hit.width,
-                    "--hit-height": hit.height,
-                    "--hit-rotate": hit.rotate,
-                    "--hit-clip": hit.clipPath,
-                    "--hit-debug-color": hit.debugColor,
-                  } as HitAreaStyle
-                }
+                className={styles.branchDebugHitArea}
+                style={getHitAreaStyle(hit)}
                 aria-label={`${project.title} 프로젝트 보기`}
-                aria-pressed={selectedProject?.id === hit.id}
+                aria-pressed={selectedProject?.id === project.id}
                 onClick={() => onSelectProject(project)}
-              />
+              >
+                <span>{hit.label}</span>
+              </button>
             );
           })}
         </div>

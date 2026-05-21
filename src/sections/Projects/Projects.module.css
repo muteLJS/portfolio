@@ -3,7 +3,7 @@
   z-index: 3;
   height: 100svh;
   flex-shrink: 0;
-  overflow: visible;
+  overflow: hidden;
   isolation: isolate;
   background: #eef1df url("/img/background/project-background.png") center /
     cover no-repeat;
@@ -58,7 +58,7 @@
 
 .inner {
   position: relative;
-  z-index: 2;
+  z-index: 5;
   display: grid;
   grid-template-columns: minmax(500px, 0.94fr) minmax(560px, 1.06fr);
   grid-template-rows: auto auto;
@@ -120,14 +120,14 @@
 
 .detailPanel {
   position: relative;
-  z-index: 7;
+  z-index: 30;
   isolation: isolate;
   display: grid;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: clamp(122px, 18vh, 170px) auto;
-  width: min(560px, calc(100vw - 40px));
+  width: min(540px, calc(100vw - 40px));
   max-height: calc(100svh - 130px);
   margin: clamp(54px, 7vh, 82px) 0 0;
   overflow: visible;
@@ -142,22 +142,22 @@
   box-shadow: none;
   backdrop-filter: none;
   opacity: 0;
-  filter: blur(4px);
+  filter: none;
   transform: none;
   animation: detailSoftAppear 220ms ease-out both;
 }
 
 .detailPanel::before {
-  content: none;
   display: none;
+  content: none;
 }
 
 .previewFrame {
   position: relative;
   width: 100%;
-  height: clamp(122px, 18vh, 170px);
+  height: clamp(150px, 20vh, 190px);
   min-width: 0;
-  margin-bottom: clamp(18px, 2.4vh, 24px);
+  margin-bottom: clamp(14px, 2vh, 20px);
   opacity: 0;
   transform: none;
   animation: detailFadeIn 220ms ease-out 40ms forwards;
@@ -181,17 +181,17 @@
   margin: 0;
   color: rgba(20, 36, 31, 0.95);
   font-family: var(--font-serif-kr), var(--font-sans), serif;
-  font-size: clamp(2.15rem, 3.2vw, 3.25rem);
+  font-size: clamp(2.05rem, 3vw, 3rem);
   font-weight: 330;
   line-height: 1.08;
-  letter-spacing: 0;
+  letter-spacing: -0.055em;
   text-shadow:
     0 1px 8px rgba(255, 255, 238, 0.45),
     0 0 1px rgba(255, 255, 238, 0.35);
 }
 
 .detailTagline {
-  margin: 12px 0 18px;
+  margin: 12px 0 16px;
   color: rgba(24, 42, 35, 0.82);
   font-size: 0.94rem;
   font-weight: 340;
@@ -212,23 +212,28 @@
   text-decoration: none;
 }
 
+.previewMediaButton {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(24, 42, 35, 0.14);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.12);
+  cursor: zoom-in;
+}
+
+.previewMediaButton:disabled {
+  cursor: default;
+}
+
 .previewFallback {
   display: grid;
   width: 100%;
   height: 100%;
   min-height: 0;
   place-items: center;
-  background:
-    radial-gradient(
-      ellipse at 30% 18%,
-      rgba(255, 255, 255, 0.18),
-      rgba(255, 255, 255, 0) 48%
-    ),
-    linear-gradient(
-      135deg,
-      rgba(205, 218, 186, 0.14),
-      rgba(122, 150, 127, 0.08)
-    );
   color: rgba(24, 42, 35, 0.52);
   font-family: var(--font-serif-kr), var(--font-sans), serif;
   font-size: 0.95rem;
@@ -242,14 +247,20 @@
   width: 100%;
   height: 100%;
   aspect-ratio: 16 / 9;
-  object-fit: cover;
-  opacity: 0.82;
+  object-fit: contain;
+  object-position: center;
+  opacity: 1;
+  filter: none;
+  transform: none;
   transition: opacity 200ms ease;
 }
 
 .previewLink:hover .previewImage,
-.previewLink:focus-visible .previewImage {
+.previewLink:focus-visible .previewImage,
+.previewMediaButton:hover .previewImage,
+.previewMediaButton:focus-visible .previewImage {
   opacity: 1;
+  filter: none;
   transform: none;
 }
 
@@ -274,7 +285,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   column-gap: 18px;
   align-items: center;
-  margin: 0 0 clamp(18px, 2.6vh, 26px);
+  margin: 0 0 clamp(16px, 2.4vh, 24px);
 }
 
 .detailKicker {
@@ -320,9 +331,9 @@
 }
 
 .detailNavButton {
-  gap: 5px;
+  gap: 9px;
   width: auto;
-  min-width: 40px;
+  min-width: 58px;
   height: auto;
   color: rgba(24, 42, 35, 0.56);
   font-size: 0.72rem;
@@ -334,31 +345,53 @@
 
 .detailCloseButton {
   position: absolute;
-  top: -2px;
-  right: -2px;
-  z-index: 40;
-  width: 28px;
-  height: 28px;
-  color: rgba(24, 42, 35, 0.64);
-  font-size: 1.1rem;
+  top: 8px;
+  right: 8px;
+  z-index: 30;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.26);
+  color: rgba(24, 42, 35, 0.72);
+  font-size: 1rem;
   font-weight: 300;
+  backdrop-filter: blur(2px);
+}
+
+.detailPanel > .detailCloseButton {
+  display: none;
+}
+
+.previewFrame .detailCloseButton {
+  display: inline-flex;
 }
 
 .navArrow,
 .navText {
   display: inline-block;
   color: rgba(24, 42, 35, 0.56);
-  font-size: 0.72rem;
   font-weight: 320;
   line-height: 1;
   text-shadow: 0 1px 7px rgba(255, 255, 238, 0.34);
+}
+
+.navArrow {
+  font-size: 1.08rem;
+  font-weight: 300;
+  line-height: 0.8;
+}
+
+.navText {
+  font-size: 0.72rem;
 }
 
 .detailNavButton:hover,
 .detailNavButton:focus-visible,
 .detailCloseButton:hover,
 .detailCloseButton:focus-visible {
-  color: rgba(18, 34, 30, 0.92);
+  color: rgba(24, 42, 35, 0.95);
+  background: rgba(255, 255, 255, 0.38);
   opacity: 1;
   outline: none;
 }
@@ -373,6 +406,7 @@
   position: relative;
   min-width: 0;
   min-height: 0;
+  margin-top: 0;
   overflow: hidden;
   padding-top: 0;
   border-top: 0;
@@ -380,14 +414,18 @@
 
 .pagesBlock h4,
 .detailStacks h4 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   color: rgba(255, 249, 224, 0.84);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 520;
   line-height: 1;
   letter-spacing: 0.08em;
   text-shadow: 0 1px 9px rgba(12, 24, 22, 0.42);
   text-transform: uppercase;
+}
+
+.detailStacks h4 {
+  margin: 0 0 10px;
 }
 
 .stackTextList {
@@ -399,8 +437,8 @@
   padding: 0 18px 2px 0;
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: none;
   list-style: none;
+  scrollbar-width: none;
 }
 
 .stackTextList::-webkit-scrollbar {
@@ -409,12 +447,12 @@
 
 .stackTextList li {
   flex: 0 0 auto;
-  color: rgba(255, 249, 224, 0.78);
+  color: rgba(255, 249, 224, 0.76);
   font-size: 0.74rem;
   font-weight: 320;
   line-height: 1.4;
-  text-shadow: 0 1px 9px rgba(12, 24, 22, 0.42);
   white-space: nowrap;
+  text-shadow: 0 1px 9px rgba(12, 24, 22, 0.42);
 }
 
 .stackTextList li + li::before {
@@ -429,8 +467,8 @@
 
 .detailMetaList {
   display: grid;
-  gap: 5px;
-  margin: 0 0 18px;
+  gap: 4px;
+  margin: 0 0 16px;
   padding: 0;
   list-style: none;
 }
@@ -459,14 +497,15 @@
 .detailInsight {
   display: block;
   margin: 0;
-  max-width: 520px;
-  max-height: 5.4em;
-  overflow: hidden;
-  padding-right: 0;
+  max-width: 500px;
+  max-height: calc(1.78em * 3);
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding-right: 10px;
   color: rgba(24, 42, 35, 0.78);
   font-size: 0.86rem;
   font-weight: 320;
-  line-height: 1.8;
+  line-height: 1.78;
   scrollbar-width: none;
   text-shadow:
     0 1px 8px rgba(255, 255, 238, 0.42),
@@ -488,18 +527,52 @@
 }
 
 .pagesBlock {
-  margin-top: clamp(22px, 3vh, 36px);
+  margin-top: 0;
+}
+
+.pagesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  margin: 0 0 12px;
+}
+
+.pagesHeader h4 {
+  margin: 0;
+}
+
+.externalPageLink {
+  margin-left: 2px;
+  color: rgba(255, 249, 224, 0.68);
+  font-size: 0.68rem;
+  font-weight: 340;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-shadow: 0 1px 7px rgba(255, 255, 238, 0.28);
+}
+
+.externalPageLink::after {
+  margin-left: 4px;
+  content: "↗";
+  font-size: 0.72rem;
+}
+
+.externalPageLink:hover,
+.externalPageLink:focus-visible {
+  color: rgba(255, 255, 236, 0.96);
+  outline: none;
 }
 
 .pagesBlock ul {
   display: flex;
   flex-wrap: wrap;
-  max-height: calc(1.35em * 3 + 12px);
-  gap: 9px 18px;
+  gap: 8px 16px;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  color: rgba(255, 249, 224, 0.78);
+  color: rgba(255, 249, 224, 0.76);
   font-size: 0.76rem;
   font-weight: 320;
   line-height: 1.35;
@@ -513,31 +586,57 @@
 }
 
 .pageTextButton {
+  position: relative;
   border: 0;
   background: transparent;
   padding: 0;
-  color: rgba(255, 249, 224, 0.78);
+  color: rgba(255, 249, 224, 0.76);
   cursor: pointer;
   font: inherit;
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   font-weight: 320;
-  line-height: 1.35;
+  line-height: 1.4;
   text-align: left;
   text-shadow: inherit;
+}
+
+.pageTextButton::after {
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.45);
+  transform-origin: left;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
 }
 
 .pageTextButton:hover,
 .pageTextButton:focus-visible,
 .pageTextButton[data-active="true"] {
   color: rgba(255, 255, 236, 0.96);
+  text-decoration: underline;
+  text-underline-offset: 4px;
   outline: none;
+}
+
+.pageTextButton:hover::after,
+.pageTextButton:focus-visible::after,
+.pageTextButton[data-active="true"]::after {
+  opacity: 0.8;
+  transform: scaleX(1);
 }
 
 .detailMetaArea {
   display: grid;
-  gap: 26px;
+  gap: 24px;
   align-self: end;
-  margin-top: clamp(24px, 3.2vh, 42px);
+  margin-top: clamp(26px, 3.8vh, 44px);
 }
 
 .planningOverlay {
@@ -548,6 +647,47 @@
   place-items: center;
   background: rgba(13, 24, 22, 0.28);
   backdrop-filter: blur(2px);
+}
+
+.previewViewerOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: rgba(12, 20, 18, 0.38);
+}
+
+.previewViewer {
+  position: relative;
+  width: min(80vw, 1180px);
+  max-height: 82vh;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.previewViewerImage {
+  display: block;
+  width: 100%;
+  max-height: 82vh;
+  object-fit: contain;
+}
+
+.previewViewerClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: rgba(24, 42, 35, 0.78);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .planningViewer {
@@ -623,109 +763,93 @@
 
 .projectBranchScene {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  z-index: 3;
-  width: 100vw;
-  min-height: 100vh;
-  overflow-x: clip;
-  overflow-y: visible;
+  top: clamp(168px, 24.2vh, 232px);
+  right: -68px;
+  z-index: 6;
+  width: min(62vw, 1200px);
+  aspect-ratio: 1646 / 689;
+  overflow: visible;
   pointer-events: none;
-  transform: translateX(-50%);
+  transform: none;
 }
 
-.projectBranchObject {
-  position: absolute;
-  top: var(--branch-object-top, 31vh);
-  right: var(--branch-object-right, -8px);
-  width: var(--branch-object-width, clamp(820px, 58vw, 1160px));
-  transform: rotate(var(--branch-object-rotate, 0deg));
-  transform-origin: 88% 50%;
-  pointer-events: none;
-}
-
-.projectBranchComposite {
-  display: block;
+.branchScene {
+  position: relative;
+  z-index: 2;
   width: 100%;
+  height: 100%;
+  aspect-ratio: inherit;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.branchPiece {
+  position: absolute;
+  left: var(--piece-left);
+  top: var(--piece-top);
+  display: block;
+  width: var(--piece-width);
   height: auto;
   object-fit: contain;
   pointer-events: none;
+  user-select: none;
 }
 
-.projectLeafHintPosition {
-  position: absolute;
-  left: var(--hint-leaf-left, -5.2%);
-  top: var(--hint-leaf-top, -12.8%);
-  width: var(--hint-leaf-width, 67.5%);
-  pointer-events: none;
-  transform-origin: var(--hint-leaf-origin, 46.8% 49.5%);
+.branchLeafPiece {
+  z-index: 5;
 }
 
-.projectLeafHint {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  pointer-events: none;
-  transform: rotate(0deg);
-  transform-origin: var(--hint-leaf-origin, 46.8% 49.5%);
+.branchBasePiece {
+  z-index: 10;
 }
 
-.projectBranchSceneEntered .projectLeafHint {
-  animation: leafHintStemSway 1.45s ease-out 0.25s 1 both;
-}
-
-.projectLeafHitLayer {
+.branchDebugHitLayer {
   position: absolute;
   inset: 0;
-  z-index: 20;
+  z-index: 30;
   pointer-events: none;
 }
 
-.projectLeafHitArea {
+.branchDebugHitArea {
   position: absolute;
   left: var(--hit-left);
   top: var(--hit-top);
+  display: grid;
   width: var(--hit-width);
   height: var(--hit-height);
+  place-items: center;
   margin: 0;
   padding: 0;
   border: 0;
   border-radius: 999px;
   background: transparent;
-  clip-path: var(--hit-clip, ellipse(44% 36% at 50% 50%));
+  clip-path: ellipse(44% 36% at 50% 50%);
+  color: transparent;
   cursor: pointer;
-  pointer-events: auto;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  text-shadow: none;
   transform: translate(-50%, -50%) rotate(var(--hit-rotate, 0deg));
+  pointer-events: auto;
 }
 
-.projectLeafHitArea::after {
+.branchDebugHitArea::after {
   content: none;
 }
 
-.projectLeafHitArea:focus-visible {
+.branchDebugHitArea span {
+  display: none;
+}
+
+.branchDebugHitArea:focus-visible {
   outline: 1px solid rgba(245, 239, 216, 0.72);
   outline-offset: 3px;
 }
 
-.projectLeafHitAreaActive {
+.branchDebugHitArea[aria-pressed="true"] {
   box-shadow: none;
-}
-
-.branchScene {
-  --branch-right: max(0px, calc(100vw - 100%));
-  --branch-width: clamp(620px, 48vw, 920px);
-  --branch-project-right: -36px;
-  --branch-project-top: 30vh;
-  --branch-project-rotate: 0deg;
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  width: 100%;
-  min-height: 100vh;
-  overflow: visible;
-  pointer-events: none;
 }
 
 .branchPosition {
@@ -973,12 +1097,12 @@
 @keyframes detailSoftAppear {
   0% {
     opacity: 0;
-    filter: blur(3px);
+    filter: none;
   }
 
   100% {
     opacity: 1;
-    filter: blur(0);
+    filter: none;
   }
 }
 
@@ -1066,22 +1190,14 @@
   }
 
   .detailPanel {
-    width: min(100%, 520px);
+    width: min(100%, 500px);
     max-height: calc(100svh - 150px);
     margin-top: clamp(40px, 5vh, 52px);
     padding-right: 30px;
   }
 
-  .projectBranchObject {
-    --branch-object-width: clamp(840px, 72vw, 1120px);
-    --branch-object-right: -44px;
-    --branch-object-top: 34vh;
-  }
-
   .branchScene {
-    --branch-project-right: -20px;
-    --branch-project-top: 31vh;
-    --branch-width: clamp(600px, 50vw, 860px);
+    width: 100%;
   }
 
   .branchPosition {
@@ -1125,16 +1241,10 @@
     font-size: 1rem;
   }
 
-  .projectBranchObject {
-    --branch-object-width: 112vw;
-    --branch-object-right: -42px;
-    --branch-object-top: 50vh;
-  }
-
-  .branchScene {
-    --branch-project-right: -28px;
-    --branch-project-top: 42vh;
-    --branch-width: clamp(540px, 72vw, 720px);
+  .projectBranchScene {
+    top: 52vh;
+    right: 12px;
+    width: min(82vw, 760px);
   }
 
   .branchPosition {
@@ -1196,21 +1306,15 @@
 
   .projectBranchScene {
     position: absolute;
-    min-height: 100%;
-  }
-
-  .projectBranchObject {
-    --branch-object-width: 126vw;
-    --branch-object-right: -36px;
-    --branch-object-top: 58vh;
+    top: 56vh;
+    right: 8px;
+    width: min(92vw, 620px);
   }
 
   .branchScene {
     position: relative;
-    inset: auto;
     transform: none;
-    height: auto;
-    min-height: 0;
+    height: 100%;
   }
 
   .branchPosition {
@@ -1344,7 +1448,6 @@
   }
 
   .previewImage,
-  .projectLeafHint,
   .projectLeafVisual,
   .projectLeafImage,
   .projectLeafButton,
@@ -1377,9 +1480,5 @@
 
   .branchPosition[data-phase="projects"] {
     opacity: 1;
-  }
-
-  .projectBranchSceneEntered .projectLeafHint {
-    animation: none;
   }
 }
