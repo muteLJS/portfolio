@@ -5,11 +5,41 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import ProjectBranchScene from "./ProjectBranchScene";
 import type { Project } from "./ProjectBranchScene";
-import { getProjectStackIcon } from "./projectStackIcons";
 import styles from "./Projects.module.css";
 
 const getProjectDisplayTitle = (project: Project) =>
   project.id === "landing" ? "랜딩페이지" : project.title;
+
+const getProjectPreviewType = (project: Project | null) => {
+  if (!project) {
+    return "desktop";
+  }
+
+  if (project.id === "mute") {
+    return "mobile";
+  }
+
+  if (project.id === "goreon") {
+    return "responsive";
+  }
+
+  return "desktop";
+};
+
+const goreonMobilePreviewMap: Record<string, string> = {
+  "/img/web_imgs/goreon/cart.png": "/img/web_imgs/goreon/cart_mobile.png",
+  "/img/web_imgs/goreon/like.png": "/img/web_imgs/goreon/like_mobile.png",
+  "/img/web_imgs/goreon/main.png": "/img/web_imgs/goreon/main_mobile.png",
+  "/img/web_imgs/goreon/mypage.png": "/img/web_imgs/goreon/mypage_mobile.png",
+  "/img/web_imgs/goreon/payment.png": "/img/web_imgs/goreon/payment_mobile.png",
+  "/img/web_imgs/goreon/pc_assembly.png":
+    "/img/web_imgs/goreon/pc_assembly_mobile.png",
+  "/img/web_imgs/goreon/pc_assembly_quote.png":
+    "/img/web_imgs/goreon/pc_assmebly_quote_mobile.png",
+  "/img/web_imgs/goreon/popup.png": "/img/web_imgs/goreon/popup_mobile.png",
+  "/img/web_imgs/goreon/search_result.png":
+    "/img/web_imgs/goreon/search_result_mobile.png",
+};
 
 const projects: Project[] = [
   {
@@ -493,20 +523,6 @@ const getValidPages = (project: Project | null) => {
 const getInitialPageName = (project: Project | null) =>
   getValidPages(project)[0]?.name ?? project?.pages[0]?.name ?? null;
 
-const getReadableTextColor = (index: number, total: number) => {
-  const ratio = total <= 1 ? 0 : index / (total - 1);
-
-  if (ratio < 0.45) {
-    return "rgba(255, 249, 224, 0.8)";
-  }
-
-  if (ratio < 0.75) {
-    return "rgba(204, 210, 188, 0.78)";
-  }
-
-  return "rgba(42, 62, 54, 0.72)";
-};
-
 const getStackShortLabel = (stack: string) => {
   const labelMap: Record<string, string> = {
     "React Router": "Router",
@@ -524,20 +540,6 @@ const getStackShortLabel = (stack: string) => {
   };
 
   return labelMap[stack] ?? stack;
-};
-
-const getStackFallbackLabel = (stack: string) => {
-  if (/[가-힣]/.test(stack)) {
-    return stack.replace(/\s+/g, "").slice(0, 2);
-  }
-
-  return stack
-    .split(/\s+|\.|-/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 3)
-    .toUpperCase();
 };
 
 const projectRoleFallbackMap: Record<string, string> = {
@@ -583,21 +585,34 @@ export default function Projects() {
     selectedProject?.pages[0] ??
     null;
   const previewImage = selectedPage?.previewImage ?? selectedPage?.image ?? "";
+  const previewType = getProjectPreviewType(selectedProject);
+  const mobilePreviewImage = previewImage
+    ? goreonMobilePreviewMap[previewImage]
+    : undefined;
   const previewHref = selectedPage?.externalUrl ?? null;
   const previewImageKey = selectedProject
     ? `${selectedProject.id}:${previewImage}`
     : "";
+  const mobilePreviewImageKey = selectedProject
+    ? `${selectedProject.id}:mobile:${mobilePreviewImage ?? ""}`
+    : "";
   const selectedProjectDisplayTitle = selectedProject
     ? getProjectDisplayTitle(selectedProject)
     : "";
-  const pagePreviewLimit = selectedProject?.planning ? 4 : 5;
+  const isLongKoreanTitle =
+    selectedProject?.id === "ypbooks" || selectedProject?.id === "hangeul";
+  const selectedProjectNumber = selectedProject
+    ? `${String(selectedIndex + 1).padStart(2, "0")} / ${String(projects.length).padStart(2, "0")}`
+    : "";
+  const pagePreviewLimit = selectedProject?.planning ? 3 : 4;
   const visiblePages = validPages.slice(0, pagePreviewLimit);
   const hiddenPages = validPages.slice(pagePreviewLimit);
   const hiddenPageCount = selectedProject
     ? Math.max(validPages.length - visiblePages.length, 0)
     : 0;
-  const shownStacks = selectedProject?.stacks.slice(0, 8) ?? [];
-  const hiddenStacks = selectedProject?.stacks.slice(8) ?? [];
+  const stackPreviewLimit = 5;
+  const shownStacks = selectedProject?.stacks.slice(0, stackPreviewLimit) ?? [];
+  const hiddenStacks = selectedProject?.stacks.slice(stackPreviewLimit) ?? [];
   const hiddenStackCount = hiddenStacks.length;
   const selectProject = (project: Project) => {
     setSelectedProject(project);
@@ -663,7 +678,7 @@ export default function Projects() {
 
       const computedStyle = window.getComputedStyle(summary);
       const lineHeight = Number.parseFloat(computedStyle.lineHeight);
-      const collapsedHeight = lineHeight * 3;
+      const collapsedHeight = lineHeight * 2;
 
       setIsDescriptionOverflowing(summary.scrollHeight > collapsedHeight + 2);
     };
@@ -694,27 +709,47 @@ export default function Projects() {
     brokenImages[previewImageKey] || !previewImage ? (
       <span className={styles.previewFallback}>{selectedProjectDisplayTitle}</span>
     ) : (
-      <Image
-        key={previewImage}
-        className={styles.previewImage}
-        src={previewImage}
-        alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
-        width={960}
-        height={600}
-        sizes="(max-width: 900px) calc(100vw - 64px), 560px"
-        onError={() =>
-          setBrokenImages((current) => ({
-            ...current,
-            [previewImageKey]: true,
-          }))
-        }
-      />
+      <div className={styles.previewMedia} data-preview-type={previewType}>
+        <Image
+          key={previewImage}
+          className={styles.previewImage}
+          src={previewImage}
+          alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
+          width={960}
+          height={600}
+          sizes="(max-width: 900px) calc(100vw - 64px), 560px"
+          onError={() =>
+            setBrokenImages((current) => ({
+              ...current,
+              [previewImageKey]: true,
+            }))
+          }
+        />
+        {previewType === "responsive" &&
+        mobilePreviewImage &&
+        !brokenImages[mobilePreviewImageKey] ? (
+          <Image
+            key={mobilePreviewImage}
+            className={styles.previewMobileImage}
+            src={mobilePreviewImage}
+            alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} mobile screen`}
+            width={360}
+            height={720}
+            sizes="120px"
+            onError={() =>
+              setBrokenImages((current) => ({
+                ...current,
+                [mobilePreviewImageKey]: true,
+              }))
+            }
+          />
+        ) : null}
+      </div>
     )
   ) : null;
 
-  const detailPanel = selectedProject ? (
-    <article className={styles.detailPanel} aria-live="polite">
-      <div className={styles.previewFrame}>
+  const previewFrame = selectedProject ? (
+    <div className={styles.previewFrame}>
         <button
           type="button"
           className={`${styles.previewSideNav} ${styles.previewSideNavPrev}`}
@@ -761,23 +796,38 @@ export default function Projects() {
           }}
           aria-label="프로젝트 닫기"
         >
-          ×
+          <svg
+            className={styles.detailCloseIcon}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path d="M6.5 6.5 17.5 17.5" />
+            <path d="m17.5 6.5-11 11" />
+          </svg>
         </button>
       </div>
+  ) : null;
+
+  const detailPanel = selectedProject ? (
+    <article className={styles.detailPanel} aria-live="polite">
 
       <div className={styles.detailContent}>
-        <div className={styles.detailHeader}>
-          <h3 className={styles.detailTitle}>{selectedProjectDisplayTitle}</h3>
-          <p className={styles.detailTagline}>{selectedProject.tagline}</p>
-        </div>
+        <header className={styles.detailHeader}>
+          <p className={styles.projectNumber}>{selectedProjectNumber}</p>
+          <h3
+            className={`${styles.detailTitle} ${
+              isLongKoreanTitle ? styles.detailTitleKoreanLong : ""
+            }`}
+          >
+            {selectedProjectDisplayTitle}
+          </h3>
+        </header>
 
-        <div className={`${styles.detailBody} ${styles.detailText}`}>
+        <div className={styles.detailInfoGroup}>
+          <p className={styles.detailTagline}>{selectedProject.tagline}</p>
           <ul className={styles.detailMetaList}>
-            <li>
-              {[selectedProject.period, selectedProject.team]
-                .filter(Boolean)
-                .join(" / ")}
-            </li>
+            {selectedProject.period ? <li>{selectedProject.period}</li> : null}
+            {selectedProject.team ? <li>{selectedProject.team}</li> : null}
             <li>{getProjectRoleText(selectedProject)}</li>
           </ul>
           <div className={styles.descriptionBlock}>
@@ -807,6 +857,7 @@ export default function Projects() {
             ) : null}
           </div>
         </div>
+        {previewFrame}
         <div
           className={styles.bottomInfo}
           data-hidden={isDescriptionOpen ? "true" : "false"}
@@ -874,34 +925,35 @@ export default function Projects() {
                           type="button"
                           className={styles.overflowMoreButton}
                           onClick={() => {
-                            setIsStacksOpen(false);
                             setIsDescriptionOpen(false);
                             setIsPagesOpen((value) => !value);
                           }}
                         >
                           +{hiddenPageCount}
                         </button>
-                        {isPagesOpen && hiddenPages.length > 0 ? (
-                          <div className={styles.sideFlyout}>
-                            {hiddenPages.map((page, index) => (
-                              <button
-                                key={page.name}
-                                type="button"
-                                className={styles.sideFlyoutButton}
-                                style={
-                                  {
-                                    "--i": index,
-                                  } as CSSProperties
-                                }
-                                onClick={() => handlePageClick(page.name)}
-                              >
-                                {page.name}
-                              </button>
-                            ))}
-                          </div>
-                        ) : null}
                       </li>
                     ) : null}
+                    {isPagesOpen
+                      ? hiddenPages.map((page, index) => (
+                          <li
+                            key={page.name}
+                            style={
+                              {
+                                "--i": index,
+                              } as CSSProperties
+                            }
+                          >
+                            <button
+                              type="button"
+                              className={styles.pageTextButton}
+                              data-active={selectedPage?.name === page.name}
+                              onClick={() => handlePageClick(page.name)}
+                            >
+                              {page.name}
+                            </button>
+                          </li>
+                        ))
+                      : null}
                   </ul>
                 </div>
               </section>
@@ -917,88 +969,41 @@ export default function Projects() {
                     className={styles.stackIconList}
                     title={selectedProject.stacks.join(" / ")}
                   >
-                    {shownStacks.map((stack, index) => {
-                      const stackIcon = getProjectStackIcon(stack);
-
-                      return (
-                        <li
-                          key={stack}
-                          className={styles.stackIconItem}
-                          title={stack}
-                          style={
-                            {
-                              "--readable-color": getReadableTextColor(
-                                index,
-                                selectedProject.stacks.length,
-                              ),
-                            } as CSSProperties
-                          }
-                        >
-                          {stackIcon ? (
-                            <i
-                              className={`${stackIcon.className} ${styles.stackIcon}`}
-                              aria-hidden="true"
-                            />
-                          ) : (
-                            <span className={styles.stackIconFallback} aria-hidden="true">
-                              {getStackFallbackLabel(stack)}
-                            </span>
-                          )}
-                          <span className={styles.stackIconLabel}>
-                            {getStackShortLabel(stack)}
-                          </span>
-                        </li>
-                      );
-                    })}
+                    {shownStacks.map((stack) => (
+                      <li key={stack} className={styles.stackTextItem} title={stack}>
+                        {getStackShortLabel(stack)}
+                      </li>
+                    ))}
                     {hiddenStackCount > 0 ? (
                       <li className={`${styles.stackMoreItem} ${styles.overflowMoreItem}`}>
                         <button
                           type="button"
                           className={styles.overflowMoreButton}
                           onClick={() => {
-                            setIsPagesOpen(false);
                             setIsDescriptionOpen(false);
                             setIsStacksOpen((value) => !value);
                           }}
                         >
                           +{hiddenStackCount}
                         </button>
-                        {isStacksOpen && hiddenStacks.length > 0 ? (
-                          <div className={`${styles.sideFlyout} ${styles.stackSideFlyout}`}>
-                            {hiddenStacks.map((stack, index) => {
-                              const stackIcon = getProjectStackIcon(stack);
-
-                              return (
-                                <div
-                                  key={stack}
-                                  className={styles.stackFlyoutItem}
-                                  title={stack}
-                                  style={
-                                    {
-                                      "--i": index,
-                                    } as CSSProperties
-                                  }
-                                >
-                                  {stackIcon ? (
-                                    <i
-                                      className={`${stackIcon.className} ${styles.stackIcon}`}
-                                      aria-hidden="true"
-                                    />
-                                  ) : (
-                                    <span className={styles.stackIconFallback} aria-hidden="true">
-                                      {getStackFallbackLabel(stack)}
-                                    </span>
-                                  )}
-                                  <span className={styles.stackIconLabel}>
-                                    {getStackShortLabel(stack)}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        ) : null}
                       </li>
                     ) : null}
+                    {isStacksOpen
+                      ? hiddenStacks.map((stack, index) => (
+                          <li
+                            key={stack}
+                            className={styles.stackTextItem}
+                            title={stack}
+                            style={
+                              {
+                                "--i": index,
+                              } as CSSProperties
+                            }
+                          >
+                            {getStackShortLabel(stack)}
+                          </li>
+                        ))
+                      : null}
                   </ul>
                 </div>
               </section>
@@ -1016,6 +1021,7 @@ export default function Projects() {
       id="projects"
       className={styles.projects}
       aria-labelledby="projects-title"
+      data-detail-open={selectedProject ? "true" : "false"}
       data-reveal-section="true"
     >
       <video
