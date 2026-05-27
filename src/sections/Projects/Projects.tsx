@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ProjectBranchScene from "./ProjectBranchScene";
 import type { Project } from "./ProjectBranchScene";
@@ -29,8 +29,11 @@ const getProjectPreviewType = (project: Project | null) => {
 const goreonMobilePreviewMap: Record<string, string> = {
   "/img/web_imgs/goreon/cart.png": "/img/web_imgs/goreon/cart_mobile.png",
   "/img/web_imgs/goreon/like.png": "/img/web_imgs/goreon/like_mobile.png",
+  "/img/web_imgs/goreon/login.png": "/img/web_imgs/goreon/login_mobile.png",
   "/img/web_imgs/goreon/main.png": "/img/web_imgs/goreon/main_mobile.png",
   "/img/web_imgs/goreon/mypage.png": "/img/web_imgs/goreon/mypage_mobile.png",
+  "/img/web_imgs/goreon/order_history.png":
+    "/img/web_imgs/goreon/order-history_mobile.png",
   "/img/web_imgs/goreon/payment.png": "/img/web_imgs/goreon/payment_mobile.png",
   "/img/web_imgs/goreon/pc_assembly.png":
     "/img/web_imgs/goreon/pc_assembly_mobile.png",
@@ -41,7 +44,22 @@ const goreonMobilePreviewMap: Record<string, string> = {
     "/img/web_imgs/goreon/search_result_mobile.png",
 };
 
-const projects: Project[] = [
+const getMobilePreviewImage = (project: Project | null, previewImage: string) => {
+  if (project?.id !== "goreon" || !previewImage) {
+    return null;
+  }
+
+  return goreonMobilePreviewMap[previewImage] ?? null;
+};
+
+const projectOrder = ["landing", "ypbooks", "mute", "goreon", "hangeul"];
+const getProjectOrderIndex = (project: Project) => {
+  const index = projectOrder.indexOf(project.id);
+
+  return index === -1 ? projectOrder.length : index;
+};
+
+const projects: Project[] = ([
   {
     id: "mute",
     title: "Mute",
@@ -282,12 +300,12 @@ const projects: Project[] = [
       },
       { name: "Cart", image: null, previewImage: "/img/web_imgs/goreon/cart.png" },
       { name: "Wishlist", image: null, previewImage: "/img/web_imgs/goreon/like.png" },
-      { name: "Login", image: null },
+      { name: "Login", image: null, previewImage: "/img/web_imgs/goreon/login.png" },
       { name: "My Page", image: null, previewImage: "/img/web_imgs/goreon/mypage.png" },
       {
         name: "Order List",
         image: null,
-        previewImage: "/img/web_imgs/goreon/orderlist.png",
+        previewImage: "/img/web_imgs/goreon/order_history.png",
       },
       {
         name: "PC Assembly",
@@ -500,9 +518,9 @@ const projects: Project[] = [
     },
     accent: "dark",
   },
-];
+] satisfies Project[]).sort((a, b) => getProjectOrderIndex(a) - getProjectOrderIndex(b));
 
-const DETAIL_DEBUG_PROJECT_ID: string | null = "ypbooks";
+const DETAIL_DEBUG_PROJECT_ID: string | null = "goreon";
 
 const initialDebugProject = DETAIL_DEBUG_PROJECT_ID
   ? projects.find((project) => project.id === DETAIL_DEBUG_PROJECT_ID) ?? null
@@ -566,12 +584,18 @@ export default function Projects() {
   const [isPlanningOpen, setIsPlanningOpen] = useState(false);
   const [isPagesOpen, setIsPagesOpen] = useState(false);
   const [isStacksOpen, setIsStacksOpen] = useState(false);
-  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const [expandedSummaryProjectId, setExpandedSummaryProjectId] = useState<
+    string | null
+  >(null);
+  const [closingSummaryProjectId, setClosingSummaryProjectId] = useState<
+    string | null
+  >(null);
   const [isDescriptionOverflowing, setIsDescriptionOverflowing] = useState(false);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const sectionRef = useRef<HTMLElement | null>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement | null>(null);
-  const summaryRef = useRef<HTMLParagraphElement | null>(null);
+  const summaryRef = useRef<HTMLSpanElement | null>(null);
+  const summaryCloseTimerRef = useRef<number | null>(null);
   const selectedIndex = selectedProject
     ? projects.findIndex((project) => project.id === selectedProject.id)
     : 0;
@@ -586,9 +610,7 @@ export default function Projects() {
     null;
   const previewImage = selectedPage?.previewImage ?? selectedPage?.image ?? "";
   const previewType = getProjectPreviewType(selectedProject);
-  const mobilePreviewImage = previewImage
-    ? goreonMobilePreviewMap[previewImage]
-    : undefined;
+  const mobilePreviewImage = getMobilePreviewImage(selectedProject, previewImage);
   const previewHref = selectedPage?.externalUrl ?? null;
   const previewImageKey = selectedProject
     ? `${selectedProject.id}:${previewImage}`
@@ -601,33 +623,89 @@ export default function Projects() {
     : "";
   const isLongKoreanTitle =
     selectedProject?.id === "ypbooks" || selectedProject?.id === "hangeul";
-  const selectedProjectNumber = selectedProject
-    ? `${String(selectedIndex + 1).padStart(2, "0")} / ${String(projects.length).padStart(2, "0")}`
+  const currentProjectNumber = selectedProject
+    ? String(selectedIndex + 1).padStart(2, "0")
     : "";
-  const pagePreviewLimit = selectedProject?.planning ? 3 : 4;
+  const totalProjectNumber = String(projects.length).padStart(2, "0");
+  const isSummaryExpanded = selectedProject
+    ? expandedSummaryProjectId === selectedProject.id
+    : false;
+  const isSummaryClosing = selectedProject
+    ? closingSummaryProjectId === selectedProject.id
+    : false;
+  const summaryState = isSummaryClosing
+    ? "closing"
+    : isSummaryExpanded
+      ? "expanded"
+      : "collapsed";
+  const pagePreviewLimit = selectedProject?.planning ? 5 : 6;
   const visiblePages = validPages.slice(0, pagePreviewLimit);
-  const hiddenPages = validPages.slice(pagePreviewLimit);
+  const overflowPages = validPages.slice(pagePreviewLimit);
   const hiddenPageCount = selectedProject
     ? Math.max(validPages.length - visiblePages.length, 0)
     : 0;
-  const stackPreviewLimit = 5;
+  const stackPreviewLimit = 6;
   const shownStacks = selectedProject?.stacks.slice(0, stackPreviewLimit) ?? [];
-  const hiddenStacks = selectedProject?.stacks.slice(stackPreviewLimit) ?? [];
-  const hiddenStackCount = hiddenStacks.length;
+  const overflowStacks = selectedProject?.stacks.slice(stackPreviewLimit) ?? [];
+  const hiddenStackCount = overflowStacks.length;
+  const pageListItemCount =
+    (selectedProject?.planning ? 1 : 0) + visiblePages.length;
+  const stackListItemCount = shownStacks.length;
+  const clearSummaryCloseTimer = () => {
+    if (summaryCloseTimerRef.current !== null) {
+      window.clearTimeout(summaryCloseTimerRef.current);
+      summaryCloseTimerRef.current = null;
+    }
+  };
+
+  const resetSummaryState = () => {
+    clearSummaryCloseTimer();
+    setExpandedSummaryProjectId(null);
+    setClosingSummaryProjectId(null);
+  };
+
+  const handleSummaryToggle = (projectId: string) => {
+    if (closingSummaryProjectId === projectId) {
+      clearSummaryCloseTimer();
+      setClosingSummaryProjectId(null);
+      setExpandedSummaryProjectId(projectId);
+      return;
+    }
+
+    if (expandedSummaryProjectId === projectId) {
+      clearSummaryCloseTimer();
+      setClosingSummaryProjectId(projectId);
+      summaryCloseTimerRef.current = window.setTimeout(() => {
+        setExpandedSummaryProjectId((currentProjectId) =>
+          currentProjectId === projectId ? null : currentProjectId,
+        );
+        setClosingSummaryProjectId((currentProjectId) =>
+          currentProjectId === projectId ? null : currentProjectId,
+        );
+        summaryCloseTimerRef.current = null;
+      }, 620);
+      return;
+    }
+
+    clearSummaryCloseTimer();
+    setExpandedSummaryProjectId(projectId);
+    setClosingSummaryProjectId(null);
+  };
+
   const selectProject = (project: Project) => {
     setSelectedProject(project);
     setSelectedPageName(getInitialPageName(project));
     setIsPlanningOpen(false);
     setIsPagesOpen(false);
     setIsStacksOpen(false);
-    setIsDescriptionOpen(false);
+    resetSummaryState();
   };
 
   const handlePlanningClick = () => {
     setIsPlanningOpen(true);
     setIsPagesOpen(false);
     setIsStacksOpen(false);
-    setIsDescriptionOpen(false);
+    resetSummaryState();
   };
 
   const handlePageClick = (pageName: string) => {
@@ -635,8 +713,14 @@ export default function Projects() {
     setIsPlanningOpen(false);
     setIsPagesOpen(false);
     setIsStacksOpen(false);
-    setIsDescriptionOpen(false);
+    resetSummaryState();
   };
+
+  useEffect(() => {
+    return () => {
+      clearSummaryCloseTimer();
+    };
+  }, []);
 
   useEffect(() => {
     const video = backgroundVideoRef.current;
@@ -710,39 +794,91 @@ export default function Projects() {
       <span className={styles.previewFallback}>{selectedProjectDisplayTitle}</span>
     ) : (
       <div className={styles.previewMedia} data-preview-type={previewType}>
-        <Image
-          key={previewImage}
-          className={styles.previewImage}
-          src={previewImage}
-          alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
-          width={960}
-          height={600}
-          sizes="(max-width: 900px) calc(100vw - 64px), 560px"
-          onError={() =>
-            setBrokenImages((current) => ({
-              ...current,
-              [previewImageKey]: true,
-            }))
-          }
-        />
-        {previewType === "responsive" &&
-        mobilePreviewImage &&
-        !brokenImages[mobilePreviewImageKey] ? (
+        {previewType === "responsive" && previewHref ? (
+          <a
+            className={styles.previewImageLink}
+            href={previewHref}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${selectedPage?.name ?? selectedProject.title} desktop preview open in new tab`}
+          >
+            <Image
+              key={previewImage}
+              className={styles.previewImage}
+              src={previewImage}
+              alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
+              width={960}
+              height={600}
+              sizes="(max-width: 900px) calc(100vw - 64px), 560px"
+              onError={() =>
+                setBrokenImages((current) => ({
+                  ...current,
+                  [previewImageKey]: true,
+                }))
+              }
+            />
+          </a>
+        ) : (
           <Image
-            key={mobilePreviewImage}
-            className={styles.previewMobileImage}
-            src={mobilePreviewImage}
-            alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} mobile screen`}
-            width={360}
-            height={720}
-            sizes="120px"
+            key={previewImage}
+            className={styles.previewImage}
+            src={previewImage}
+            alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
+            width={960}
+            height={600}
+            sizes="(max-width: 900px) calc(100vw - 64px), 560px"
             onError={() =>
               setBrokenImages((current) => ({
                 ...current,
-                [mobilePreviewImageKey]: true,
+                [previewImageKey]: true,
               }))
             }
           />
+        )}
+        {previewType === "responsive" &&
+        mobilePreviewImage &&
+        !brokenImages[mobilePreviewImageKey] ? (
+          previewHref ? (
+            <a
+              className={styles.previewMobileImageLink}
+              href={previewHref}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${selectedProject.title} ${selectedPage?.name ?? "main"} mobile preview open in new tab`}
+            >
+              <Image
+                key={mobilePreviewImage}
+                className={styles.previewMobileImage}
+                src={mobilePreviewImage}
+                alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} mobile screen`}
+                width={360}
+                height={720}
+                sizes="120px"
+                onError={() =>
+                  setBrokenImages((current) => ({
+                    ...current,
+                    [mobilePreviewImageKey]: true,
+                  }))
+                }
+              />
+            </a>
+          ) : (
+            <Image
+              key={mobilePreviewImage}
+              className={styles.previewMobileImage}
+              src={mobilePreviewImage}
+              alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} mobile screen`}
+              width={360}
+              height={720}
+              sizes="120px"
+              onError={() =>
+                setBrokenImages((current) => ({
+                  ...current,
+                  [mobilePreviewImageKey]: true,
+                }))
+              }
+            />
+          )
         ) : null}
       </div>
     )
@@ -750,70 +886,61 @@ export default function Projects() {
 
   const previewFrame = selectedProject ? (
     <div className={styles.previewFrame}>
-        <button
-          type="button"
-          className={`${styles.previewSideNav} ${styles.previewSideNavPrev}`}
-          onClick={() => selectProject(previousProject)}
-          aria-label="이전 프로젝트 보기"
-        />
-
-        {previewHref ? (
-          <a
-            className={styles.previewLink}
-            href={previewHref}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`${selectedPage?.name ?? selectedProject.title} preview open in new tab`}
-          >
-            {previewContent}
-          </a>
-        ) : (
-          <div
-            className={styles.previewLink}
-            data-clickable="false"
-            aria-label={`${selectedPage?.name ?? selectedProject.title} preview`}
-          >
-            {previewContent}
-          </div>
-        )}
-
-        <button
-          type="button"
-          className={`${styles.previewSideNav} ${styles.previewSideNavNext}`}
-          onClick={() => selectProject(nextProject)}
-          aria-label="다음 프로젝트 보기"
-        />
-
-        <button
-          className={styles.detailCloseButton}
-          type="button"
-          onClick={() => {
-            setSelectedProject(null);
-            setIsPlanningOpen(false);
-            setIsPagesOpen(false);
-            setIsStacksOpen(false);
-            setIsDescriptionOpen(false);
-          }}
-          aria-label="프로젝트 닫기"
+      {previewHref && previewType !== "responsive" ? (
+        <a
+          className={styles.previewLink}
+          href={previewHref}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`${selectedPage?.name ?? selectedProject.title} preview open in new tab`}
         >
-          <svg
-            className={styles.detailCloseIcon}
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path d="M6.5 6.5 17.5 17.5" />
-            <path d="m17.5 6.5-11 11" />
-          </svg>
-        </button>
-      </div>
+          {previewContent}
+        </a>
+      ) : (
+        <div
+          className={styles.previewLink}
+          data-clickable="false"
+          aria-label={`${selectedPage?.name ?? selectedProject.title} preview`}
+        >
+          {previewContent}
+        </div>
+      )}
+    </div>
   ) : null;
 
   const detailPanel = selectedProject ? (
     <article className={styles.detailPanel} aria-live="polite">
 
       <div className={styles.detailContent}>
-        <header className={styles.detailHeader}>
-          <p className={styles.projectNumber}>{selectedProjectNumber}</p>
+        <div className={styles.numberRow}>
+          <p className={styles.projectNumber}>
+            <span className={styles.currentNumber}>{currentProjectNumber}</span>
+            <span className={styles.numberSlash}>/</span>
+            <span className={styles.totalNumber}>{totalProjectNumber}</span>
+          </p>
+          <button
+            className={styles.detailCloseButton}
+            type="button"
+            onClick={() => {
+              setSelectedProject(null);
+              setIsPlanningOpen(false);
+              setIsPagesOpen(false);
+              setIsStacksOpen(false);
+              resetSummaryState();
+            }}
+            aria-label="프로젝트 닫기"
+          >
+            <svg
+              className={styles.detailCloseIcon}
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M6.5 6.5 17.5 17.5" />
+              <path d="m17.5 6.5-11 11" />
+            </svg>
+          </button>
+        </div>
+        <div className={styles.titleRow}>
           <h3
             className={`${styles.detailTitle} ${
               isLongKoreanTitle ? styles.detailTitleKoreanLong : ""
@@ -821,48 +948,63 @@ export default function Projects() {
           >
             {selectedProjectDisplayTitle}
           </h3>
-        </header>
-
-        <div className={styles.detailInfoGroup}>
+        </div>
+        <div className={styles.taglineRow}>
           <p className={styles.detailTagline}>{selectedProject.tagline}</p>
+        </div>
+        <div className={styles.metaRow}>
           <ul className={styles.detailMetaList}>
             {selectedProject.period ? <li>{selectedProject.period}</li> : null}
             {selectedProject.team ? <li>{selectedProject.team}</li> : null}
             <li>{getProjectRoleText(selectedProject)}</li>
           </ul>
-          <div className={styles.descriptionBlock}>
-            <p
-              ref={summaryRef}
-              className={styles.detailSummary}
-              data-expanded={isDescriptionOpen ? "true" : "false"}
-              data-overflowing={isDescriptionOverflowing ? "true" : "false"}
+        </div>
+        <div
+          className={styles.summaryRow}
+          data-summary-state={summaryState}
+        >
+          <div
+            className={styles.summaryBox}
+            data-summary-state={summaryState}
+          >
+            <button
+              type="button"
+              className={styles.summaryToggleButton}
+              onClick={() => handleSummaryToggle(selectedProject.id)}
+              aria-expanded={summaryState === "expanded"}
             >
-              {selectedProject.description}
-            </p>
-            {isDescriptionOverflowing ? (
-              <button
-                type="button"
-                className={styles.descriptionToggle}
-                onClick={() => {
-                  setIsDescriptionOpen((value) => !value);
-                  setIsPagesOpen(false);
-                  setIsStacksOpen(false);
-                  setIsPlanningOpen(false);
-                }}
-                aria-expanded={isDescriptionOpen}
-                aria-label={isDescriptionOpen ? "설명 접기" : "설명 펼치기"}
+              <span
+                ref={summaryRef}
+                className={styles.detailSummary}
+                data-summary-state={summaryState}
+                data-overflowing={isDescriptionOverflowing ? "true" : "false"}
               >
-                <span className={styles.descriptionChevron} aria-hidden="true" />
-              </button>
-            ) : null}
+                {selectedProject.description}
+              </span>
+            </button>
+          </div>
+          <div className={styles.summaryNavControls}>
+            <button
+              type="button"
+              className={`${styles.previewSideNav} ${styles.previewSideNavPrev}`}
+              onClick={() => selectProject(previousProject)}
+              aria-label="이전 프로젝트 보기"
+            />
+            <button
+              type="button"
+              className={`${styles.previewSideNav} ${styles.previewSideNavNext}`}
+              onClick={() => selectProject(nextProject)}
+              aria-label="다음 프로젝트 보기"
+            />
           </div>
         </div>
-        {previewFrame}
         <div
-          className={styles.bottomInfo}
-          data-hidden={isDescriptionOpen ? "true" : "false"}
-          aria-hidden={isDescriptionOpen}
+          className={styles.mediaRow}
+          data-summary-state={summaryState}
         >
+          <div className={styles.detailMediaArea}>{previewFrame}</div>
+        </div>
+        <div className={styles.bottomInfo}>
           <div className={styles.detailMetaArea}>
             {isPlanningOpen ? (
             <div className={styles.planningInlinePanel}>
@@ -890,121 +1032,157 @@ export default function Projects() {
             </div>
           ) : (
             <>
-              <section className={styles.pagesBlock} aria-label="project pages">
+              <section
+                className={styles.pagesBlock}
+                data-expanded={isPagesOpen ? "true" : "false"}
+                aria-label="project pages"
+              >
                 <div className={styles.pagesHeader}>
                   <h4>Pages</h4>
                 </div>
-                <div className={styles.inlineOverflowRow}>
-                  <ul className={styles.pageQuickList}>
-                    {selectedProject.planning ? (
-                      <li>
-                        <button
-                          type="button"
-                          className={styles.pageTextButton}
-                          onClick={handlePlanningClick}
+                <div className={styles.pagesContent}>
+                  <div className={styles.inlineOverflowRow}>
+                    <ul className={styles.pageQuickList}>
+                      {selectedProject.planning ? (
+                        <li
+                          className={styles.pageListItem}
+                          data-last={pageListItemCount === 1 ? "true" : "false"}
                         >
-                          {selectedProject.planning.title}
-                        </button>
-                      </li>
-                    ) : null}
-                    {visiblePages.map((page) => (
-                      <li key={page.name}>
-                        <button
-                          type="button"
-                          className={styles.pageTextButton}
-                          data-active={selectedPage?.name === page.name}
-                          onClick={() => handlePageClick(page.name)}
-                        >
-                          {page.name}
-                        </button>
-                      </li>
-                    ))}
-                    {hiddenPageCount > 0 ? (
-                      <li className={styles.overflowMoreItem}>
-                        <button
-                          type="button"
-                          className={styles.overflowMoreButton}
-                          onClick={() => {
-                            setIsDescriptionOpen(false);
-                            setIsPagesOpen((value) => !value);
-                          }}
-                        >
-                          +{hiddenPageCount}
-                        </button>
-                      </li>
-                    ) : null}
-                    {isPagesOpen
-                      ? hiddenPages.map((page, index) => (
-                          <li
-                            key={page.name}
-                            style={
-                              {
-                                "--i": index,
-                              } as CSSProperties
-                            }
+                          <button
+                            type="button"
+                            className={styles.pageTextButton}
+                            onClick={handlePlanningClick}
                           >
-                            <button
-                              type="button"
-                              className={styles.pageTextButton}
-                              data-active={selectedPage?.name === page.name}
-                              onClick={() => handlePageClick(page.name)}
-                            >
-                              {page.name}
-                            </button>
-                          </li>
-                        ))
-                      : null}
-                  </ul>
+                            {selectedProject.planning.title}
+                          </button>
+                          {pageListItemCount > 1 ? (
+                            <span className={styles.inlineSeparator}>/</span>
+                          ) : null}
+                        </li>
+                      ) : null}
+                      {visiblePages.map((page, index) => {
+                        const itemIndex = (selectedProject.planning ? 1 : 0) + index;
+
+                        return (
+                        <li
+                          key={page.name}
+                          className={styles.pageListItem}
+                          data-last={itemIndex === pageListItemCount - 1 ? "true" : "false"}
+                        >
+                          <button
+                            type="button"
+                            className={styles.pageTextButton}
+                            data-active={selectedPage?.name === page.name}
+                            onClick={() => handlePageClick(page.name)}
+                          >
+                            {page.name}
+                          </button>
+                          {itemIndex < pageListItemCount - 1 ? (
+                            <span className={styles.inlineSeparator}>/</span>
+                          ) : null}
+                        </li>
+                        );
+                      })}
+                    </ul>
+                    {hiddenPageCount > 0 ? (
+                      <button
+                        type="button"
+                        className={styles.overflowMoreButton}
+                        onClick={() => {
+                          setIsPagesOpen((value) => !value);
+                          setIsStacksOpen(false);
+                        }}
+                      >
+                        {isPagesOpen ? `-${hiddenPageCount}` : `+${hiddenPageCount}`}
+                      </button>
+                    ) : null}
+                  </div>
+                  {isPagesOpen && overflowPages.length > 0 ? (
+                    <ul className={styles.expandedOverflowList}>
+                      {overflowPages.map((page, index) => (
+                        <li
+                          key={page.name}
+                          className={styles.pageListItem}
+                          data-last={index === overflowPages.length - 1 ? "true" : "false"}
+                        >
+                          <button
+                            type="button"
+                            className={styles.pageTextButton}
+                            data-active={selectedPage?.name === page.name}
+                            onClick={() => handlePageClick(page.name)}
+                          >
+                            {page.name}
+                          </button>
+                          {index < overflowPages.length - 1 ? (
+                            <span className={styles.inlineSeparator}>/</span>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
               </section>
 
               <section
                 className={styles.detailStacks}
+                data-expanded={isStacksOpen ? "true" : "false"}
                 aria-label="project tech stack"
               >
                 <h4>STACK</h4>
 
-                <div className={styles.inlineOverflowRow}>
-                  <ul
-                    className={styles.stackIconList}
-                    title={selectedProject.stacks.join(" / ")}
-                  >
-                    {shownStacks.map((stack) => (
-                      <li key={stack} className={styles.stackTextItem} title={stack}>
-                        {getStackShortLabel(stack)}
-                      </li>
-                    ))}
-                    {hiddenStackCount > 0 ? (
-                      <li className={`${styles.stackMoreItem} ${styles.overflowMoreItem}`}>
-                        <button
-                          type="button"
-                          className={styles.overflowMoreButton}
-                          onClick={() => {
-                            setIsDescriptionOpen(false);
-                            setIsStacksOpen((value) => !value);
-                          }}
+                <div className={styles.stackContent}>
+                  <div className={styles.inlineOverflowRow}>
+                    <ul
+                      className={styles.stackIconList}
+                      title={selectedProject.stacks.join(" / ")}
+                    >
+                      {shownStacks.map((stack, index) => (
+                        <li
+                          key={stack}
+                          className={styles.stackTextItem}
+                          data-last={index === stackListItemCount - 1 ? "true" : "false"}
+                          title={stack}
                         >
-                          +{hiddenStackCount}
-                        </button>
-                      </li>
+                          {getStackShortLabel(stack)}
+                          {index < stackListItemCount - 1 ? (
+                            <span className={styles.inlineSeparator}>/</span>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                    {hiddenStackCount > 0 ? (
+                      <button
+                        type="button"
+                        className={styles.overflowMoreButton}
+                        onClick={() => {
+                          setIsPagesOpen(false);
+                          setIsStacksOpen((value) => !value);
+                        }}
+                      >
+                        {isStacksOpen ? `-${hiddenStackCount}` : `+${hiddenStackCount}`}
+                      </button>
                     ) : null}
-                    {isStacksOpen
-                      ? hiddenStacks.map((stack, index) => (
-                          <li
-                            key={stack}
-                            className={styles.stackTextItem}
-                            title={stack}
-                            style={
-                              {
-                                "--i": index,
-                              } as CSSProperties
-                            }
-                          >
-                            {getStackShortLabel(stack)}
-                          </li>
-                        ))
-                      : null}
-                  </ul>
+                  </div>
+                  {isStacksOpen && overflowStacks.length > 0 ? (
+                    <ul
+                      className={styles.expandedOverflowList}
+                      title={overflowStacks.join(" / ")}
+                    >
+                      {overflowStacks.map((stack, index) => (
+                        <li
+                          key={stack}
+                          className={styles.stackTextItem}
+                          data-last={index === overflowStacks.length - 1 ? "true" : "false"}
+                          title={stack}
+                        >
+                          {getStackShortLabel(stack)}
+                          {index < overflowStacks.length - 1 ? (
+                            <span className={styles.inlineSeparator}>/</span>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
               </section>
             </>
