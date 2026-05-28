@@ -63,7 +63,18 @@ type ProjectBranchSceneProps = {
   selectedProject: Project | null;
 };
 
-const BRANCH_PIECES = [
+type BranchPiece = {
+  intrinsicHeight: number;
+  intrinsicWidth: number;
+  isBranch?: boolean;
+  left: string;
+  name: string;
+  src: string;
+  top: string;
+  width: string;
+};
+
+const BRANCH_PIECES: BranchPiece[] = [
   {
     name: "left",
     src: "/img/branch_new/left.png",
@@ -172,7 +183,23 @@ type BranchPieceStyle = CSSProperties & {
   "--piece-width": string;
 };
 
-const BRANCH_DEBUG_HIT_AREAS = [
+type BranchDebugHitArea = {
+  color: string;
+  height: string;
+  id: string;
+  label: string;
+  labelLeft?: string;
+  labelOffsetX?: string;
+  labelOffsetY?: string;
+  labelTop?: string;
+  left: string;
+  rotate: string;
+  top: string;
+  type: "continue" | "project";
+  width: string;
+};
+
+const BRANCH_DEBUG_HIT_AREAS: BranchDebugHitArea[] = [
   {
     id: "hangeul",
     label: "hangeul",
@@ -183,6 +210,10 @@ const BRANCH_DEBUG_HIT_AREAS = [
     height: "28%",
     rotate: "12deg",
     color: "rgba(255, 86, 86, 0.32)",
+    labelLeft: "31.8%",
+    labelTop: "24%",
+    labelOffsetX: "0px",
+    labelOffsetY: "0px",
   },
   {
     id: "mute",
@@ -194,6 +225,10 @@ const BRANCH_DEBUG_HIT_AREAS = [
     height: "27.2%",
     rotate: "8deg",
     color: "rgba(255, 146, 64, 0.32)",
+    labelLeft: "62%",
+    labelTop: "26.3%",
+    labelOffsetX: "0px",
+    labelOffsetY: "0px",
   },
   {
     id: "goreon",
@@ -205,6 +240,10 @@ const BRANCH_DEBUG_HIT_AREAS = [
     height: "28.8%",
     rotate: "-10deg",
     color: "rgba(74, 163, 255, 0.32)",
+    labelLeft: "19%",
+    labelTop: "60.8%",
+    labelOffsetX: "0px",
+    labelOffsetY: "0px",
   },
   {
     id: "continue",
@@ -227,6 +266,10 @@ const BRANCH_DEBUG_HIT_AREAS = [
     height: "16%",
     rotate: "-57deg",
     color: "rgba(178, 104, 255, 0.32)",
+    labelLeft: "77%",
+    labelTop: "85%",
+    labelOffsetX: "0px",
+    labelOffsetY: "0px",
   },
   {
     id: "ypbooks",
@@ -238,6 +281,10 @@ const BRANCH_DEBUG_HIT_AREAS = [
     height: "14%",
     rotate: "-32deg",
     color: "rgba(255, 216, 74, 0.32)",
+    labelLeft: "33.8%",
+    labelTop: "86%",
+    labelOffsetX: "0px",
+    labelOffsetY: "0px",
   },
 ];
 
@@ -255,7 +302,7 @@ export default function ProjectBranchScene({
   projects,
   selectedProject,
 }: ProjectBranchSceneProps) {
-  const getHitAreaStyle = (hit: (typeof BRANCH_DEBUG_HIT_AREAS)[number]) =>
+  const getHitAreaStyle = (hit: BranchDebugHitArea) =>
     ({
       "--hit-left": hit.left,
       "--hit-top": hit.top,
@@ -309,17 +356,59 @@ export default function ProjectBranchScene({
             }
 
             return (
-              <button
+              <div
                 key={hit.id}
-                type="button"
-                className={styles.branchDebugHitArea}
+                className={styles.projectLeafMarker}
                 style={getHitAreaStyle(hit)}
-                aria-label={`${project.title} 프로젝트 보기`}
-                aria-pressed={selectedProject?.id === project.id}
-                onClick={() => onSelectProject(project)}
               >
-                <span>{hit.label}</span>
-              </button>
+                <button
+                  type="button"
+                  className={styles.branchDebugHitArea}
+                  aria-label={`${project.title} 프로젝트 보기`}
+                  aria-pressed={selectedProject?.id === project.id}
+                  onClick={() => onSelectProject(project)}
+                >
+                  <span>{hit.label}</span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className={styles.branchLabelOverlay} aria-hidden="true">
+          {BRANCH_DEBUG_HIT_AREAS.map((hit) => {
+            if (hit.type !== "project") {
+              return null;
+            }
+
+            const project = projects.find((item) => item.id === hit.id);
+
+            if (!project) {
+              return null;
+            }
+
+            return (
+              <span
+                key={hit.id}
+                className={styles.branchProjectLabel}
+                data-active={selectedProject?.id === project.id ? "true" : "false"}
+                data-project-id={hit.id}
+                style={
+                  {
+                    "--label-left": hit.labelLeft ?? hit.left,
+                    "--label-top": hit.labelTop ?? hit.top,
+                    "--label-offset-x": hit.labelOffsetX ?? "0px",
+                    "--label-offset-y": hit.labelOffsetY ?? "0px",
+                  } as CSSProperties
+                }
+              >
+                <strong>{project.title}</strong>
+                <em>
+                  {String(
+                    projects.findIndex((item) => item.id === project.id) + 1,
+                  ).padStart(2, "0")}
+                </em>
+              </span>
             );
           })}
         </div>

@@ -1004,7 +1004,12 @@ export default function Projects() {
         >
           <div className={styles.detailMediaArea}>{previewFrame}</div>
         </div>
-        <div className={styles.bottomInfo}>
+        <div
+          className={styles.bottomInfo}
+          data-expanded-type={
+            isPagesOpen ? "pages" : isStacksOpen ? "stacks" : "none"
+          }
+        >
           <div className={styles.detailMetaArea}>
             {isPlanningOpen ? (
             <div className={styles.planningInlinePanel}>
@@ -1040,7 +1045,10 @@ export default function Projects() {
                 <div className={styles.pagesHeader}>
                   <h4>Pages</h4>
                 </div>
-                <div className={styles.pagesContent}>
+                <div
+                  className={styles.pagesContent}
+                  data-expanded={isPagesOpen ? "true" : "false"}
+                >
                   <div className={styles.inlineOverflowRow}>
                     <ul className={styles.pageQuickList}>
                       {selectedProject.planning ? (
@@ -1097,7 +1105,10 @@ export default function Projects() {
                       </button>
                     ) : null}
                   </div>
-                  {isPagesOpen && overflowPages.length > 0 ? (
+                  <div
+                    className={styles.expandedOverflowShell}
+                    data-expanded={isPagesOpen ? "true" : "false"}
+                  >
                     <ul className={styles.expandedOverflowList}>
                       {overflowPages.map((page, index) => (
                         <li
@@ -1119,7 +1130,7 @@ export default function Projects() {
                         </li>
                       ))}
                     </ul>
-                  ) : null}
+                  </div>
                 </div>
               </section>
 
@@ -1130,7 +1141,10 @@ export default function Projects() {
               >
                 <h4>STACK</h4>
 
-                <div className={styles.stackContent}>
+                <div
+                  className={styles.stackContent}
+                  data-expanded={isStacksOpen ? "true" : "false"}
+                >
                   <div className={styles.inlineOverflowRow}>
                     <ul
                       className={styles.stackIconList}
@@ -1163,7 +1177,10 @@ export default function Projects() {
                       </button>
                     ) : null}
                   </div>
-                  {isStacksOpen && overflowStacks.length > 0 ? (
+                  <div
+                    className={styles.expandedOverflowShell}
+                    data-expanded={isStacksOpen ? "true" : "false"}
+                  >
                     <ul
                       className={styles.expandedOverflowList}
                       title={overflowStacks.join(" / ")}
@@ -1182,7 +1199,7 @@ export default function Projects() {
                         </li>
                       ))}
                     </ul>
-                  ) : null}
+                  </div>
                 </div>
               </section>
             </>
