@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { useEffect, useRef } from "react";
 
 import styles from "./Projects.module.css";
 
@@ -58,6 +59,8 @@ export type ProjectPlanning = {
 };
 
 type ProjectBranchSceneProps = {
+  entryHintCycle: number;
+  onCloseDetail: () => void;
   onSelectProject: (project: Project) => void;
   projects: Project[];
   selectedProject: Project | null;
@@ -69,6 +72,7 @@ type BranchPiece = {
   isBranch?: boolean;
   left: string;
   name: string;
+  projectId?: string;
   src: string;
   top: string;
   width: string;
@@ -92,6 +96,7 @@ const BRANCH_PIECES: BranchPiece[] = [
     width: "26%",
     intrinsicWidth: 430,
     intrinsicHeight: 219,
+    projectId: "hangeul",
   },
   {
     name: "left_top_2",
@@ -101,6 +106,7 @@ const BRANCH_PIECES: BranchPiece[] = [
     width: "24%",
     intrinsicWidth: 402,
     intrinsicHeight: 208,
+    projectId: "mute",
   },
   {
     name: "left_bottom_1",
@@ -110,6 +116,7 @@ const BRANCH_PIECES: BranchPiece[] = [
     width: "24%",
     intrinsicWidth: 395,
     intrinsicHeight: 205,
+    projectId: "goreon",
   },
   {
     name: "left_bottom_1_side",
@@ -128,6 +135,7 @@ const BRANCH_PIECES: BranchPiece[] = [
     width: "23%",
     intrinsicWidth: 385,
     intrinsicHeight: 223,
+    projectId: "portfolio",
   },
   {
     name: "left_bottom_2_side",
@@ -146,6 +154,7 @@ const BRANCH_PIECES: BranchPiece[] = [
     width: "11%",
     intrinsicWidth: 180,
     intrinsicHeight: 140,
+    projectId: "ypbooks",
   },
   {
     name: "left_bottom_small_1_side",
@@ -164,6 +173,7 @@ const BRANCH_PIECES: BranchPiece[] = [
     width: "9%",
     intrinsicWidth: 148,
     intrinsicHeight: 197,
+    projectId: "landing",
   },
   {
     name: "branch",
@@ -247,7 +257,7 @@ const BRANCH_DEBUG_HIT_AREAS: BranchDebugHitArea[] = [
   },
   {
     id: "continue",
-    label: "continue",
+    label: "포트폴리오",
     type: "continue",
     left: "59.7%",
     top: "71%",
@@ -281,8 +291,8 @@ const BRANCH_DEBUG_HIT_AREAS: BranchDebugHitArea[] = [
     height: "14%",
     rotate: "-32deg",
     color: "rgba(255, 216, 74, 0.32)",
-    labelLeft: "33.8%",
-    labelTop: "86%",
+    labelLeft: "34.1%",
+    labelTop: "86.6%",
     labelOffsetX: "0px",
     labelOffsetY: "0px",
   },
@@ -298,10 +308,81 @@ type BranchDebugHitAreaStyle = CSSProperties & {
 };
 
 export default function ProjectBranchScene({
+  entryHintCycle,
+  onCloseDetail,
   onSelectProject,
   projects,
   selectedProject,
 }: ProjectBranchSceneProps) {
+  const sceneRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const scrollContainer = document.querySelector<HTMLElement>(
+      "[data-scroll-container='true']",
+    );
+    const projectsSection = document.getElementById("projects");
+
+    if (!scene || !projectsSection) {
+      return;
+    }
+
+    let frameId: number | null = null;
+
+    const syncContinuity = () => {
+      frameId = null;
+
+      const viewportHeight =
+        scrollContainer?.clientHeight || window.innerHeight || 1;
+      const projectsRect = projectsSection.getBoundingClientRect();
+      const isPastProjects = projectsRect.bottom <= 0;
+      const isBeforeProjects = projectsRect.top >= viewportHeight;
+      const progress = isPastProjects
+        ? 0
+        : Math.min(1, Math.max(0, 1 - projectsRect.top / viewportHeight));
+      const maskLeft = 82 - progress * 82;
+      const visualOpacity = progress > 0 ? 0.2 + progress * 0.8 : 0;
+      const phase =
+        isPastProjects || isBeforeProjects
+          ? "hidden"
+          : progress < 0.98
+            ? "about"
+            : "projects";
+
+      scene.style.setProperty("--branch-mask-left", `${maskLeft.toFixed(2)}%`);
+      scene.style.setProperty(
+        "--branch-continuity-opacity",
+        visualOpacity.toFixed(3),
+      );
+      scene.dataset.continuityPhase = phase;
+    };
+
+    const scheduleSync = () => {
+      if (frameId !== null) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(syncContinuity);
+    };
+
+    syncContinuity();
+    scrollContainer?.addEventListener("scroll", scheduleSync, {
+      passive: true,
+    });
+    window.addEventListener("scroll", scheduleSync, { passive: true });
+    window.addEventListener("resize", scheduleSync);
+
+    return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      scrollContainer?.removeEventListener("scroll", scheduleSync);
+      window.removeEventListener("scroll", scheduleSync);
+      window.removeEventListener("resize", scheduleSync);
+    };
+  }, []);
+
   const getHitAreaStyle = (hit: BranchDebugHitArea) =>
     ({
       "--hit-left": hit.left,
@@ -313,32 +394,48 @@ export default function ProjectBranchScene({
     }) as BranchDebugHitAreaStyle;
 
   return (
-    <div className={styles.projectBranchScene}>
+    <div
+      key={entryHintCycle}
+      ref={sceneRef}
+      className={styles.projectBranchScene}
+      data-continuity-phase="hidden"
+    >
       <div className={styles.branchScene}>
-        {BRANCH_PIECES.map((piece) => (
-          <Image
-            key={piece.name}
-            className={[
-              styles.branchPiece,
-              piece.isBranch ? styles.branchBasePiece : styles.branchLeafPiece,
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            src={piece.src}
-            alt=""
-            width={piece.intrinsicWidth}
-            height={piece.intrinsicHeight}
-            sizes="(max-width: 900px) 92vw, min(92vw, 1646px)"
-            style={
-              {
-                "--piece-left": piece.left,
-                "--piece-top": piece.top,
-                "--piece-width": piece.width,
-              } as BranchPieceStyle
-            }
-            aria-hidden="true"
-          />
-        ))}
+        <div className={styles.branchRevealVisualWrapper} aria-hidden="true">
+          {BRANCH_PIECES.map((piece) => (
+            <Image
+              key={
+                piece.projectId ? `${piece.name}-${entryHintCycle}` : piece.name
+              }
+              className={[
+                styles.branchPiece,
+                piece.isBranch
+                  ? styles.branchBasePiece
+                  : styles.branchLeafPiece,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              src={piece.src}
+              alt=""
+              data-hint-cycle={piece.projectId ? entryHintCycle : undefined}
+              data-entry-hint={
+                piece.projectId === "hangeul" ? "true" : undefined
+              }
+              data-project-id={piece.projectId}
+              width={piece.intrinsicWidth}
+              height={piece.intrinsicHeight}
+              sizes="(max-width: 900px) 92vw, min(92vw, 1646px)"
+              style={
+                {
+                  "--piece-left": piece.left,
+                  "--piece-top": piece.top,
+                  "--piece-width": piece.width,
+                } as BranchPieceStyle
+              }
+              aria-hidden="true"
+            />
+          ))}
+        </div>
 
         <div
           className={styles.branchDebugHitLayer}
@@ -346,7 +443,22 @@ export default function ProjectBranchScene({
         >
           {BRANCH_DEBUG_HIT_AREAS.map((hit) => {
             if (hit.type === "continue") {
-              return null;
+              return (
+                <div
+                  key={hit.id}
+                  className={styles.projectLeafMarker}
+                  style={getHitAreaStyle(hit)}
+                >
+                  <button
+                    type="button"
+                    className={styles.branchDebugHitArea}
+                    aria-label="포트폴리오 소개로 돌아가기"
+                    onClick={onCloseDetail}
+                  >
+                    <span>{hit.label}</span>
+                  </button>
+                </div>
+              );
             }
 
             const project = projects.find((item) => item.id === hit.id);
@@ -391,7 +503,9 @@ export default function ProjectBranchScene({
               <span
                 key={hit.id}
                 className={styles.branchProjectLabel}
-                data-active={selectedProject?.id === project.id ? "true" : "false"}
+                data-active={
+                  selectedProject?.id === project.id ? "true" : "false"
+                }
                 data-project-id={hit.id}
                 style={
                   {
@@ -402,7 +516,9 @@ export default function ProjectBranchScene({
                   } as CSSProperties
                 }
               >
-                <strong>{project.title}</strong>
+                <strong>
+                  {project.id === "landing" ? "랜딩페이지" : project.title}
+                </strong>
                 <em>
                   {String(
                     projects.findIndex((item) => item.id === project.id) + 1,

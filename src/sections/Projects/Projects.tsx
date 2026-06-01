@@ -520,7 +520,7 @@ const projects: Project[] = ([
   },
 ] satisfies Project[]).sort((a, b) => getProjectOrderIndex(a) - getProjectOrderIndex(b));
 
-const DETAIL_DEBUG_PROJECT_ID: string | null = "goreon";
+const DETAIL_DEBUG_PROJECT_ID: string | null = null;
 
 const initialDebugProject = DETAIL_DEBUG_PROJECT_ID
   ? projects.find((project) => project.id === DETAIL_DEBUG_PROJECT_ID) ?? null
@@ -592,10 +592,12 @@ export default function Projects() {
   >(null);
   const [isDescriptionOverflowing, setIsDescriptionOverflowing] = useState(false);
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
+  const [entryHintCycle, setEntryHintCycle] = useState(0);
   const sectionRef = useRef<HTMLElement | null>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement | null>(null);
   const summaryRef = useRef<HTMLSpanElement | null>(null);
   const summaryCloseTimerRef = useRef<number | null>(null);
+  const wasInProjectsViewRef = useRef(false);
   const selectedIndex = selectedProject
     ? projects.findIndex((project) => project.id === selectedProject.id)
     : 0;
@@ -701,6 +703,14 @@ export default function Projects() {
     resetSummaryState();
   };
 
+  const handleCloseDetail = () => {
+    setSelectedProject(null);
+    setIsPlanningOpen(false);
+    setIsPagesOpen(false);
+    setIsStacksOpen(false);
+    resetSummaryState();
+  };
+
   const handlePlanningClick = () => {
     setIsPlanningOpen(true);
     setIsPagesOpen(false);
@@ -719,6 +729,35 @@ export default function Projects() {
   useEffect(() => {
     return () => {
       clearSummaryCloseTimer();
+    };
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !wasInProjectsViewRef.current) {
+          wasInProjectsViewRef.current = true;
+          setEntryHintCycle((cycle) => cycle + 1);
+          return;
+        }
+
+        if (!entry.isIntersecting) {
+          wasInProjectsViewRef.current = false;
+        }
+      },
+      { threshold: 0.35 },
+    );
+
+    observer.observe(section);
+
+    return () => {
+      observer.disconnect();
     };
   }, []);
 
@@ -921,13 +960,7 @@ export default function Projects() {
           <button
             className={styles.detailCloseButton}
             type="button"
-            onClick={() => {
-              setSelectedProject(null);
-              setIsPlanningOpen(false);
-              setIsPagesOpen(false);
-              setIsStacksOpen(false);
-              resetSummaryState();
-            }}
+            onClick={handleCloseDetail}
             aria-label="프로젝트 닫기"
           >
             <svg
@@ -1256,9 +1289,11 @@ export default function Projects() {
       </div>
 
       <ProjectBranchScene
+        entryHintCycle={entryHintCycle}
         projects={projects}
         selectedProject={selectedProject}
         onSelectProject={selectProject}
+        onCloseDetail={handleCloseDetail}
       />
     </section>
   );
