@@ -28,9 +28,10 @@ export default function ContactBackground() {
       const rect = section.getBoundingClientRect();
       const viewportHeight = scrollContainer.clientHeight || window.innerHeight;
       const progress = Math.min(Math.max(1 - rect.top / viewportHeight, 0), 1);
-      const scale = 1.06 - progress * 0.06;
+      const scale = 1.2 - progress * 0.2;
 
       stage.style.setProperty("--contact-video-scale", scale.toFixed(4));
+      stage.style.setProperty("--contact-video-progress", progress.toFixed(4));
     };
 
     syncScale();

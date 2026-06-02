@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 import styles from "./Projects.module.css";
 
@@ -59,7 +59,9 @@ export type ProjectPlanning = {
 };
 
 type ProjectBranchSceneProps = {
+  branchScrollProgress: number;
   entryHintCycle: number;
+  isInteractive: boolean;
   onCloseDetail: () => void;
   onSelectProject: (project: Project) => void;
   projects: Project[];
@@ -307,81 +309,23 @@ type BranchDebugHitAreaStyle = CSSProperties & {
   "--hit-width": string;
 };
 
+type ProjectBranchSceneStyle = CSSProperties & {
+  "--branch-scroll-progress": string;
+};
+
 export default function ProjectBranchScene({
+  branchScrollProgress,
   entryHintCycle,
+  isInteractive,
   onCloseDetail,
   onSelectProject,
   projects,
   selectedProject,
 }: ProjectBranchSceneProps) {
-  const sceneRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const scene = sceneRef.current;
-    const scrollContainer = document.querySelector<HTMLElement>(
-      "[data-scroll-container='true']",
-    );
-    const projectsSection = document.getElementById("projects");
-
-    if (!scene || !projectsSection) {
-      return;
-    }
-
-    let frameId: number | null = null;
-
-    const syncContinuity = () => {
-      frameId = null;
-
-      const viewportHeight =
-        scrollContainer?.clientHeight || window.innerHeight || 1;
-      const projectsRect = projectsSection.getBoundingClientRect();
-      const isPastProjects = projectsRect.bottom <= 0;
-      const isBeforeProjects = projectsRect.top >= viewportHeight;
-      const progress = isPastProjects
-        ? 0
-        : Math.min(1, Math.max(0, 1 - projectsRect.top / viewportHeight));
-      const maskLeft = 82 - progress * 82;
-      const visualOpacity = progress > 0 ? 0.2 + progress * 0.8 : 0;
-      const phase =
-        isPastProjects || isBeforeProjects
-          ? "hidden"
-          : progress < 0.98
-            ? "about"
-            : "projects";
-
-      scene.style.setProperty("--branch-mask-left", `${maskLeft.toFixed(2)}%`);
-      scene.style.setProperty(
-        "--branch-continuity-opacity",
-        visualOpacity.toFixed(3),
-      );
-      scene.dataset.continuityPhase = phase;
-    };
-
-    const scheduleSync = () => {
-      if (frameId !== null) {
-        return;
-      }
-
-      frameId = window.requestAnimationFrame(syncContinuity);
-    };
-
-    syncContinuity();
-    scrollContainer?.addEventListener("scroll", scheduleSync, {
-      passive: true,
-    });
-    window.addEventListener("scroll", scheduleSync, { passive: true });
-    window.addEventListener("resize", scheduleSync);
-
-    return () => {
-      if (frameId !== null) {
-        window.cancelAnimationFrame(frameId);
-      }
-
-      scrollContainer?.removeEventListener("scroll", scheduleSync);
-      window.removeEventListener("scroll", scheduleSync);
-      window.removeEventListener("resize", scheduleSync);
-    };
-  }, []);
+  const sharedLayer =
+    typeof document === "undefined"
+      ? null
+      : document.getElementById("shared-branch-layer");
 
   const getHitAreaStyle = (hit: BranchDebugHitArea) =>
     ({
@@ -393,12 +337,16 @@ export default function ProjectBranchScene({
       "--hit-color": hit.color,
     }) as BranchDebugHitAreaStyle;
 
-  return (
+  const branchScene = (
     <div
       key={entryHintCycle}
-      ref={sceneRef}
       className={styles.projectBranchScene}
-      data-continuity-phase="hidden"
+      data-branch-interactive={isInteractive ? "true" : "false"}
+      style={
+        {
+          "--branch-scroll-progress": branchScrollProgress.toFixed(4),
+        } as ProjectBranchSceneStyle
+      }
     >
       <div className={styles.branchScene}>
         <div className={styles.branchRevealVisualWrapper} aria-hidden="true">
@@ -531,4 +479,10 @@ export default function ProjectBranchScene({
       </div>
     </div>
   );
+
+  if (!sharedLayer) {
+    return null;
+  }
+
+  return createPortal(branchScene, sharedLayer);
 }

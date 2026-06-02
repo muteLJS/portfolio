@@ -1,4 +1,5 @@
 .page {
+  position: relative;
   display: flex;
   min-height: 100vh;
   min-height: 100svh;
@@ -11,6 +12,14 @@
   scroll-snap-type: none;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+.sharedBranchLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: visible;
+  pointer-events: none;
 }
 
 .page > :global(section) {

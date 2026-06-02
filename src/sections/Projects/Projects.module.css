@@ -1557,16 +1557,56 @@
 }
 
 .projectBranchScene {
-  position: fixed;
-  top: clamp(216px, calc(24.2vh + 48px), 280px);
+  --branch-about-x: 762px;
+  --branch-project-x: 0px;
+  --branch-about-y: calc(100svh + 112vh);
+  --branch-project-y: calc(200svh + clamp(232px, calc(24.2vh + 64px), 296px));
+  --branch-about-rotate: 24deg;
+  --branch-project-rotate: 10deg;
+  --branch-scroll-progress: 0;
+  position: absolute;
+  top: var(--branch-about-y);
   right: -132px;
   z-index: 6;
   width: min(62vw, 1200px);
   aspect-ratio: 1646 / 689;
   overflow: visible;
-  opacity: var(--branch-continuity-opacity, 0);
+  opacity: 1;
   pointer-events: none;
-  transform: none;
+  transform: translate3d(
+    calc(
+      var(--branch-about-x) +
+        (
+          (var(--branch-project-x) - var(--branch-about-x)) *
+            var(--branch-scroll-progress)
+        )
+    ),
+    calc(
+      (var(--branch-project-y) - var(--branch-about-y)) *
+        var(--branch-scroll-progress)
+    ),
+    0
+  );
+}
+
+.projectBranchScene::before {
+  position: absolute;
+  inset: -18% -10% -22% -18%;
+  z-index: 1;
+  content: "";
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 82% 56%,
+    rgba(174, 194, 192, 0.28),
+    rgba(174, 194, 192, 0.14) 32%,
+    rgba(174, 194, 192, 0) 70%
+  );
+  opacity: clamp(0, calc((1 - var(--branch-scroll-progress)) * 0.9), 0.9);
+}
+
+.projectBranchScene[data-branch-interactive="false"] .branchDebugHitLayer,
+.projectBranchScene[data-branch-interactive="false"] .branchLabelOverlay {
+  display: none;
 }
 
 .branchRevealVisualWrapper {
@@ -1574,19 +1614,27 @@
   inset: 0;
   overflow: visible;
   pointer-events: none;
-  clip-path: inset(0 0 0 var(--branch-mask-left, 82%));
-  transition: clip-path 120ms linear;
+  clip-path: none;
 }
 
 .branchScene {
-  position: relative;
-  z-index: 2;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   aspect-ratio: inherit;
   overflow: visible;
   pointer-events: none;
-  transform: rotate(10deg);
+  opacity: 1;
+  transform: rotate(
+    calc(
+      var(--branch-about-rotate) +
+        (
+          (var(--branch-project-rotate) - var(--branch-about-rotate)) *
+            var(--branch-scroll-progress)
+        )
+    )
+  );
   transform-origin: 88% 50%;
 }
 
@@ -1604,7 +1652,11 @@
 
 .branchLeafPiece {
   z-index: 5;
-  will-change: transform;
+  will-change: opacity, transform;
+}
+
+.branchLeafPiece[data-project-id] {
+  opacity: clamp(0, calc((var(--branch-scroll-progress) - 0.22) * 2.2), 1);
 }
 
 /* Leaf motion tuning
@@ -1686,15 +1738,15 @@
   }
 
   24% {
-    transform: rotate(-3.4deg) translate3d(-0.28px, 0.16px, 0);
+    transform: rotate(-2.4deg) translate3d(-0.2px, 0.11px, 0);
   }
 
   54% {
-    transform: rotate(2.1deg) translate3d(0.18px, -0.14px, 0);
+    transform: rotate(1.35deg) translate3d(0.12px, -0.09px, 0);
   }
 
   78% {
-    transform: rotate(-0.58deg) translate3d(-0.06px, 0.05px, 0);
+    transform: rotate(-0.35deg) translate3d(-0.04px, 0.03px, 0);
   }
 
   100% {
@@ -2027,7 +2079,7 @@
   text-align: center;
   transform: translate(-50%, -50%)
     translate(var(--label-offset-x, 0px), var(--label-offset-y, 0px))
-    rotate(-10deg);
+    rotate(-10.7deg);
   transition:
     opacity 220ms ease,
     transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -2041,7 +2093,7 @@
 
 .branchProjectLabel strong {
   display: block;
-  font-size: 0.86rem;
+  font-size: 1.24rem;
   font-weight: 560;
   line-height: 1.1;
   letter-spacing: 0.04em;
@@ -2051,12 +2103,22 @@
 .branchProjectLabel em {
   display: block;
   margin-top: 4px;
-  font-size: 0.62rem;
+  font-size: 0.86rem;
   font-style: normal;
   font-weight: 430;
   line-height: 1;
   letter-spacing: 0.08em;
   opacity: 0.76;
+}
+
+.branchProjectLabel[data-project-id="ypbooks"] strong,
+.branchProjectLabel[data-project-id="landing"] strong {
+  font-size: 0.86rem;
+}
+
+.branchProjectLabel[data-project-id="ypbooks"] em,
+.branchProjectLabel[data-project-id="landing"] em {
+  font-size: 0.62rem;
 }
 
 .projectLeaf[data-entry-hint="true"] .projectLeafVisual {
@@ -2278,7 +2340,9 @@
   }
 
   .projectBranchScene {
-    top: 52vh;
+    --branch-about-x: 500px;
+    --branch-about-y: calc(100svh + 84vh);
+    --branch-project-y: calc(200svh + 52vh);
     right: 12px;
     width: min(82vw, 760px);
   }
@@ -2372,7 +2436,9 @@
 
   .projectBranchScene {
     position: absolute;
-    top: 56vh;
+    --branch-about-x: 380px;
+    --branch-about-y: calc(100svh + 88vh);
+    --branch-project-y: calc(200svh + 56vh);
     right: 8px;
     width: min(92vw, 620px);
   }
@@ -2509,19 +2575,26 @@
   }
 
   .projectBranchScene,
+  .branchScene,
   .branchRevealVisualWrapper {
     animation: none;
     filter: none;
     transform: none;
     transition: none;
+    will-change: auto;
   }
 
   .projectBranchScene {
-    opacity: var(--branch-continuity-opacity, 1);
+    position: absolute;
+    opacity: 1;
+  }
+
+  .branchScene {
+    opacity: 1;
   }
 
   .branchRevealVisualWrapper {
-    clip-path: inset(0 0 0 var(--branch-mask-left, 0%));
+    clip-path: none;
   }
 
   .branchMotion {

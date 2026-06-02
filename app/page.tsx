@@ -13,6 +13,10 @@ export default function Home() {
       <OneScrollController />
       <RevealController />
       <TopNavigation />
+      <div
+        id="shared-branch-layer"
+        className={styles.sharedBranchLayer}
+      />
       <Hero />
       <About />
       <Projects />
