@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 
 import ProjectBranchScene from "./ProjectBranchScene";
 import type { Project } from "./ProjectBranchScene";
@@ -77,7 +78,29 @@ const projects: Project[] = (
         "Naver 로그인 / Kakao 로그인 / Google 로그인 / AI 채팅 / 음악 데이터 연동 / 이미지 관리 / DB 연동",
       description:
         "첫 팀프로젝트로 기획을 전반적으로 담당하여, 기획안 작성에 큰 기여도를 담당하고, 디자인과 개발에서도 역할 분담을 통해 로그인 기능, 페이지 퍼블리싱, 라이브러리 기능 등을 주요적으로 담당했습니다. 팀 프로젝트를 진행하며 소통이라는 부분이 가장 중요하다고 생각됩니다. 같은 기획안을 보고, 같은 페이지를 만들더라도 각자의 개성이 반영되기 때문에 모두가 공통의 방향을 설정할 수 있도록 소통에 가장 노력을 많이 하고, 배웠습니다. 또한 팀원들 모두 각자의 역량이 다른 것을 보고 배울 점이 많은 팀원들과 함께하여, 많은 것을 배우고, 생각하고, 구현까지 마무리 할 수 있었던 프로젝트입니다.",
-      insight: "",
+      highlights: [
+        {
+          label: "문제",
+          text: "음악 앱의 복잡한 UI 속에서도 사용자가 원하는 기능을 쉽게 찾고, 취향에 맞는 경험을 이어갈 수 있어야 했습니다.",
+        },
+        {
+          label: "맡은 역할",
+          text: "기획 참여, PPT 약 90% 제작, 앱 개발 및 화면의 디테일 요소 수정에 집중했습니다.",
+        },
+        {
+          label: "구현",
+          text: "AI 비서를 활용한 이용 흐름과 개인화 경험을 설계하고, 다른 음악 앱의 강점을 벤치마킹해 서비스에 반영했습니다.",
+        },
+        {
+          label: "결과/배운 점",
+          text: "기획, 디자인, 개발을 함께 맞추며 서비스의 핵심 흐름을 구체화했고, 팀이 같은 기준으로 소통하는 과정의 중요성을 배웠습니다.",
+        },
+        {
+          label: "인사이트",
+          text: "음악 서비스의 편리함은 기능의 수보다 사용자가 자신의 취향으로 자연스럽게 이동하는 흐름에서 만들어진다고 생각합니다.",
+        },
+      ],
+      insight: "음악 서비스의 편리함은 사용자가 자신의 취향으로 자연스럽게 이동하는 흐름에서 만들어진다고 생각합니다.",
       skills: [
         "Vue",
         "JavaScript",
@@ -197,7 +220,7 @@ const projects: Project[] = (
         title: "기획안",
         summary:
           "음악 경험과 AI 채팅 흐름을 연결하기 위해 서비스 구조와 팀 작업 방향을 정리한 기획 자료입니다.",
-        image: null,
+        pdfUrl: "/ppts/mute_ppt.pdf",
       },
       leaf: {
         asset: "/img/branch/project-leaf-main-01.png",
@@ -229,7 +252,29 @@ const projects: Project[] = (
         "GitHub 세팅 / 프로젝트 초기 세팅 / 라우터 구조 설정 / 공통 레이아웃 구성 / 헤더·푸터 / 메인 페이지 / 검색창·네비바 / 로그인 기능 / 배포 / 반응형 구현 / 기획 일부 참여 / 견적 리스트 페이지 디자인 / 조립 견적 페이지 디자인",
       description:
         "숙련자와 초보자가 제일 많이 나뉘는 곳이 전문성을 요구하는 사이트라고 생각됩니다. 구입에 어려움이 없도록 AI 채팅을 통해 원하는 결과를 찾고, 구입할 수 있게 자연스러운 연결을 구현한 사이트입니다. 리액트 그리고 다양한 툴들을 사용하게 되는 시작이었고, 팀원들에게 도움을 정말 많이 받았습니다. 개발 담당이었지만 저보다 더 잘 아는 그리고 부담감 없이 도와주는 팀원들에게 많이 배웠습니다. 이전의 팀프로젝트 경험이 협업에 더욱 도움이 될 수 있었던 것 같습니다.",
-      insight: "",
+      highlights: [
+        {
+          label: "문제",
+          text: "전문성이 필요한 PC 구매 과정에서 초보자도 원하는 상품과 견적을 어렵지 않게 탐색할 수 있어야 했습니다.",
+        },
+        {
+          label: "맡은 역할",
+          text: "타 사이트 조사와 UI 리서치, 앱 개발 준비 약 90%, 메인 페이지 및 세부 UI 구현을 맡았습니다.",
+        },
+        {
+          label: "구현",
+          text: "리서치 내용을 디자인 기준으로 정리하고, 프로젝트 초기 구조와 공통 레이아웃, 메인 페이지와 세부 화면을 구현했습니다.",
+        },
+        {
+          label: "결과/배운 점",
+          text: "조사 단계의 기준을 실제 화면까지 연결하며, 팀 개발에서 사전 구조 설계와 세부 완성도의 중요성을 확인했습니다.",
+        },
+        {
+          label: "인사이트",
+          text: "복잡한 커머스 서비스일수록 사용자가 이해해야 할 정보보다 먼저 결정할 수 있는 흐름을 설계하는 일이 중요하다고 생각합니다.",
+        },
+      ],
+      insight: "복잡한 커머스 서비스일수록 사용자가 먼저 결정할 수 있는 흐름이 중요하다고 생각합니다.",
       skills: [
         "React",
         "Vite",
@@ -361,7 +406,7 @@ const projects: Project[] = (
         title: "기획안",
         summary:
           "AI를 활용한 상품 탐색과 구매 흐름을 설계하고, PC 견적 경험까지 연결한 서비스 기획 자료입니다.",
-        image: null,
+        pdfUrl: "/ppts/goreon_PPT.pdf",
       },
       leaf: {
         asset: "/img/branch/project-leaf-main-02.png",
@@ -393,13 +438,39 @@ const projects: Project[] = (
       role: "기획 / 디자인 / 구현",
       description:
         "다양한 프로젝트를 경험한 후 기획부터 디자인, 구현한 에듀테크 서비스입니다. 현재 시장 조사, 그리고 만들어야 할 서비스의 시장성, 현대 사회의 문제 등을 고려하여 만들어낸 서비스로, 최근 AI의 도움을 통해 발전이 이루어지지만 한 가지 허점, 글을 직접 읽고, 생각해서 작성하는 사고적 능력이 부족해지는 부분이 있는 것을 보완하고자 기획하였습니다. 에듀테크 서비스의 목적을 이룸과 동시에 글, 그리고 문장에는 절대적인 평가기준이 없다는 것을 고려하여 현재 사용되고 있는 에듀테크 앱들에서 참고하여 서비스를 제공하고자 하였고, 그에 맞는 디자인과 기능을 추가함으로서 사용자들로 하여금 더욱 쉽고 편하게 그리고 목적에 맞게 이용할 수 있도록 하였습니다.",
-      insight: "",
+      highlights: [
+        {
+          label: "문제",
+          text: "평가와 완성에 대한 집착, 글쓰기에 대한 불안이 커지는 환경에서 자기만의 글을 부담 없이 완성할 수 있는 경험이 필요했습니다.",
+        },
+        {
+          label: "맡은 역할",
+          text: "기획, 디자인, 구현 전 과정을 100% 개인 작업으로 진행하고 있습니다.",
+        },
+        {
+          label: "구현",
+          text: "글쓰기, 배움, 기록, 자기개발의 흐름을 설계하고, 최소한의 학습 피드백 외에는 평가 중심 요소를 배제한 에듀테크 서비스를 기획했습니다.",
+        },
+        {
+          label: "결과/배운 점",
+          text: "서비스 기획안과 홈 화면, 한이 캐릭터 디자인 가이드를 완성했으며 현재 구현을 준비하고 있습니다.",
+        },
+        {
+          label: "인사이트",
+          text: "성장을 돕는 서비스는 정답을 제시하기보다 사용자가 자신의 언어와 기록을 계속 이어갈 수 있게 해야 한다고 생각합니다.",
+        },
+      ],
+      insight: "성장을 돕는 서비스는 사용자가 자신의 언어와 기록을 계속 이어갈 수 있게 해야 한다고 생각합니다.",
       skills: ["추후 정리"],
       stacks: ["추후 정리"],
-      image: "/img/projects/hangeul-main.png",
+      image: "/img/han-geul_beta_img/main.png",
       link: "/projects/hangeul",
       pages: [
-        { name: "Main", image: null },
+        {
+          name: "Main",
+          image: null,
+          previewImage: "/img/han-geul_beta_img/main.png",
+        },
         { name: "Writing", image: null },
         { name: "Feedback", image: null },
         { name: "Growth", image: null },
@@ -409,7 +480,7 @@ const projects: Project[] = (
         title: "기획안",
         summary:
           "AI 시대에 직접 읽고 생각해 쓰는 사고 능력을 보완하기 위한 에듀테크 서비스 기획 자료입니다.",
-        image: null,
+        pdfUrl: "/ppts/한글_서비스기획안_v4_final.pdf",
       },
       leaf: {
         asset: "/img/branch/project-leaf-main-03.png",
@@ -438,7 +509,29 @@ const projects: Project[] = (
       team: "개인 프로젝트",
       description:
         "기존 영풍문고 페이지를 보고, 사용자들이 불편함을 느끼거나 기존의 획일화된 틀을 사용하는 것이 아닌 다양한 페이지들과 레이아웃을 참고하여 저만의 기준으로 한 단계 성장시킨 페이지입니다. 두 번째 작업물로, 이전과 다르게 JavaScript와 jQuery를 활용하여 한결 더 동적인 페이지를 만들 수 있었습니다. 특히 차트 부분을 3일 정도 노력하며 만들었던 기억이 인상에 남습니다.",
-      insight: "",
+      highlights: [
+        {
+          label: "문제",
+          text: "처음 방문한 사용자가 원하는 책과 최신 트렌드를 빠르게 탐색할 수 있는 정보 구조가 필요했습니다.",
+        },
+        {
+          label: "맡은 역할",
+          text: "기획, 디자인, 퍼블리싱을 포함한 전 과정을 100% 개인 작업으로 진행했습니다.",
+        },
+        {
+          label: "구현",
+          text: "검색과 트렌드 탐색 흐름을 중심으로 UI를 재구성하고, 익숙한 인터랙션 요소를 더해 편리하고 편안한 이용 경험을 설계했습니다.",
+        },
+        {
+          label: "결과/배운 점",
+          text: "첫 웹페이지 작업으로 색감, 구조, 배치의 부족함을 분명히 확인했고, 이후 작업에서 화면의 기본 구성부터 더 신중하게 판단하는 기준을 얻었습니다.",
+        },
+        {
+          label: "인사이트",
+          text: "리디자인은 새로운 장식을 더하는 일보다 사용자가 처음부터 편하게 탐색할 수 있는 순서를 다시 만드는 일이라고 생각합니다.",
+        },
+      ],
+      insight: "리디자인은 사용자가 처음부터 편하게 탐색할 수 있는 순서를 다시 만드는 일이라고 생각합니다.",
       skills: [
         "HTML",
         "CSS",
@@ -481,12 +574,6 @@ const projects: Project[] = (
         { name: "Chart", image: null },
         { name: "Board", image: null },
       ],
-      planning: {
-        title: "기획안",
-        summary:
-          "기존 서점 페이지의 정보 구조와 사용자 흐름을 다시 정리한 리디자인 기획 자료입니다.",
-        image: null,
-      },
       leaf: {
         asset: "/img/branch/project-leaf-small-01.png",
         left: "55.6%",
@@ -532,12 +619,6 @@ const projects: Project[] = (
         { name: "Benefit", image: null },
         { name: "Guide", image: null },
       ],
-      planning: {
-        title: "기획안",
-        summary:
-          "첫 개인 페이지 제작 과정에서 구조와 시각 구현 기준을 정리한 기획 자료입니다.",
-        image: null,
-      },
       leaf: {
         asset: "/img/branch/project-leaf-small-02.png",
         left: "45.1%",
@@ -621,6 +702,12 @@ export default function Projects() {
     getInitialPageName(initialDebugProject),
   );
   const [isPlanningOpen, setIsPlanningOpen] = useState(false);
+  const [imagePreview, setImagePreview] = useState<{
+    alt: string;
+    height: number;
+    src: string;
+    width: number;
+  } | null>(null);
   const [isPagesOpen, setIsPagesOpen] = useState(false);
   const [isStacksOpen, setIsStacksOpen] = useState(false);
   const [expandedSummaryProjectId, setExpandedSummaryProjectId] = useState<
@@ -633,11 +720,17 @@ export default function Projects() {
   const [branchScrollProgress, setBranchScrollProgress] = useState(0);
   const [isDescriptionOverflowing, setIsDescriptionOverflowing] =
     useState(false);
+  const [expandedOverflowHeights, setExpandedOverflowHeights] = useState({
+    pages: 0,
+    stacks: 0,
+  });
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const [entryHintCycle, setEntryHintCycle] = useState(0);
   const sectionRef = useRef<HTMLElement | null>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement | null>(null);
   const summaryRef = useRef<HTMLSpanElement | null>(null);
+  const pagesOverflowRef = useRef<HTMLDivElement | null>(null);
+  const stacksOverflowRef = useRef<HTMLDivElement | null>(null);
   const summaryCloseTimerRef = useRef<number | null>(null);
   const wasInProjectsViewRef = useRef(false);
   const selectedIndex = selectedProject
@@ -685,7 +778,8 @@ export default function Projects() {
     : isSummaryExpanded
       ? "expanded"
       : "collapsed";
-  const pagePreviewLimit = selectedProject?.planning ? 5 : 6;
+  const hasPlanningDocument = Boolean(selectedProject?.planning?.pdfUrl);
+  const pagePreviewLimit = hasPlanningDocument ? 5 : 6;
   const visiblePages = validPages.slice(0, pagePreviewLimit);
   const overflowPages = validPages.slice(pagePreviewLimit);
   const hiddenPageCount = selectedProject
@@ -696,7 +790,7 @@ export default function Projects() {
   const overflowStacks = selectedProject?.stacks.slice(stackPreviewLimit) ?? [];
   const hiddenStackCount = overflowStacks.length;
   const pageListItemCount =
-    (selectedProject?.planning ? 1 : 0) + visiblePages.length;
+    (hasPlanningDocument ? 1 : 0) + visiblePages.length;
   const stackListItemCount = shownStacks.length;
   const clearSummaryCloseTimer = () => {
     if (summaryCloseTimerRef.current !== null) {
@@ -743,6 +837,7 @@ export default function Projects() {
     setSelectedProject(project);
     setSelectedPageName(getInitialPageName(project));
     setIsPlanningOpen(false);
+    setImagePreview(null);
     setIsPagesOpen(false);
     setIsStacksOpen(false);
     resetSummaryState();
@@ -751,12 +846,17 @@ export default function Projects() {
   const handleCloseDetail = () => {
     setSelectedProject(null);
     setIsPlanningOpen(false);
+    setImagePreview(null);
     setIsPagesOpen(false);
     setIsStacksOpen(false);
     resetSummaryState();
   };
 
   const handlePlanningClick = () => {
+    if (!selectedProject?.planning?.pdfUrl) {
+      return;
+    }
+
     setIsPlanningOpen(true);
     setIsPagesOpen(false);
     setIsStacksOpen(false);
@@ -901,6 +1001,22 @@ export default function Projects() {
   }, [isPlanningOpen]);
 
   useEffect(() => {
+    if (!imagePreview) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setImagePreview(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [imagePreview]);
+
+  useEffect(() => {
     const summary = summaryRef.current;
 
     const measure = () => {
@@ -938,13 +1054,54 @@ export default function Projects() {
     };
   }, [selectedProject?.id, selectedProject?.description]);
 
+  useEffect(() => {
+    const measure = () => {
+      const pages = Math.ceil(pagesOverflowRef.current?.scrollHeight ?? 0);
+      const stacks = Math.ceil(stacksOverflowRef.current?.scrollHeight ?? 0);
+
+      setExpandedOverflowHeights((current) =>
+        current.pages === pages && current.stacks === stacks
+          ? current
+          : { pages, stacks },
+      );
+    };
+
+    const frame = window.requestAnimationFrame(measure);
+    const observer = new ResizeObserver(measure);
+
+    if (pagesOverflowRef.current) {
+      observer.observe(pagesOverflowRef.current);
+    }
+
+    if (stacksOverflowRef.current) {
+      observer.observe(stacksOverflowRef.current);
+    }
+
+    window.addEventListener("resize", measure);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [selectedProject?.id, overflowPages.length, overflowStacks.length]);
+
+  const getExpandedOverflowStyle = (height: number) =>
+    ({
+      "--expanded-overflow-height": `${height}px`,
+    }) as CSSProperties;
+
   const previewContent = selectedProject ? (
     brokenImages[previewImageKey] || !previewImage ? (
       <span className={styles.previewFallback}>
         {selectedProjectDisplayTitle}
       </span>
     ) : (
-      <div className={styles.previewMedia} data-preview-type={previewType}>
+      <div
+        className={styles.previewMedia}
+        data-preview-type={previewType}
+        data-project-id={selectedProject.id}
+      >
         {previewType === "responsive" && previewHref ? (
           <a
             className={styles.previewImageLink}
@@ -969,6 +1126,36 @@ export default function Projects() {
               }
             />
           </a>
+        ) : selectedProject.id === "hangeul" ? (
+          <button
+            type="button"
+            className={styles.previewZoomButton}
+            onClick={() =>
+              setImagePreview({
+                src: previewImage,
+                alt: `${selectedProject.title} ${selectedPage?.name ?? "main"} screen`,
+                width: 941,
+                height: 1672,
+              })
+            }
+            aria-label={`${selectedProject.title} ${selectedPage?.name ?? "main"} 이미지 확대`}
+          >
+            <Image
+              key={previewImage}
+              className={styles.previewImage}
+              src={previewImage}
+              alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
+              width={960}
+              height={600}
+              sizes="(max-width: 900px) calc(100vw - 64px), 560px"
+              onError={() =>
+                setBrokenImages((current) => ({
+                  ...current,
+                  [previewImageKey]: true,
+                }))
+              }
+            />
+          </button>
         ) : (
           <Image
             key={previewImage}
@@ -986,6 +1173,30 @@ export default function Projects() {
             }
           />
         )}
+        {selectedProject.id === "hangeul" ? (
+          <button
+            type="button"
+            className={`${styles.previewZoomButton} ${styles.previewHangeulGuide}`}
+            onClick={() =>
+              setImagePreview({
+                src: "/img/han-geul_beta_img/han-i.png",
+                alt: "한-글 한이 캐릭터 디자인 가이드",
+                width: 1254,
+                height: 1254,
+              })
+            }
+            aria-label="한-글 한이 캐릭터 디자인 가이드 이미지 확대"
+          >
+            <Image
+              className={styles.previewHangeulGuideImage}
+              src="/img/han-geul_beta_img/han-i.png"
+              alt="한-글 한이 캐릭터 디자인 가이드"
+              width={1254}
+              height={1254}
+              sizes="180px"
+            />
+          </button>
+        ) : null}
         {previewType === "responsive" &&
         mobilePreviewImage &&
         !brokenImages[mobilePreviewImageKey] ? (
@@ -1146,36 +1357,12 @@ export default function Projects() {
           }
         >
           <div className={styles.detailMetaArea}>
-            {isPlanningOpen ? (
-              <div className={styles.planningInlinePanel}>
-                <p className={styles.planningInlineEyebrow}>
-                  {selectedProject.planning?.title}
-                </p>
-                <p>{selectedProject.planning?.summary}</p>
-                {selectedProject.planning?.image ? (
-                  <Image
-                    className={styles.planningInlineImage}
-                    src={selectedProject.planning.image}
-                    alt={`${selectedProject.title} planning document`}
-                    width={1200}
-                    height={800}
-                    sizes="(max-width: 900px) calc(100vw - 64px), 480px"
-                  />
-                ) : null}
-                <button
-                  type="button"
-                  className={styles.planningInlineClose}
-                  onClick={() => setIsPlanningOpen(false)}
-                >
-                  닫기
-                </button>
-              </div>
-            ) : (
-              <>
+            <>
                 <section
                   className={styles.pagesBlock}
                   data-expanded={isPagesOpen ? "true" : "false"}
                   aria-label="project pages"
+                  style={getExpandedOverflowStyle(expandedOverflowHeights.pages)}
                 >
                   <div className={styles.pagesHeader}>
                     <h4>Pages</h4>
@@ -1186,7 +1373,7 @@ export default function Projects() {
                   >
                     <div className={styles.inlineOverflowRow}>
                       <ul className={styles.pageQuickList}>
-                        {selectedProject.planning ? (
+                        {hasPlanningDocument ? (
                           <li
                             className={styles.pageListItem}
                             data-last={
@@ -1198,7 +1385,7 @@ export default function Projects() {
                               className={styles.pageTextButton}
                               onClick={handlePlanningClick}
                             >
-                              {selectedProject.planning.title}
+                              {selectedProject.planning?.title}
                             </button>
                             {pageListItemCount > 1 ? (
                               <span className={styles.inlineSeparator}>/</span>
@@ -1207,7 +1394,7 @@ export default function Projects() {
                         ) : null}
                         {visiblePages.map((page, index) => {
                           const itemIndex =
-                            (selectedProject.planning ? 1 : 0) + index;
+                            (hasPlanningDocument ? 1 : 0) + index;
 
                           return (
                             <li
@@ -1252,6 +1439,7 @@ export default function Projects() {
                       ) : null}
                     </div>
                     <div
+                      ref={pagesOverflowRef}
                       className={styles.expandedOverflowShell}
                       data-expanded={isPagesOpen ? "true" : "false"}
                     >
@@ -1288,6 +1476,7 @@ export default function Projects() {
                   className={styles.detailStacks}
                   data-expanded={isStacksOpen ? "true" : "false"}
                   aria-label="project tech stack"
+                  style={getExpandedOverflowStyle(expandedOverflowHeights.stacks)}
                 >
                   <h4>STACK</h4>
 
@@ -1334,6 +1523,7 @@ export default function Projects() {
                       ) : null}
                     </div>
                     <div
+                      ref={stacksOverflowRef}
                       className={styles.expandedOverflowShell}
                       data-expanded={isStacksOpen ? "true" : "false"}
                     >
@@ -1362,16 +1552,100 @@ export default function Projects() {
                     </div>
                   </div>
                 </section>
-              </>
-            )}
+            </>
           </div>
         </div>
       </div>
     </article>
   ) : null;
 
+  const planningDialog =
+    isPlanningOpen && selectedProject?.planning?.pdfUrl
+      ? createPortal(
+          <div
+            className={styles.planningOverlay}
+            role="presentation"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                setIsPlanningOpen(false);
+              }
+            }}
+          >
+            <section
+              className={styles.planningViewer}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="planning-viewer-title"
+            >
+              <div className={styles.planningViewerHeader}>
+                <div>
+                  <p className={styles.planningEyebrow}>
+                    {selectedProject.title} · {selectedProject.planning.title}
+                  </p>
+                  <h3 id="planning-viewer-title">
+                    {selectedProject.planning.title}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  className={styles.planningCloseButton}
+                  onClick={() => setIsPlanningOpen(false)}
+                  aria-label="기획안 닫기"
+                >
+                  ×
+                </button>
+              </div>
+              <p className={styles.planningViewerSummary}>
+                {selectedProject.planning.summary}
+              </p>
+              <iframe
+                className={styles.planningPdfFrame}
+                src={`${selectedProject.planning.pdfUrl}#view=FitH`}
+                title={`${selectedProject.title} 기획안 PDF`}
+              />
+            </section>
+          </div>,
+          document.body,
+        )
+      : null;
+
+  const imageLightbox = imagePreview
+    ? createPortal(
+        <div
+          className={styles.imageLightboxOverlay}
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setImagePreview(null);
+            }
+          }}
+        >
+          <figure className={styles.imageLightbox}>
+            <button
+              type="button"
+              className={styles.imageLightboxCloseButton}
+              onClick={() => setImagePreview(null)}
+              aria-label="확대 이미지 닫기"
+            >
+              ×
+            </button>
+            <Image
+              className={styles.imageLightboxImage}
+              src={imagePreview.src}
+              alt={imagePreview.alt}
+              width={imagePreview.width}
+              height={imagePreview.height}
+              sizes="(max-width: 640px) 94vw, 86vw"
+            />
+          </figure>
+        </div>,
+        document.body,
+      )
+    : null;
+
   return (
-    <section
+    <>
+      <section
       ref={sectionRef}
       id="projects"
       className={styles.projects}
@@ -1423,6 +1697,9 @@ export default function Projects() {
         onSelectProject={selectProject}
         onCloseDetail={handleCloseDetail}
       />
-    </section>
+      </section>
+      {planningDialog}
+      {imageLightbox}
+    </>
   );
 }

@@ -76,11 +76,18 @@
   min-width: 260px;
   aspect-ratio: 4 / 5;
   justify-self: end;
+  overflow: hidden;
   border: 1px solid rgba(47, 65, 75, 0.18);
-  background: rgba(255, 250, 235, 0.08);
+  background: rgba(255, 250, 235, 0.22);
   box-shadow: inset 0 0 0 1px rgba(255, 250, 235, 0.14);
   opacity: 0;
   transform: translateY(14px);
+}
+
+.contactProfileImage {
+  object-fit: contain;
+  object-position: center bottom;
+  padding: 18px 12px 0;
 }
 
 .contactProfilePlaceholder::before,

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import ContactBackground from "./ContactBackground";
 import styles from "./Contact.module.css";
 
@@ -9,8 +10,17 @@ const contactLinks: {
   icon: React.ReactNode;
 }[] = [
   {
+    href: "tel:01024749586",
+    label: "010-2474-9586",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.7" stroke="currentColor" aria-hidden="true">
+        <path d="M5.1 3.8 8 3.1c.6-.1 1.2.2 1.4.8l1.2 3c.2.5.1 1-.3 1.4L8.6 9.7a14.8 14.8 0 0 0 5.7 5.7l1.4-1.7c.4-.4.9-.5 1.4-.3l3 1.2c.6.2.9.8.8 1.4l-.7 2.9c-.1.5-.6.9-1.1.9C10.7 19.8 4.2 13.3 4.2 4.9c0-.5.4-1 .9-1.1Z" />
+      </svg>
+    ),
+  },
+  {
     href: "mailto:ajrqh1030@gmail.com",
-    label: "Email",
+    label: "ajrqh1030@gmail.com",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" stroke="currentColor" aria-hidden="true">
         <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -90,12 +100,14 @@ export default function Contact() {
             ))}
           </nav>
         </div>
-        <div
-          className={styles.contactProfilePlaceholder}
-          aria-hidden="true"
-          data-reveal="4"
-        >
-          <span />
+        <div className={styles.contactProfilePlaceholder} data-reveal="4">
+          <Image
+            className={styles.contactProfileImage}
+            src="/img/profile/profile.png"
+            alt="이준성 프로필 사진"
+            fill
+            sizes="(max-width: 760px) 58vw, 360px"
+          />
         </div>
       </div>
     </section>

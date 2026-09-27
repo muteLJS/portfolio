@@ -15,10 +15,30 @@ export default function RevealController() {
       section.dataset.revealed = "true";
     };
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const revealAll = () => {
       sections.forEach(reveal);
+    };
+
+    // Content is visible by default. Only opt into the entrance animation after
+    // the client is ready, so a suspended or restored tab can never remain blank.
+    document.documentElement.classList.add("reveal-ready");
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      revealAll();
       return;
     }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        revealAll();
+      }
+    };
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        revealAll();
+      }
+    };
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -41,7 +61,15 @@ export default function RevealController() {
 
     sections.forEach((section) => observer.observe(section));
 
-    return () => observer.disconnect();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pageshow", handlePageShow);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pageshow", handlePageShow);
+      document.documentElement.classList.remove("reveal-ready");
+    };
   }, []);
 
   return null;

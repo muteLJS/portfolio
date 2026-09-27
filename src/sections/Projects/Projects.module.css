@@ -148,7 +148,7 @@
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto auto auto;
   width: min(680px, 46vw);
-  margin: clamp(54px, 7.8vh, 84px) 0 0;
+  margin: clamp(54px, 7.8vh, 84px) 0 0 clamp(-32px, -2.4vw, -20px);
   overflow: visible;
   gap: 0;
   align-items: start;
@@ -457,6 +457,103 @@
   max-height: clamp(150px, 20vh, 190px);
   object-fit: contain;
   object-position: center;
+}
+
+.previewMedia[data-project-id="hangeul"] {
+  grid-template-columns: minmax(0, 220px) minmax(0, 180px);
+  column-gap: 10px;
+  width: min(100%, 410px);
+}
+
+.previewMedia[data-project-id="hangeul"] .previewImage {
+  grid-column: 1;
+  width: 220px;
+  max-width: 100%;
+  max-height: 190px;
+}
+
+.previewHangeulGuide {
+  grid-column: 2;
+  display: block;
+  width: 180px;
+  max-width: 100%;
+  height: auto;
+  max-height: 190px;
+}
+
+.previewHangeulGuideImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  filter: drop-shadow(0 10px 22px rgba(18, 32, 28, 0.12));
+}
+
+.previewZoomButton {
+  display: block;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.previewZoomButton:focus-visible {
+  outline: 2px solid rgba(23, 55, 47, 0.7);
+  outline-offset: 4px;
+}
+
+.imageLightboxOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(9, 15, 14, 0.8);
+  backdrop-filter: blur(8px);
+}
+
+.imageLightbox {
+  position: relative;
+  display: grid;
+  max-width: min(86vw, 1100px);
+  max-height: 88svh;
+  margin: 0;
+}
+
+.imageLightboxImage {
+  display: block;
+  max-width: 100%;
+  max-height: 88svh;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  object-fit: contain;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
+}
+
+.imageLightboxCloseButton {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  z-index: 1;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(21, 29, 28, 0.9);
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.imageLightboxCloseButton:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
 }
 
 .previewMedia[data-preview-type="responsive"] .previewImage {
@@ -1082,7 +1179,7 @@
 
 .pagesBlock[data-expanded="true"]::after,
 .detailStacks[data-expanded="true"]::after {
-  bottom: -76px;
+  bottom: calc(-1 * (var(--expanded-overflow-height, 0px) + 14px));
 }
 
 .pagesHeader {
@@ -1291,8 +1388,8 @@
 
 .expandedOverflowShell {
   position: absolute;
-  left: 0;
   top: calc(100% + 6px);
+  left: 0;
   z-index: 20;
   width: 100%;
   height: 0;
@@ -1306,9 +1403,14 @@
 }
 
 .expandedOverflowShell[data-expanded="true"] {
-  height: 120px;
+  height: var(--expanded-overflow-height, 0px);
   opacity: 1;
   pointer-events: auto;
+}
+
+.pagesBlock[data-expanded="true"]::after,
+.detailStacks[data-expanded="true"]::after {
+  opacity: 1;
 }
 
 .expandedOverflowList {
@@ -1478,34 +1580,48 @@
 .planningOverlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 100;
   display: grid;
   place-items: center;
-  background: rgba(13, 24, 22, 0.28);
-  backdrop-filter: blur(2px);
+  padding: 24px;
+  background: rgba(13, 24, 22, 0.58);
+  backdrop-filter: blur(8px);
 }
 
 .planningViewer {
   position: relative;
-  width: min(80vw, 1120px);
-  max-height: 80vh;
-  overflow: auto;
-  padding: clamp(24px, 4vw, 48px);
-  background: rgba(246, 242, 222, 0.82);
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: min(92vw, 1180px);
+  height: min(88svh, 900px);
+  overflow: hidden;
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid rgba(246, 242, 222, 0.38);
+  border-radius: 16px;
+  background: rgba(246, 242, 222, 0.96);
   color: rgba(24, 42, 35, 0.86);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+}
+
+.planningViewerHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
 }
 
 .planningCloseButton {
   position: absolute;
-  top: 14px;
-  right: 16px;
-  width: 28px;
-  height: 28px;
+  top: 20px;
+  right: 22px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   border: 0;
   background: transparent;
   color: rgba(24, 42, 35, 0.72);
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 300;
   line-height: 1;
 }
@@ -1533,6 +1649,48 @@
   font-weight: 340;
   line-height: 1.72;
   word-break: keep-all;
+}
+
+.planningViewerSummary {
+  margin: 14px 0 18px !important;
+}
+
+.planningPdfFrame {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  border: 1px solid rgba(24, 42, 35, 0.14);
+  border-radius: 8px;
+  background: #fff;
+}
+
+@media (max-width: 640px) {
+  .planningOverlay {
+    padding: 12px;
+  }
+
+  .planningViewer {
+    width: 100%;
+    height: calc(100svh - 24px);
+    padding: 20px 16px 16px;
+    border-radius: 12px;
+  }
+
+  .planningViewer h3 {
+    font-size: 1.5rem;
+  }
+
+  .planningViewerSummary {
+    margin: 10px 0 14px !important;
+    font-size: 0.8rem !important;
+    line-height: 1.55 !important;
+  }
+
+  .planningCloseButton {
+    position: static;
+    flex: 0 0 36px;
+  }
 }
 
 .planningImage,
@@ -2266,6 +2424,7 @@
 
   .detailPanel {
     width: min(100%, 560px);
+    margin-left: -24px;
     padding-right: 0;
   }
 
@@ -2306,6 +2465,7 @@
   .detailPanel {
     width: min(100%, 620px);
     margin-top: clamp(64px, 8vh, 88px);
+    margin-left: -20px;
   }
 
   .detailContent,
@@ -2387,6 +2547,7 @@
   .detailPanel {
     width: 100%;
     max-height: none;
+    margin-left: -14px;
     padding: 0;
   }
 
@@ -2418,6 +2579,36 @@
     align-self: start;
   }
 
+  .previewMedia[data-project-id="hangeul"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+    column-gap: 6px;
+    width: 100%;
+  }
+
+  .previewMedia[data-project-id="hangeul"] .previewImage,
+  .previewHangeulGuide {
+    width: 100%;
+    max-height: 190px;
+  }
+
+  .imageLightboxOverlay {
+    padding: 12px;
+  }
+
+  .imageLightbox {
+    max-width: 94vw;
+    max-height: calc(100svh - 24px);
+  }
+
+  .imageLightboxImage {
+    max-height: calc(100svh - 24px);
+  }
+
+  .imageLightboxCloseButton {
+    top: 8px;
+    right: 8px;
+  }
+
   .bottomInfo {
     width: 100%;
     max-width: 100%;
@@ -2428,10 +2619,6 @@
     grid-template-columns: 76px minmax(0, 1fr);
     column-gap: 12px;
     max-width: 100%;
-  }
-
-  .expandedOverflowShell[data-expanded="true"] {
-    height: 160px;
   }
 
   .projectBranchScene {
@@ -2540,6 +2727,7 @@
   }
 
   .detailPanel {
+    margin-left: -8px;
     padding-top: 0;
   }
 }

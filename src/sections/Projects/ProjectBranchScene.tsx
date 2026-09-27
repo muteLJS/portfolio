@@ -12,6 +12,7 @@ export type Project = {
   deploy?: string;
   id: string;
   image: string;
+  highlights?: ProjectHighlight[];
   leaf: {
     asset: string;
     height: string;
@@ -52,8 +53,13 @@ export type ProjectPage = {
   previewImage?: string;
 };
 
+export type ProjectHighlight = {
+  label: string;
+  text: string;
+};
+
 export type ProjectPlanning = {
-  image: string | null;
+  pdfUrl?: string;
   summary: string;
   title: string;
 };
