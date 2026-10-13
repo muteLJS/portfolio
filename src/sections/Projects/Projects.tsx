@@ -504,7 +504,7 @@ const projects: Project[] = (
       title: "영풍문고 리디자인",
       type: "sub",
       shortLine: "Bookstore Redesign",
-      tagline: "서점의 탐색 흐름을 다시 정리한 리디자인",
+      tagline: "읽을 책을 찾는 과정을 고려한 온라인 서점",
       period: "2025.12.26 ~ 2026.02.02",
       team: "개인 프로젝트",
       description:
@@ -512,23 +512,15 @@ const projects: Project[] = (
       highlights: [
         {
           label: "문제",
-          text: "처음 방문한 사용자가 원하는 책과 최신 트렌드를 빠르게 탐색할 수 있는 정보 구조가 필요했습니다.",
+          text: "책을 정하지 못한 사용자의\n탐색 출발점 고민",
         },
         {
-          label: "맡은 역할",
-          text: "기획, 디자인, 퍼블리싱을 포함한 전 과정을 100% 개인 작업으로 진행했습니다.",
+          label: "해결",
+          text: "첫 화면 상단에서\n관심 조건으로 도서 탐색",
         },
         {
-          label: "구현",
-          text: "검색과 트렌드 탐색 흐름을 중심으로 UI를 재구성하고, 익숙한 인터랙션 요소를 더해 편리하고 편안한 이용 경험을 설계했습니다.",
-        },
-        {
-          label: "결과/배운 점",
-          text: "첫 웹페이지 작업으로 색감, 구조, 배치의 부족함을 분명히 확인했고, 이후 작업에서 화면의 기본 구성부터 더 신중하게 판단하는 기준을 얻었습니다.",
-        },
-        {
-          label: "인사이트",
-          text: "리디자인은 새로운 장식을 더하는 일보다 사용자가 처음부터 편하게 탐색할 수 있는 순서를 다시 만드는 일이라고 생각합니다.",
+          label: "역할",
+          text: "개인 프로젝트\n기획·디자인·개발 전 과정",
         },
       ],
       insight: "리디자인은 사용자가 처음부터 편하게 탐색할 수 있는 순서를 다시 만드는 일이라고 생각합니다.",
@@ -727,6 +719,7 @@ export default function Projects() {
   const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
   const [entryHintCycle, setEntryHintCycle] = useState(0);
   const sectionRef = useRef<HTMLElement | null>(null);
+  const detailPanelRef = useRef<HTMLElement | null>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement | null>(null);
   const summaryRef = useRef<HTMLSpanElement | null>(null);
   const pagesOverflowRef = useRef<HTMLDivElement | null>(null);
@@ -763,6 +756,35 @@ export default function Projects() {
     : "";
   const isLongKoreanTitle =
     selectedProject?.id === "ypbooks" || selectedProject?.id === "hangeul";
+  const isBookstoreDetail = selectedProject?.id === "ypbooks";
+
+  useEffect(() => {
+    const panel = detailPanelRef.current;
+    if (!isBookstoreDetail || !panel) return;
+
+    // Keep native detail scrolling from reaching the full-page wheel/touch handler.
+    const stopSectionScroll = (event: Event) => event.stopPropagation();
+    panel.addEventListener("wheel", stopSectionScroll, { passive: true });
+    panel.addEventListener("touchmove", stopSectionScroll, { passive: true });
+    panel.scrollTop = 0;
+    // On a narrow screen the unchanged branch sits above the detail.
+    const frame = window.requestAnimationFrame(() => {
+      if (window.matchMedia("(max-width: 640px)").matches) {
+        const container = document.querySelector<HTMLElement>("[data-scroll-container='true']");
+        if (container) {
+          container.scrollTo({
+            top: container.scrollTop + panel.getBoundingClientRect().top - container.getBoundingClientRect().top - 112,
+            behavior: "smooth",
+          });
+        }
+      }
+    });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      panel.removeEventListener("wheel", stopSectionScroll);
+      panel.removeEventListener("touchmove", stopSectionScroll);
+    };
+  }, [isBookstoreDetail]);
   const currentProjectNumber = selectedProject
     ? String(selectedIndex + 1).padStart(2, "0")
     : "";
@@ -844,6 +866,10 @@ export default function Projects() {
   };
 
   const handleCloseDetail = () => {
+    if (isBookstoreDetail && window.matchMedia("(max-width: 640px)").matches) {
+      const container = document.querySelector<HTMLElement>("[data-scroll-container='true']");
+      container?.scrollTo({ top: sectionRef.current?.offsetTop ?? 0, behavior: "instant" });
+    }
     setSelectedProject(null);
     setIsPlanningOpen(false);
     setImagePreview(null);
@@ -1164,7 +1190,7 @@ export default function Projects() {
             alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
             width={960}
             height={600}
-            sizes="(max-width: 900px) calc(100vw - 64px), 560px"
+            sizes={isBookstoreDetail ? "(max-width: 640px) calc(100vw - 32px), (max-width: 900px) 55vw, (max-width: 1455px) 44vw, 640px" : "(max-width: 900px) calc(100vw - 64px), 560px"}
             onError={() =>
               setBrokenImages((current) => ({
                 ...current,
@@ -1271,7 +1297,14 @@ export default function Projects() {
   ) : null;
 
   const detailPanel = selectedProject ? (
-    <article className={styles.detailPanel} aria-live="polite">
+    <article
+      ref={detailPanelRef}
+      className={`${styles.detailPanel} ${isBookstoreDetail ? styles.bookstoreDetail : ""}`}
+      aria-live="polite"
+      aria-label={isBookstoreDetail ? "영풍문고 프로젝트 상세" : undefined}
+      tabIndex={isBookstoreDetail ? 0 : undefined}
+      onKeyDown={isBookstoreDetail ? (event) => event.stopPropagation() : undefined}
+    >
       <div className={styles.detailContent}>
         <div className={styles.numberRow}>
           <p className={styles.projectNumber}>
@@ -1311,10 +1344,10 @@ export default function Projects() {
           <ul className={styles.detailMetaList}>
             {selectedProject.period ? <li>{selectedProject.period}</li> : null}
             {selectedProject.team ? <li>{selectedProject.team}</li> : null}
-            <li>{getProjectRoleText(selectedProject)}</li>
+            {!isBookstoreDetail ? <li>{getProjectRoleText(selectedProject)}</li> : null}
           </ul>
         </div>
-        <div className={styles.summaryRow} data-summary-state={summaryState}>
+        {!isBookstoreDetail ? <div className={styles.summaryRow} data-summary-state={summaryState}>
           <div className={styles.summaryBox} data-summary-state={summaryState}>
             <button
               type="button"
@@ -1346,10 +1379,49 @@ export default function Projects() {
               aria-label="다음 프로젝트 보기"
             />
           </div>
-        </div>
+        </div> : null}
         <div className={styles.mediaRow} data-summary-state={summaryState}>
           <div className={styles.detailMediaArea}>{previewFrame}</div>
         </div>
+        {isBookstoreDetail ? (
+          <>
+            <dl className={styles.bookstoreHighlights}>
+              {selectedProject.highlights?.map((highlight, index) => (
+                <div key={highlight.label} className={styles.bookstoreHighlight}>
+                  <dt>
+                    <span className={styles.bookstoreIcon} aria-hidden="true">
+                      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                        {index === 0 ? (
+                          <>
+                            <circle cx="14" cy="14" r="9" />
+                            <path d="m21 21 6 6M11.5 11a2.5 2.5 0 0 1 5 .5c0 2-2.5 2-2.5 4M14 19h.01" />
+                          </>
+                        ) : index === 1 ? (
+                          <>
+                            <path d="M4 8h5m6 0h13M4 16h14m6 0h4M4 24h5m6 0h13" />
+                            <circle cx="12" cy="8" r="3" />
+                            <circle cx="21" cy="16" r="3" />
+                            <circle cx="12" cy="24" r="3" />
+                          </>
+                        ) : (
+                          <>
+                            <circle cx="13" cy="9" r="5" />
+                            <path d="M4 27v-3a9 9 0 0 1 14-7m1 5 7-7 3 3-7 7-4 1zM24 17l3 3" />
+                          </>
+                        )}
+                      </svg>
+                    </span>
+                    {highlight.label}
+                  </dt>
+                  <dd>{highlight.text}</dd>
+                </div>
+              ))}
+            </dl>
+            <a className={styles.bookstoreSiteLink} href={selectedProject.siteUrl} target="_blank" rel="noreferrer">
+              사이트 보기 <span aria-hidden="true">↗</span>
+            </a>
+          </>
+        ) : null}
         <div
           className={styles.bottomInfo}
           data-expanded-type={
@@ -1651,6 +1723,7 @@ export default function Projects() {
       className={styles.projects}
       aria-labelledby="projects-title"
       data-detail-open={selectedProject ? "true" : "false"}
+      data-project-detail={selectedProject?.id}
       data-reveal-section="true"
     >
       <video

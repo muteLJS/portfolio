@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import type { CSSProperties } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 
 import styles from "./Projects.module.css";
@@ -319,6 +319,10 @@ type ProjectBranchSceneStyle = CSSProperties & {
   "--branch-scroll-progress": string;
 };
 
+const subscribeToClient = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export default function ProjectBranchScene({
   branchScrollProgress,
   entryHintCycle,
@@ -328,10 +332,14 @@ export default function ProjectBranchScene({
   projects,
   selectedProject,
 }: ProjectBranchSceneProps) {
-  const sharedLayer =
-    typeof document === "undefined"
-      ? null
-      : document.getElementById("shared-branch-layer");
+  const isClient = useSyncExternalStore(
+    subscribeToClient,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
+  const sharedLayer = isClient
+    ? document.getElementById("shared-branch-layer")
+    : null;
 
   const getHitAreaStyle = (hit: BranchDebugHitArea) =>
     ({

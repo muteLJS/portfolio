@@ -10,6 +10,291 @@
   color: #1c302c;
 }
 
+/* Only the bookstore case study uses this editorial, naturally sized layout. */
+.projects[data-project-detail="ypbooks"] .inner {
+  display: block;
+  padding-top: clamp(240px, 26vh, 280px);
+  padding-bottom: 24px;
+}
+
+.projects[data-project-detail="ypbooks"] .leftPane {
+  min-height: 0;
+  height: 100%;
+  align-items: flex-start;
+}
+
+.projects[data-project-detail="ypbooks"] .backgroundVeil {
+  background: linear-gradient(90deg, rgba(255, 250, 235, 0.76) 0%, rgba(255, 250, 235, 0.72) 43%, rgba(255, 250, 235, 0) 65%);
+}
+
+.detailPanel.bookstoreDetail {
+  width: min(640px, 44vw);
+  max-height: 100%;
+  margin: 0;
+  padding: 4px 14px 32px 2px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #526f61 transparent;
+  color: #17372f;
+}
+
+.bookstoreDetail .detailContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bookstoreDetail .numberRow {
+  width: 100%;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.bookstoreDetail .projectNumber,
+.bookstoreDetail .detailCloseButton {
+  transform: none;
+}
+
+.bookstoreDetail .detailCloseButton {
+  width: 32px;
+  height: 32px;
+}
+
+.bookstoreDetail .detailTitle {
+  display: block;
+  min-height: 0;
+  max-height: none;
+  font-size: clamp(2.35rem, 3.2vw, 3.5rem);
+  line-height: 1.24;
+  overflow: visible;
+}
+
+.bookstoreDetail .detailTagline {
+  display: block;
+  max-height: none;
+  font-size: clamp(1rem, 1.12vw, 1.25rem);
+  line-height: 1.55;
+  color: #17372f;
+  overflow: visible;
+}
+
+.bookstoreDetail .detailMetaList {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.bookstoreDetail .detailMetaList li {
+  font-size: 0.875rem;
+  font-weight: 450;
+  color: #344f45;
+}
+
+.bookstoreDetail .detailMetaList li + li::before {
+  content: "·";
+  margin: 0 10px;
+  color: currentColor;
+}
+
+.bookstoreDetail .mediaRow,
+.bookstoreDetail .detailMediaArea,
+.bookstoreDetail .previewFrame,
+.bookstoreDetail .previewLink,
+.bookstoreDetail .previewMedia[data-project-id="ypbooks"] {
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+}
+
+.bookstoreDetail .mediaRow {
+  margin: 6px 0;
+}
+
+.bookstoreDetail .previewMedia[data-project-id="ypbooks"] .previewImage {
+  width: 100%;
+  height: auto;
+  max-height: none;
+  object-position: top;
+  border-radius: 10px;
+  filter: none;
+  aspect-ratio: 2.65 / 1;
+  object-fit: cover;
+}
+
+.bookstoreHighlights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  text-align: center;
+}
+
+.bookstoreHighlight dt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.0625rem;
+  font-weight: 650;
+}
+
+.bookstoreIcon {
+  display: grid;
+  width: 60px;
+  height: 60px;
+  place-items: center;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+.bookstoreIcon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.bookstoreHighlight dd {
+  margin: 8px 0 0;
+  font-size: 0.9375rem;
+  font-weight: 450;
+  line-height: 1.6;
+  white-space: pre-line;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-shadow: 0 1px 2px rgba(255, 250, 235, 0.65);
+}
+
+.bookstoreSiteLink {
+  align-self: flex-start;
+  display: inline-flex;
+  gap: 12px;
+  margin: 6px 0 0;
+  padding: 4px 0;
+  border-bottom: 1px solid currentColor;
+  color: #17372f;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.bookstoreDetail .bottomInfo {
+  width: 100%;
+  max-width: none;
+  margin-top: 6px;
+}
+
+.bookstoreDetail .pagesBlock,
+.bookstoreDetail .detailStacks {
+  max-width: none;
+  max-height: none;
+  grid-template-columns: 72px minmax(0, 1fr);
+  column-gap: 16px;
+}
+
+.bookstoreDetail .pagesBlock h4,
+.bookstoreDetail .detailStacks h4,
+.bookstoreDetail .pageTextButton,
+.bookstoreDetail .stackTextItem,
+.bookstoreDetail .overflowMoreButton,
+.bookstoreDetail .inlineSeparator {
+  color: #17372f;
+  opacity: 1;
+}
+
+.bookstoreDetail .pageTextButton,
+.bookstoreDetail .stackTextItem,
+.bookstoreDetail .overflowMoreButton {
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+
+.bookstoreDetail .stackIconList {
+  flex-wrap: wrap;
+  max-height: none;
+  row-gap: 4px;
+}
+
+.bookstoreDetail .expandedOverflowShell {
+  position: static;
+}
+
+.bookstoreDetail .expandedOverflowShell[data-expanded="true"] {
+  margin-top: 8px;
+}
+
+.bookstoreDetail .pagesBlock::after,
+.bookstoreDetail .detailStacks::after {
+  bottom: 0;
+  background: rgba(23, 55, 47, 0.3);
+}
+
+.bookstoreDetail .pageTextButton[data-active="true"] {
+  color: #17372f;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.bookstoreDetail:focus-visible,
+.bookstoreDetail button:focus-visible,
+.bookstoreDetail a:focus-visible {
+  outline: 2px solid #17372f;
+  outline-offset: -2px;
+}
+
+@media (max-width: 900px) {
+  .detailPanel.bookstoreDetail {
+    width: min(540px, 55vw);
+  }
+}
+
+@media (max-width: 640px) {
+  .projects[data-project-detail="ypbooks"] {
+    height: auto;
+    overflow: visible;
+    scroll-margin-top: 112px;
+  }
+
+  .projects[data-project-detail="ypbooks"] .backgroundVeil {
+    background: rgba(255, 250, 235, 0.72);
+  }
+
+  .projects[data-project-detail="ypbooks"] .inner {
+    height: auto;
+    /* Leave the existing mobile branch in place above the case study. */
+    padding-top: calc(56svh + min(38.5vw, 260px) + 80px);
+    padding-bottom: 48px;
+  }
+
+  .detailPanel.bookstoreDetail {
+    width: 100%;
+    max-height: none;
+    padding: 4px 2px 24px;
+    margin: 0;
+    overflow: visible;
+  }
+
+  .bookstoreDetail .detailTitle {
+    font-size: 2.125rem;
+    line-height: 1.3;
+  }
+
+  .bookstoreHighlights {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    margin: 6px 0;
+  }
+
+  .bookstoreHighlight dd {
+    font-size: 1rem;
+  }
+
+  .bookstoreDetail .pagesBlock,
+  .bookstoreDetail .detailStacks {
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: 12px;
+  }
+}
+
 .backgroundVeil,
 .projects::after {
   position: absolute;
