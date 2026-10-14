@@ -13,8 +13,8 @@
 /* Only the bookstore case study uses this editorial, naturally sized layout. */
 .projects[data-project-detail="ypbooks"] .inner {
   display: block;
-  padding-top: clamp(240px, 26vh, 280px);
-  padding-bottom: 24px;
+  padding-top: clamp(120px, 14vh, 150px);
+  padding-bottom: 20px;
 }
 
 .projects[data-project-detail="ypbooks"] .leftPane {
@@ -24,32 +24,43 @@
 }
 
 .projects[data-project-detail="ypbooks"] .backgroundVeil {
-  background: linear-gradient(90deg, rgba(255, 250, 235, 0.76) 0%, rgba(255, 250, 235, 0.72) 43%, rgba(255, 250, 235, 0) 65%);
+  background: linear-gradient(90deg, rgba(255, 250, 235, 0.66) 0%, rgba(255, 250, 235, 0.60) 43%, rgba(255, 250, 235, 0) 64%);
 }
 
 .detailPanel.bookstoreDetail {
+  display: flex;
+  flex-direction: column;
   width: min(640px, 44vw);
   max-height: 100%;
   margin: 0;
-  padding: 4px 14px 32px 2px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-  scrollbar-width: thin;
-  scrollbar-color: #526f61 transparent;
+  padding: 0 0 0 2px;
+  overflow: visible;
   color: #17372f;
 }
 
 .bookstoreDetail .detailContent {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  padding: 0 14px 12px 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #526f61 transparent;
+  scroll-padding-block: 12px;
+  overflow-anchor: none;
+}
+
+.bookstoreDetail .detailContent > * {
+  flex-shrink: 0;
 }
 
 .bookstoreDetail .numberRow {
   width: 100%;
   align-items: center;
-  margin-bottom: 4px;
+  flex-shrink: 0;
+  margin-bottom: 12px;
+  padding-right: 14px;
 }
 
 .bookstoreDetail .projectNumber,
@@ -108,7 +119,7 @@
 }
 
 .bookstoreDetail .mediaRow {
-  margin: 6px 0;
+  margin: 4px 0;
 }
 
 .bookstoreDetail .previewMedia[data-project-id="ypbooks"] .previewImage {
@@ -134,7 +145,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 1.0625rem;
   font-weight: 650;
 }
@@ -158,7 +169,8 @@
   font-size: 0.9375rem;
   font-weight: 450;
   line-height: 1.6;
-  white-space: pre-line;
+  white-space: normal;
+  text-wrap: pretty;
   word-break: keep-all;
   overflow-wrap: anywhere;
   text-shadow: 0 1px 2px rgba(255, 250, 235, 0.65);
@@ -255,7 +267,7 @@
   }
 
   .projects[data-project-detail="ypbooks"] .backgroundVeil {
-    background: rgba(255, 250, 235, 0.72);
+    background: rgba(255, 250, 235, 0.62);
   }
 
   .projects[data-project-detail="ypbooks"] .inner {
@@ -271,6 +283,11 @@
     padding: 4px 2px 24px;
     margin: 0;
     overflow: visible;
+  }
+
+  .bookstoreDetail .detailContent {
+    overflow: visible;
+    padding: 0;
   }
 
   .bookstoreDetail .detailTitle {

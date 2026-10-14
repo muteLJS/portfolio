@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 
 import ProjectBranchScene from "./ProjectBranchScene";
@@ -512,11 +512,11 @@ const projects: Project[] = (
       highlights: [
         {
           label: "문제",
-          text: "책을 정하지 못한 사용자의\n탐색 출발점 고민",
+          text: "읽을 책이 정해지지 않은 사용자를 위한 탐색 방법 고민",
         },
         {
           label: "해결",
-          text: "첫 화면 상단에서\n관심 조건으로 도서 탐색",
+          text: "첫 화면 상단에 관심 조건별 도서 탐색 배치",
         },
         {
           label: "역할",
@@ -720,6 +720,7 @@ export default function Projects() {
   const [entryHintCycle, setEntryHintCycle] = useState(0);
   const sectionRef = useRef<HTMLElement | null>(null);
   const detailPanelRef = useRef<HTMLElement | null>(null);
+  const detailScrollRef = useRef<HTMLDivElement | null>(null);
   const backgroundVideoRef = useRef<HTMLVideoElement | null>(null);
   const summaryRef = useRef<HTMLSpanElement | null>(null);
   const pagesOverflowRef = useRef<HTMLDivElement | null>(null);
@@ -766,7 +767,8 @@ export default function Projects() {
     const stopSectionScroll = (event: Event) => event.stopPropagation();
     panel.addEventListener("wheel", stopSectionScroll, { passive: true });
     panel.addEventListener("touchmove", stopSectionScroll, { passive: true });
-    panel.scrollTop = 0;
+    if (detailScrollRef.current) detailScrollRef.current.scrollTop = 0;
+    panel.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
     // On a narrow screen the unchanged branch sits above the detail.
     const frame = window.requestAnimationFrame(() => {
       if (window.matchMedia("(max-width: 640px)").matches) {
@@ -785,6 +787,43 @@ export default function Projects() {
       panel.removeEventListener("touchmove", stopSectionScroll);
     };
   }, [isBookstoreDetail]);
+
+  const handleBookstoreKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    event.stopPropagation();
+    const panel = detailPanelRef.current;
+    const content = detailScrollRef.current;
+    if (!panel || !content) return;
+
+    // The next DOM section is Contact; keep Tab from scrolling there just to focus a link.
+    // Navigation stays reachable without trapping focus in this non-modal detail.
+    if (event.key === "Tab") {
+      const controls = Array.from(panel.querySelectorAll<HTMLElement>(
+        'button, a[href], [tabindex="0"]',
+      )).filter((element) => element.getClientRects().length > 0);
+      const boundary = event.shiftKey ? controls[0] : controls.at(-1);
+      if (document.activeElement === boundary) {
+        const navigation = document.querySelector<HTMLElement>('header nav button');
+        if (navigation) {
+          event.preventDefault();
+          navigation.focus({ preventScroll: true });
+        }
+      }
+      return;
+    }
+
+    if (window.matchMedia("(min-width: 641px)").matches) {
+      const distance = content.clientHeight * 0.8;
+      const offsets: Record<string, number> = {
+        ArrowDown: 40, ArrowUp: -40, PageDown: distance, PageUp: -distance,
+      };
+      if (event.key in offsets || event.key === "Home" || event.key === "End") {
+        event.preventDefault();
+        const top = event.key === "Home" ? 0 : event.key === "End"
+          ? content.scrollHeight : content.scrollTop + offsets[event.key];
+        content.scrollTo({ top, behavior: "instant" });
+      }
+    }
+  };
   const currentProjectNumber = selectedProject
     ? String(selectedIndex + 1).padStart(2, "0")
     : "";
@@ -866,6 +905,11 @@ export default function Projects() {
   };
 
   const handleCloseDetail = () => {
+    if (isBookstoreDetail) {
+      document.querySelector<HTMLButtonElement>(
+        'button[aria-label="영풍문고 리디자인 프로젝트 보기"]',
+      )?.focus({ preventScroll: true });
+    }
     if (isBookstoreDetail && window.matchMedia("(max-width: 640px)").matches) {
       const container = document.querySelector<HTMLElement>("[data-scroll-container='true']");
       container?.scrollTo({ top: sectionRef.current?.offsetTop ?? 0, behavior: "instant" });
@@ -1190,6 +1234,7 @@ export default function Projects() {
             alt={`${selectedProject.title} ${selectedPage?.name ?? "main"} screen`}
             width={960}
             height={600}
+            unoptimized={isBookstoreDetail}
             sizes={isBookstoreDetail ? "(max-width: 640px) calc(100vw - 32px), (max-width: 900px) 55vw, (max-width: 1455px) 44vw, 640px" : "(max-width: 900px) calc(100vw - 64px), 560px"}
             onError={() =>
               setBrokenImages((current) => ({
@@ -1296,17 +1341,8 @@ export default function Projects() {
     </div>
   ) : null;
 
-  const detailPanel = selectedProject ? (
-    <article
-      ref={detailPanelRef}
-      className={`${styles.detailPanel} ${isBookstoreDetail ? styles.bookstoreDetail : ""}`}
-      aria-live="polite"
-      aria-label={isBookstoreDetail ? "영풍문고 프로젝트 상세" : undefined}
-      tabIndex={isBookstoreDetail ? 0 : undefined}
-      onKeyDown={isBookstoreDetail ? (event) => event.stopPropagation() : undefined}
-    >
-      <div className={styles.detailContent}>
-        <div className={styles.numberRow}>
+  const detailNumberRow = (
+    <div className={styles.numberRow}>
           <p className={styles.projectNumber}>
             <span className={styles.currentNumber}>{currentProjectNumber}</span>
             <span className={styles.numberSlash}>/</span>
@@ -1327,7 +1363,26 @@ export default function Projects() {
               <path d="m17.5 6.5-11 11" />
             </svg>
           </button>
-        </div>
+    </div>
+  );
+
+  const detailPanel = selectedProject ? (
+    <article
+      ref={detailPanelRef}
+      className={`${styles.detailPanel} ${isBookstoreDetail ? styles.bookstoreDetail : ""}`}
+      aria-live="polite"
+      aria-label={isBookstoreDetail ? "영풍문고 프로젝트 상세" : undefined}
+      onKeyDown={isBookstoreDetail ? handleBookstoreKeyDown : undefined}
+    >
+      {isBookstoreDetail ? detailNumberRow : null}
+      <div
+        ref={detailScrollRef}
+        className={styles.detailContent}
+        tabIndex={isBookstoreDetail ? 0 : undefined}
+        role={isBookstoreDetail ? "region" : undefined}
+        aria-label={isBookstoreDetail ? "영풍문고 상세 내용" : undefined}
+      >
+        {!isBookstoreDetail ? detailNumberRow : null}
         <div className={styles.titleRow}>
           <h3
             className={`${styles.detailTitle} ${
@@ -1583,6 +1638,9 @@ export default function Projects() {
                         <button
                           type="button"
                           className={styles.overflowMoreButton}
+                          aria-expanded={isBookstoreDetail ? isStacksOpen : undefined}
+                          aria-controls={isBookstoreDetail ? "ypbooks-stack-extra" : undefined}
+                          aria-label={isBookstoreDetail ? (isStacksOpen ? "기술 스택 접기" : "기술 스택 더 보기") : undefined}
                           onClick={() => {
                             setIsPagesOpen(false);
                             setIsStacksOpen((value) => !value);
@@ -1596,6 +1654,8 @@ export default function Projects() {
                     </div>
                     <div
                       ref={stacksOverflowRef}
+                      id={isBookstoreDetail ? "ypbooks-stack-extra" : undefined}
+                      aria-hidden={isBookstoreDetail ? !isStacksOpen : undefined}
                       className={styles.expandedOverflowShell}
                       data-expanded={isStacksOpen ? "true" : "false"}
                     >
