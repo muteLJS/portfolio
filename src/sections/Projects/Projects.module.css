@@ -35,6 +35,8 @@
 }
 
 .detailPanel.bookstoreDetail {
+  --bookstore-annotation-color: #466fa6;
+
   display: flex;
   flex-direction: column;
   width: min(640px, 44vw);
@@ -143,7 +145,7 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  color: #17372f;
+  color: var(--bookstore-annotation-color);
 }
 
 .bookstoreCaption {
@@ -151,6 +153,10 @@
   font-size: 0.875rem;
   line-height: 1.65;
   color: #17372f;
+}
+
+.bookstoreAnnotationMarker {
+  color: var(--bookstore-annotation-color);
 }
 
 .bookstoreIntentToggle {
@@ -380,6 +386,22 @@
   .bookstoreDetail .detailStacks {
     grid-template-columns: 56px minmax(0, 1fr);
     column-gap: 12px;
+  }
+}
+
+/* At wide desktop widths, align the case study with the header copy without
+   changing the established spacing on smaller desktop and mobile layouts. */
+@media (min-width: 1456px) and (min-height: 820px) {
+  .projects[data-project-detail="ypbooks"] .inner {
+    padding-top: clamp(92px, calc(14vh - 28px), 122px);
+  }
+
+  .detailPanel.bookstoreDetail {
+    margin-left: -26px;
+  }
+
+  .bookstoreHighlights {
+    margin-top: 28px;
   }
 }
 

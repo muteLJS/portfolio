@@ -1240,7 +1240,7 @@ export default function Projects() {
         {showBookstoreAnnotation ? (
           <svg className={styles.bookstoreAnnotation} viewBox="0 0 1900 940" preserveAspectRatio="xMidYMin slice" aria-hidden="true" focusable="false">
             {/* Source PNG: pink area x=210..1696, y=341..641; outline sits outside it. */}
-            <rect x="200" y="331" width="1506" height="320" rx="22" fill="none" stroke="currentColor" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            <rect x="200" y="331" width="1506" height="320" rx="22" fill="none" stroke="currentColor" strokeWidth="1.75" vectorEffect="non-scaling-stroke" />
             <text x="170" y="320" textAnchor="middle" fontSize="64" fill="currentColor">①</text>
           </svg>
         ) : null}
@@ -1439,7 +1439,9 @@ export default function Projects() {
           <div className={styles.detailMediaArea}>{previewFrame}</div>
         </div>
         {showBookstoreAnnotation ? (
-          <p className={styles.bookstoreCaption}>① 관심 조건으로 읽을 책을 찾아보는 탐색 영역</p>
+          <p className={styles.bookstoreCaption}>
+            <span className={styles.bookstoreAnnotationMarker}>①</span> 관심 조건으로 읽을 책을 찾아보는 탐색 영역
+          </p>
         ) : null}
         {isBookstoreDetail ? (
           <>
