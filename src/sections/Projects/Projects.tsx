@@ -702,6 +702,7 @@ export default function Projects() {
   } | null>(null);
   const [isPagesOpen, setIsPagesOpen] = useState(false);
   const [isStacksOpen, setIsStacksOpen] = useState(false);
+  const [isDesignIntentOpen, setIsDesignIntentOpen] = useState(false);
   const [expandedSummaryProjectId, setExpandedSummaryProjectId] = useState<
     string | null
   >(null);
@@ -758,15 +759,12 @@ export default function Projects() {
   const isLongKoreanTitle =
     selectedProject?.id === "ypbooks" || selectedProject?.id === "hangeul";
   const isBookstoreDetail = selectedProject?.id === "ypbooks";
+  const showBookstoreAnnotation = isBookstoreDetail && selectedPage?.name === "Main" && !brokenImages[previewImageKey];
 
   useEffect(() => {
     const panel = detailPanelRef.current;
     if (!isBookstoreDetail || !panel) return;
 
-    // Keep native detail scrolling from reaching the full-page wheel/touch handler.
-    const stopSectionScroll = (event: Event) => event.stopPropagation();
-    panel.addEventListener("wheel", stopSectionScroll, { passive: true });
-    panel.addEventListener("touchmove", stopSectionScroll, { passive: true });
     if (detailScrollRef.current) detailScrollRef.current.scrollTop = 0;
     panel.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
     // On a narrow screen the unchanged branch sits above the detail.
@@ -783,8 +781,6 @@ export default function Projects() {
     });
     return () => {
       window.cancelAnimationFrame(frame);
-      panel.removeEventListener("wheel", stopSectionScroll);
-      panel.removeEventListener("touchmove", stopSectionScroll);
     };
   }, [isBookstoreDetail]);
 
@@ -811,18 +807,7 @@ export default function Projects() {
       return;
     }
 
-    if (window.matchMedia("(min-width: 641px)").matches) {
-      const distance = content.clientHeight * 0.8;
-      const offsets: Record<string, number> = {
-        ArrowDown: 40, ArrowUp: -40, PageDown: distance, PageUp: -distance,
-      };
-      if (event.key in offsets || event.key === "Home" || event.key === "End") {
-        event.preventDefault();
-        const top = event.key === "Home" ? 0 : event.key === "End"
-          ? content.scrollHeight : content.scrollTop + offsets[event.key];
-        content.scrollTo({ top, behavior: "instant" });
-      }
-    }
+    // Other navigation keys keep their native main-page scrolling behavior.
   };
   const currentProjectNumber = selectedProject
     ? String(selectedIndex + 1).padStart(2, "0")
@@ -895,6 +880,13 @@ export default function Projects() {
   };
 
   const selectProject = (project: Project) => {
+    if (isBookstoreDetail && project.id !== "ypbooks") {
+      const container = document.querySelector<HTMLElement>("[data-scroll-container='true']");
+      if (container && sectionRef.current && container.scrollTop > sectionRef.current.offsetTop) {
+        container.scrollTo({ top: sectionRef.current.offsetTop, behavior: "instant" });
+      }
+    }
+    setIsDesignIntentOpen(false);
     setSelectedProject(project);
     setSelectedPageName(getInitialPageName(project));
     setIsPlanningOpen(false);
@@ -910,11 +902,12 @@ export default function Projects() {
         'button[aria-label="영풍문고 리디자인 프로젝트 보기"]',
       )?.focus({ preventScroll: true });
     }
-    if (isBookstoreDetail && window.matchMedia("(max-width: 640px)").matches) {
+    if (isBookstoreDetail) {
       const container = document.querySelector<HTMLElement>("[data-scroll-container='true']");
       container?.scrollTo({ top: sectionRef.current?.offsetTop ?? 0, behavior: "instant" });
     }
     setSelectedProject(null);
+    setIsDesignIntentOpen(false);
     setIsPlanningOpen(false);
     setImagePreview(null);
     setIsPagesOpen(false);
@@ -957,7 +950,7 @@ export default function Projects() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         const isInProjects =
-          entry.isIntersecting && entry.intersectionRatio >= 0.35;
+          entry.isIntersecting && entry.intersectionRect.height >= Math.min(entry.boundingClientRect.height, window.innerHeight) * 0.35;
 
         setIsBranchInteractive(isInProjects);
 
@@ -972,7 +965,7 @@ export default function Projects() {
           setIsBranchInteractive(false);
         }
       },
-      { threshold: 0.35 },
+      { threshold: Array.from({ length: 21 }, (_, index) => index / 20) },
     );
 
     observer.observe(section);
@@ -1244,6 +1237,13 @@ export default function Projects() {
             }
           />
         )}
+        {showBookstoreAnnotation ? (
+          <svg className={styles.bookstoreAnnotation} viewBox="0 0 1900 940" preserveAspectRatio="xMidYMin slice" aria-hidden="true" focusable="false">
+            {/* Source PNG: pink area x=210..1696, y=341..641; outline sits outside it. */}
+            <rect x="200" y="331" width="1506" height="320" rx="22" fill="none" stroke="currentColor" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            <text x="170" y="320" textAnchor="middle" fontSize="64" fill="currentColor">①</text>
+          </svg>
+        ) : null}
         {selectedProject.id === "hangeul" ? (
           <button
             type="button"
@@ -1438,6 +1438,9 @@ export default function Projects() {
         <div className={styles.mediaRow} data-summary-state={summaryState}>
           <div className={styles.detailMediaArea}>{previewFrame}</div>
         </div>
+        {showBookstoreAnnotation ? (
+          <p className={styles.bookstoreCaption}>① 관심 조건으로 읽을 책을 찾아보는 탐색 영역</p>
+        ) : null}
         {isBookstoreDetail ? (
           <>
             <dl className={styles.bookstoreHighlights}>
@@ -1472,6 +1475,25 @@ export default function Projects() {
                 </div>
               ))}
             </dl>
+            <div className={styles.bookstoreIntent}>
+              <button type="button" className={styles.bookstoreIntentToggle} aria-expanded={isDesignIntentOpen} aria-controls="ypbooks-design-intent" onClick={() => setIsDesignIntentOpen((open) => !open)}>
+                {isDesignIntentOpen ? "설계 의도 접기 −" : "설계 의도 보기 +"}
+              </button>
+              <ol id="ypbooks-design-intent" className={styles.bookstoreIntentList} hidden={!isDesignIntentOpen}>
+                <li>
+                  <h4>어떤 사용자를 생각했는가</h4>
+                  <p>구매할 책이 정해진 사용자와 아직 읽을 책을 고르는 사용자가 있을 것으로 가정했습니다. 그중 아직 책을 정하지 않은 사용자가 탐색을 시작할 수 있는 방법에 주목했습니다.</p>
+                </li>
+                <li>
+                  <h4>왜 첫 화면 상단에 배치했는가</h4>
+                  <p>책 제목을 정하지 않은 상태에서도 관심 조건을 선택하며 탐색을 시작할 수 있도록, 도서 탐색 영역을 첫 화면 상단에 배치했습니다.</p>
+                </li>
+                <li>
+                  <h4>어떤 구성은 익숙하게 유지했는가</h4>
+                  <p>다른 온라인 서점의 구성을 참고해 필요한 메뉴와 도서 소개 영역을 구성했습니다. 새로운 탐색 기능을 제공하면서도 서점 이용 방식이 낯설어지지 않도록 의도했습니다.</p>
+                </li>
+              </ol>
+            </div>
             <a className={styles.bookstoreSiteLink} href={selectedProject.siteUrl} target="_blank" rel="noreferrer">
               사이트 보기 <span aria-hidden="true">↗</span>
             </a>

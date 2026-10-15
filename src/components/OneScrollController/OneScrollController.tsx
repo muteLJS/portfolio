@@ -84,7 +84,17 @@ export default function OneScrollController() {
       target instanceof HTMLElement &&
       Boolean(target.closest("a, button, input, textarea, select, [contenteditable='true']"));
 
+    // The bookstore case study grows in normal document flow. Do not skip its
+    // content with the one-wheel/one-section navigation used elsewhere.
+    const isReadingBookstore = () => {
+      const projects = document.getElementById("projects");
+      if (projects?.dataset.projectDetail !== "ypbooks") return false;
+      const top = scrollContainer.scrollTop;
+      return top >= projects.offsetTop - 2 && top < projects.offsetTop + projects.offsetHeight - 2;
+    };
+
     const handleWheel = (event: WheelEvent) => {
+      if (isReadingBookstore()) return;
       if (Math.abs(event.deltaY) < wheelThreshold) {
         return;
       }
@@ -99,6 +109,7 @@ export default function OneScrollController() {
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isReadingBookstore()) return;
       if (isInteractiveTarget(event.target)) {
         return;
       }
@@ -136,6 +147,7 @@ export default function OneScrollController() {
     };
 
     const handleTouchMove = (event: TouchEvent) => {
+      if (isReadingBookstore()) return;
       if (touchStartYRef.current === null) {
         return;
       }
