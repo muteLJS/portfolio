@@ -1439,9 +1439,7 @@ export default function Projects() {
           <div className={styles.detailMediaArea}>{previewFrame}</div>
         </div>
         {showBookstoreAnnotation ? (
-          <p className={styles.bookstoreCaption}>
-            <span className={styles.bookstoreAnnotationMarker}>①</span> 관심 조건으로 읽을 책을 찾아보는 탐색 영역
-          </p>
+          <p className={styles.bookstoreCaption}>① 관심 조건으로 읽을 책을 찾아보는 탐색 영역</p>
         ) : null}
         {isBookstoreDetail ? (
           <>

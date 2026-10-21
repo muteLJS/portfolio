@@ -152,10 +152,6 @@
   margin: -6px 0 0;
   font-size: 0.875rem;
   line-height: 1.65;
-  color: #17372f;
-}
-
-.bookstoreAnnotationMarker {
   color: var(--bookstore-annotation-color);
 }
 
@@ -394,10 +390,6 @@
 @media (min-width: 1456px) and (min-height: 820px) {
   .projects[data-project-detail="ypbooks"] .inner {
     padding-top: clamp(92px, calc(14vh - 28px), 122px);
-  }
-
-  .detailPanel.bookstoreDetail {
-    margin-left: -26px;
   }
 
   .bookstoreHighlights {
