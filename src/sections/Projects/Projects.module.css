@@ -41,7 +41,8 @@
   flex-direction: column;
   width: min(640px, 44vw);
   max-height: none;
-  margin: 0 0 0 -12px;
+  /* Match the shared desktop content edge while retaining this case study's 2px inset. */
+  margin: 0 0 0 calc(var(--detail-content-offset) - 2px);
   padding: 0 0 0 2px;
   overflow: visible;
   color: #17372f;
@@ -526,6 +527,7 @@
 
 .detailPanel {
   --content-lift: 0px;
+  --detail-content-offset: clamp(-32px, -2.4vw, -20px);
   position: relative;
   z-index: 30;
   isolation: isolate;
@@ -535,7 +537,7 @@
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto auto auto;
   width: min(680px, 46vw);
-  margin: clamp(54px, 7.8vh, 84px) 0 0 clamp(-32px, -2.4vw, -20px);
+  margin: clamp(54px, 7.8vh, 84px) 0 0 var(--detail-content-offset);
   overflow: visible;
   gap: 0;
   align-items: start;
@@ -2795,6 +2797,10 @@
 }
 
 @media (max-width: 1180px) {
+  .detailPanel.bookstoreDetail {
+    margin-left: -12px;
+  }
+
   .inner {
     grid-template-columns: minmax(420px, 0.96fr) minmax(500px, 1.04fr);
     width: min(100% - 56px, 1160px);
