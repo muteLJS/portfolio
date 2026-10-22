@@ -812,10 +812,10 @@ export default function Projects() {
         Math.max(0, (viewportWidth - wideStart) / (targetWidth - wideStart)),
       );
       const paneLeft = leftPane.getBoundingClientRect().left;
-      // Preserve the existing wide-screen interpolation, with the requested
+      // Preserve the existing wide-screen interpolation, with the additional
       // 12px desktop inset applied consistently at both endpoints.
-      const baseContentStart = paneLeft - 20;
-      const headerTarget = role.getBoundingClientRect().right + 24;
+      const baseContentStart = paneLeft - 8;
+      const headerTarget = role.getBoundingClientRect().right + 36;
       const contentStart =
         baseContentStart + (headerTarget - baseContentStart) * progress;
       const paddingLeft = Number.parseFloat(getComputedStyle(panel).paddingLeft) || 0;
@@ -1522,9 +1522,9 @@ export default function Projects() {
               </div>
               <section className={styles.bookstoreIntentScreen} aria-hidden={!isDesignIntentOpen}>
                 <ol className={styles.bookstoreIntentList}>
-                  <li><span className={styles.bookstoreIntentNumber}>01</span><h4>사용자 가정</h4><p>읽을 책을 정한 사용자와 아직 고르는 사용자가 있다고 가정했습니다. 그중 책을 고르는 사용자의 탐색 시작점을 고민했습니다.</p></li>
-                  <li><span className={styles.bookstoreIntentNumber}>02</span><h4>배치 판단</h4><p>책 제목을 몰라도 탐색을 시작할 수 있도록, 관심 조건을 선택하는 영역을 첫 화면 상단에 배치했습니다.</p></li>
-                  <li><span className={styles.bookstoreIntentNumber}>03</span><h4>익숙함 유지</h4><p>다른 온라인 서점의 메뉴와 도서 소개 구성을 참고해, 새로운 탐색 기능을 익숙한 이용 흐름 안에 담았습니다.</p></li>
+                  <li><span className={styles.bookstoreIntentNumber}>01</span><h4>사용자 가정</h4><p>읽을 책이 정해지지 않은 사용자도 탐색을 시작할 수 있어야 한다고 생각했습니다.</p></li>
+                  <li><span className={styles.bookstoreIntentNumber}>02</span><h4>배치 판단</h4><p>책 제목을 몰라도 관심 조건으로 탐색할 수 있도록, 조건 선택 영역을 첫 화면 상단에 배치했습니다.</p></li>
+                  <li><span className={styles.bookstoreIntentNumber}>03</span><h4>익숙함 유지</h4><p>다른 온라인 서점의 메뉴와 도서 소개 구성을 참고해, 새로운 기능도 익숙한 흐름 안에서 이용하도록 구성했습니다.</p></li>
                 </ol>
               </section>
             </div>

@@ -245,9 +245,47 @@
 }
 
 @media (min-width: 1181px) {
+  .bookstoreDetail .titleRow {
+    margin-bottom: 8px;
+  }
+
   .bookstoreIntentScreen {
+    inset: 0;
     box-sizing: border-box;
-    padding-top: 24px;
+    padding-top: 32px;
+  }
+
+  .bookstoreIntentList li {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 11px;
+  }
+
+  .bookstoreIntentList li + li {
+    margin-top: clamp(28px, 3vh, 32px);
+  }
+
+  .bookstoreIntentNumber {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    margin: 0;
+  }
+
+  .bookstoreIntentList h4 {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  .bookstoreIntentList p {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .bookstoreDetail .pagesHeader {
+    align-self: center;
   }
 
   .bookstoreProjectScreen,
@@ -456,7 +494,7 @@
 
 @media (min-width: 1181px) {
   .detailPanel.bookstoreDetail {
-    margin-left: calc(var(--detail-content-offset) + 10px);
+    margin-left: calc(var(--detail-content-offset) + 22px);
   }
 
   .bookstoreDetail .detailStacks {
@@ -503,7 +541,7 @@
   .detailPanel.bookstoreDetail {
     margin-left: var(
       --bookstore-wide-panel-margin,
-      calc(var(--detail-content-offset) + 10px)
+      calc(var(--detail-content-offset) + 22px)
     );
   }
 }
