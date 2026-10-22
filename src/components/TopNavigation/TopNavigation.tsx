@@ -32,7 +32,9 @@ export default function TopNavigation() {
         onClick={() => scrollToSection("hero")}
       >
         <span className={styles.brandName}>이진성</span>
-        <span className={styles.brandRole}>UX/UI Designer · Frontend Developer</span>
+        <span className={styles.brandRole} data-brand-role>
+          UX/UI Designer · Frontend Developer
+        </span>
       </button>
 
       <nav className={styles.nav} aria-label="Main navigation">

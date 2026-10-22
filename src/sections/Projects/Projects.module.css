@@ -156,6 +156,42 @@
   color: var(--bookstore-annotation-color);
 }
 
+.bookstoreMiddleStage {
+  position: relative;
+  width: 100%;
+}
+
+.bookstoreProjectScreen {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  transition: opacity 160ms ease, visibility 0s linear 160ms;
+}
+
+.bookstoreIntentScreen {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 160ms ease, visibility 0s linear 160ms;
+}
+
+.bookstoreMiddleStage[data-view="intent"] .bookstoreProjectScreen {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.bookstoreMiddleStage[data-view="intent"] .bookstoreIntentScreen {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 160ms ease, visibility 0s linear 0s;
+}
+
 .bookstoreIntentToggle {
   padding: 6px 0;
   border: 0;
@@ -165,7 +201,6 @@
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  scroll-margin-block: 112px 24px;
 }
 
 .bookstoreIntentToggle:hover {
@@ -174,31 +209,37 @@
 }
 
 .bookstoreIntentList {
-  margin: 16px 0 0;
-  padding-left: 22px;
-  list-style: decimal;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   text-align: left;
 }
 
 .bookstoreIntentList li + li {
-  margin-top: 24px;
+  margin-top: clamp(18px, 2.4vh, 26px);
 }
 
-.bookstoreIntentList li::marker {
-  font-size: 0.8125rem;
+.bookstoreIntentNumber {
+  display: block;
+  margin: 0 0 5px;
+  color: rgba(23, 55, 47, 0.62);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
 }
 
 .bookstoreIntentList h4 {
-  margin: 0 0 8px;
-  font-size: 1rem;
+  margin: 0 0 6px;
+  font-size: 1.0625rem;
   font-weight: 600;
   line-height: 1.6;
 }
 
 .bookstoreIntentList p {
   margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.8;
+  font-size: 0.95rem;
+  line-height: 1.72;
   word-break: keep-all;
   overflow-wrap: anywhere;
 }
@@ -386,9 +427,18 @@
   }
 }
 
-/* At wide desktop widths, align the case study with the header copy without
-   changing the established spacing on smaller desktop and mobile layouts. */
+/* The measured header-role alignment eases in across wide desktop widths only. */
+@media (min-width: 1456px) {
+  .detailPanel.bookstoreDetail {
+    margin-left: var(
+      --bookstore-wide-panel-margin,
+      calc(var(--detail-content-offset) - 2px)
+    );
+  }
+}
+
 @media (min-width: 1456px) and (min-height: 820px) {
+
   .projects[data-project-detail="ypbooks"] .inner {
     padding-top: clamp(92px, calc(14vh - 28px), 122px);
   }

@@ -703,6 +703,9 @@ export default function Projects() {
   const [isPagesOpen, setIsPagesOpen] = useState(false);
   const [isStacksOpen, setIsStacksOpen] = useState(false);
   const [isDesignIntentOpen, setIsDesignIntentOpen] = useState(false);
+  const [bookstoreWidePanelMargin, setBookstoreWidePanelMargin] = useState<
+    number | null
+  >(null);
   const [expandedSummaryProjectId, setExpandedSummaryProjectId] = useState<
     string | null
   >(null);
@@ -781,6 +784,53 @@ export default function Projects() {
     });
     return () => {
       window.cancelAnimationFrame(frame);
+    };
+  }, [isBookstoreDetail]);
+
+  useEffect(() => {
+    if (!isBookstoreDetail) {
+      return;
+    }
+
+    const panel = detailPanelRef.current;
+    const role = document.querySelector<HTMLElement>("[data-brand-role]");
+    const leftPane = panel?.parentElement;
+    if (!panel || !role || !leftPane) return;
+
+    const updateWideAlignment = () => {
+      const viewportWidth = window.innerWidth;
+      const wideStart = 1456;
+      const targetWidth = 1920;
+
+      if (viewportWidth < wideStart) {
+        setBookstoreWidePanelMargin(null);
+        return;
+      }
+
+      const progress = Math.min(
+        1,
+        Math.max(0, (viewportWidth - wideStart) / (targetWidth - wideStart)),
+      );
+      const paneLeft = leftPane.getBoundingClientRect().left;
+      const baseContentStart = paneLeft - 32;
+      const headerTarget = role.getBoundingClientRect().right + 12;
+      const contentStart =
+        baseContentStart + (headerTarget - baseContentStart) * progress;
+      const paddingLeft = Number.parseFloat(getComputedStyle(panel).paddingLeft) || 0;
+
+      setBookstoreWidePanelMargin(contentStart - paneLeft - paddingLeft);
+    };
+
+    const frame = window.requestAnimationFrame(updateWideAlignment);
+    const observer = new ResizeObserver(updateWideAlignment);
+    observer.observe(role);
+    observer.observe(leftPane);
+    window.addEventListener("resize", updateWideAlignment);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", updateWideAlignment);
     };
   }, [isBookstoreDetail]);
 
@@ -1370,6 +1420,13 @@ export default function Projects() {
     <article
       ref={detailPanelRef}
       className={`${styles.detailPanel} ${isBookstoreDetail ? styles.bookstoreDetail : ""}`}
+      style={
+        isBookstoreDetail && bookstoreWidePanelMargin !== null
+          ? ({
+              "--bookstore-wide-panel-margin": `${bookstoreWidePanelMargin}px`,
+            } as CSSProperties)
+          : undefined
+      }
       aria-live="polite"
       aria-label={isBookstoreDetail ? "영풍문고 프로젝트 상세" : undefined}
       onKeyDown={isBookstoreDetail ? handleBookstoreKeyDown : undefined}
@@ -1435,70 +1492,52 @@ export default function Projects() {
             />
           </div>
         </div> : null}
-        <div className={styles.mediaRow} data-summary-state={summaryState}>
-          <div className={styles.detailMediaArea}>{previewFrame}</div>
-        </div>
-        {showBookstoreAnnotation ? (
-          <p className={styles.bookstoreCaption}>① 관심 조건으로 읽을 책을 찾아보는 탐색 영역</p>
-        ) : null}
         {isBookstoreDetail ? (
           <>
-            <dl className={styles.bookstoreHighlights}>
-              {selectedProject.highlights?.map((highlight, index) => (
-                <div key={highlight.label} className={styles.bookstoreHighlight}>
-                  <dt>
-                    <span className={styles.bookstoreIcon} aria-hidden="true">
-                      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
-                        {index === 0 ? (
-                          <>
-                            <circle cx="14" cy="14" r="9" />
-                            <path d="m21 21 6 6M11.5 11a2.5 2.5 0 0 1 5 .5c0 2-2.5 2-2.5 4M14 19h.01" />
-                          </>
-                        ) : index === 1 ? (
-                          <>
-                            <path d="M4 8h5m6 0h13M4 16h14m6 0h4M4 24h5m6 0h13" />
-                            <circle cx="12" cy="8" r="3" />
-                            <circle cx="21" cy="16" r="3" />
-                            <circle cx="12" cy="24" r="3" />
-                          </>
-                        ) : (
-                          <>
-                            <circle cx="13" cy="9" r="5" />
-                            <path d="M4 27v-3a9 9 0 0 1 14-7m1 5 7-7 3 3-7 7-4 1zM24 17l3 3" />
-                          </>
-                        )}
-                      </svg>
-                    </span>
-                    {highlight.label}
-                  </dt>
-                  <dd>{highlight.text}</dd>
+            <div id="ypbooks-middle-stage" className={styles.bookstoreMiddleStage} data-view={isDesignIntentOpen ? "intent" : "project"}>
+              <div className={styles.bookstoreProjectScreen} aria-hidden={isDesignIntentOpen} inert={isDesignIntentOpen}>
+                <div className={styles.mediaRow} data-summary-state={summaryState}>
+                  <div className={styles.detailMediaArea}>{previewFrame}</div>
                 </div>
-              ))}
-            </dl>
-            <div className={styles.bookstoreIntent}>
-              <button type="button" className={styles.bookstoreIntentToggle} aria-expanded={isDesignIntentOpen} aria-controls="ypbooks-design-intent" onClick={() => setIsDesignIntentOpen((open) => !open)}>
-                {isDesignIntentOpen ? "설계 의도 접기 −" : "설계 의도 보기 +"}
-              </button>
-              <ol id="ypbooks-design-intent" className={styles.bookstoreIntentList} hidden={!isDesignIntentOpen}>
-                <li>
-                  <h4>어떤 사용자를 생각했는가</h4>
-                  <p>구매할 책이 정해진 사용자와 아직 읽을 책을 고르는 사용자가 있을 것으로 가정했습니다. 그중 아직 책을 정하지 않은 사용자가 탐색을 시작할 수 있는 방법에 주목했습니다.</p>
-                </li>
-                <li>
-                  <h4>왜 첫 화면 상단에 배치했는가</h4>
-                  <p>책 제목을 정하지 않은 상태에서도 관심 조건을 선택하며 탐색을 시작할 수 있도록, 도서 탐색 영역을 첫 화면 상단에 배치했습니다.</p>
-                </li>
-                <li>
-                  <h4>어떤 구성은 익숙하게 유지했는가</h4>
-                  <p>다른 온라인 서점의 구성을 참고해 필요한 메뉴와 도서 소개 영역을 구성했습니다. 새로운 탐색 기능을 제공하면서도 서점 이용 방식이 낯설어지지 않도록 의도했습니다.</p>
-                </li>
-              </ol>
+                {showBookstoreAnnotation ? (
+                  <p className={styles.bookstoreCaption}>① 관심 조건으로 읽을 책을 찾아보는 탐색 영역</p>
+                ) : null}
+                <dl className={styles.bookstoreHighlights}>
+                  {selectedProject.highlights?.map((highlight, index) => (
+                    <div key={highlight.label} className={styles.bookstoreHighlight}>
+                      <dt>
+                        <span className={styles.bookstoreIcon} aria-hidden="true">
+                          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                            {index === 0 ? <><circle cx="14" cy="14" r="9" /><path d="m21 21 6 6M11.5 11a2.5 2.5 0 0 1 5 .5c0 2-2.5 2-2.5 4M14 19h.01" /></> : index === 1 ? <><path d="M4 8h5m6 0h13M4 16h14m6 0h4M4 24h5m6 0h13" /><circle cx="12" cy="8" r="3" /><circle cx="21" cy="16" r="3" /><circle cx="12" cy="24" r="3" /></> : <><circle cx="13" cy="9" r="5" /><path d="M4 27v-3a9 9 0 0 1 14-7m1 5 7-7 3 3-7 7-4 1zM24 17l3 3" /></>}
+                          </svg>
+                        </span>
+                        {highlight.label}
+                      </dt>
+                      <dd>{highlight.text}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+              <section className={styles.bookstoreIntentScreen} aria-hidden={!isDesignIntentOpen}>
+                <ol className={styles.bookstoreIntentList}>
+                  <li><span className={styles.bookstoreIntentNumber}>01</span><h4>사용자 가정</h4><p>읽을 책을 정한 사용자와 아직 고르는 사용자가 있다고 가정했습니다. 그중 책을 고르는 사용자의 탐색 시작점을 고민했습니다.</p></li>
+                  <li><span className={styles.bookstoreIntentNumber}>02</span><h4>배치 판단</h4><p>책 제목을 몰라도 탐색을 시작할 수 있도록, 관심 조건을 선택하는 영역을 첫 화면 상단에 배치했습니다.</p></li>
+                  <li><span className={styles.bookstoreIntentNumber}>03</span><h4>익숙함 유지</h4><p>다른 온라인 서점의 메뉴와 도서 소개 구성을 참고해, 새로운 탐색 기능을 익숙한 이용 흐름 안에 담았습니다.</p></li>
+                </ol>
+              </section>
             </div>
+            <button type="button" className={styles.bookstoreIntentToggle} aria-expanded={isDesignIntentOpen} aria-controls="ypbooks-middle-stage" onClick={() => setIsDesignIntentOpen((open) => !open)}>
+              {isDesignIntentOpen ? "← 프로젝트 화면 보기" : "설계 의도 보기 →"}
+            </button>
             <a className={styles.bookstoreSiteLink} href={selectedProject.siteUrl} target="_blank" rel="noreferrer">
               사이트 보기 <span aria-hidden="true">↗</span>
             </a>
           </>
-        ) : null}
+        ) : (
+          <div className={styles.mediaRow} data-summary-state={summaryState}>
+            <div className={styles.detailMediaArea}>{previewFrame}</div>
+          </div>
+        )}
         <div
           className={styles.bottomInfo}
           data-expanded-type={
