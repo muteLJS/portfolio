@@ -812,8 +812,10 @@ export default function Projects() {
         Math.max(0, (viewportWidth - wideStart) / (targetWidth - wideStart)),
       );
       const paneLeft = leftPane.getBoundingClientRect().left;
-      const baseContentStart = paneLeft - 32;
-      const headerTarget = role.getBoundingClientRect().right + 12;
+      // Preserve the existing wide-screen interpolation, with the requested
+      // 12px desktop inset applied consistently at both endpoints.
+      const baseContentStart = paneLeft - 20;
+      const headerTarget = role.getBoundingClientRect().right + 24;
       const contentStart =
         baseContentStart + (headerTarget - baseContentStart) * progress;
       const paddingLeft = Number.parseFloat(getComputedStyle(panel).paddingLeft) || 0;

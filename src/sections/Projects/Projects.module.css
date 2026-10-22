@@ -244,6 +244,33 @@
   overflow-wrap: anywhere;
 }
 
+@media (min-width: 1181px) {
+  .bookstoreIntentScreen {
+    box-sizing: border-box;
+    padding-top: 24px;
+  }
+
+  .bookstoreProjectScreen,
+  .bookstoreIntentScreen {
+    transition: opacity 240ms ease-out, visibility 0s linear 0s;
+  }
+
+  .bookstoreMiddleStage[data-view="intent"] .bookstoreProjectScreen,
+  .bookstoreMiddleStage[data-view="project"] .bookstoreIntentScreen {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0s linear, visibility 0s linear;
+  }
+
+  .bookstoreMiddleStage[data-view="intent"] .bookstoreIntentScreen {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 240ms ease-out, visibility 0s linear 0s;
+  }
+}
+
 .bookstoreHighlights {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -427,12 +454,56 @@
   }
 }
 
+@media (min-width: 1181px) {
+  .detailPanel.bookstoreDetail {
+    margin-left: calc(var(--detail-content-offset) + 10px);
+  }
+
+  .bookstoreDetail .detailStacks {
+    grid-template-rows: auto auto;
+    align-items: start;
+    padding: 8px 0 12px;
+  }
+
+  .bookstoreDetail .detailStacks > h4 {
+    align-self: center;
+  }
+
+  .bookstoreDetail .detailStacks > .stackContent {
+    display: contents;
+  }
+
+  .bookstoreDetail .detailStacks .inlineOverflowRow {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    align-items: center;
+  }
+
+  .bookstoreDetail .detailStacks .expandedOverflowShell {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .bookstoreDetail .overflowMoreButton {
+    transform: none;
+  }
+}
+
+@media (min-width: 1181px) and (prefers-reduced-motion: reduce) {
+  .bookstoreProjectScreen,
+  .bookstoreIntentScreen {
+    transition: none !important;
+  }
+}
+
 /* The measured header-role alignment eases in across wide desktop widths only. */
 @media (min-width: 1456px) {
   .detailPanel.bookstoreDetail {
     margin-left: var(
       --bookstore-wide-panel-margin,
-      calc(var(--detail-content-offset) - 2px)
+      calc(var(--detail-content-offset) + 10px)
     );
   }
 }
