@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 작업 부산물 (검증 스크린샷, 배포 전 백업)
+/artifacts/
+/backups/
+/Claude outputs/
+*.tgz
