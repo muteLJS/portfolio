@@ -67,38 +67,34 @@ const projects: Project[] = (
   [
     {
       id: "mute",
-      title: "Mute",
+      title: "MUTE",
       type: "main",
       shortLine: "AI Music Platform",
-      tagline: "AI 채팅과 음악 경험을 연결한 팀 프로젝트",
+      tagline: "다양한 탐색 방식과 이용 편의성을 고려한 음악 서비스",
       period: "2026.02.03 ~ 2026.03.20",
       team: "팀 프로젝트 / 3인",
-      role: "기획 전반 참여 / 로그인 기능 / 페이지 퍼블리싱 / 라이브러리 기능 구현",
+      role: "기획안 PPT 제작 약 90%\n주요 화면 개발",
       contribution:
         "Naver 로그인 / Kakao 로그인 / Google 로그인 / AI 채팅 / 음악 데이터 연동 / 이미지 관리 / DB 연동",
-      description:
-        "첫 팀프로젝트로 기획을 전반적으로 담당하여, 기획안 작성에 큰 기여도를 담당하고, 디자인과 개발에서도 역할 분담을 통해 로그인 기능, 페이지 퍼블리싱, 라이브러리 기능 등을 주요적으로 담당했습니다. 팀 프로젝트를 진행하며 소통이라는 부분이 가장 중요하다고 생각됩니다. 같은 기획안을 보고, 같은 페이지를 만들더라도 각자의 개성이 반영되기 때문에 모두가 공통의 방향을 설정할 수 있도록 소통에 가장 노력을 많이 하고, 배웠습니다. 또한 팀원들 모두 각자의 역량이 다른 것을 보고 배울 점이 많은 팀원들과 함께하여, 많은 것을 배우고, 생각하고, 구현까지 마무리 할 수 있었던 프로젝트입니다.",
+      description: "",
       highlights: [
         {
           label: "문제",
-          text: "음악 앱의 복잡한 UI 속에서도 사용자가 원하는 기능을 쉽게 찾고, 취향에 맞는 경험을 이어갈 수 있어야 했습니다.",
+          text: "사용자마다 다른\n음악 탐색 방식과 입력의 편의성",
         },
         {
-          label: "맡은 역할",
-          text: "기획 참여, PPT 약 90% 제작, 앱 개발 및 화면의 디테일 요소 수정에 집중했습니다.",
+          label: "접근",
+          text: "차트·검색 등 탐색 경로 구성\n음성 AI 비서 기획",
         },
         {
-          label: "구현",
-          text: "AI 비서를 활용한 이용 흐름과 개인화 경험을 설계하고, 다른 음악 앱의 강점을 벤치마킹해 서비스에 반영했습니다.",
+          label: "역할",
+          text: "기획안 PPT 제작 약 90%\n주요 화면 개발",
         },
-        {
-          label: "결과/배운 점",
-          text: "기획, 디자인, 개발을 함께 맞추며 서비스의 핵심 흐름을 구체화했고, 팀이 같은 기준으로 소통하는 과정의 중요성을 배웠습니다.",
-        },
-        {
-          label: "인사이트",
-          text: "음악 서비스의 편리함은 기능의 수보다 사용자가 자신의 취향으로 자연스럽게 이동하는 흐름에서 만들어진다고 생각합니다.",
-        },
+      ],
+      designIntent: [
+        { title: "서로 다른 탐색 방식", text: "새로운 음악을 찾아 듣는 사용자와 익숙한 음악을 간편하게 듣고 싶은 사용자를 구분했습니다. 각자의 방식으로 음악을 찾을 수 있도록 차트·검색·추천을 함께 구성했습니다." },
+        { title: "입력 부담을 줄이는 방법", text: "타이핑보다 음성이 편한 사용자도 이용할 수 있도록, 말로 음악을 찾고 도움받는 AI 비서를 기획했습니다. 음성 기능은 구현하지 못했으며, 실제 채팅은 선택지를 통한 일부 검색으로 구현했습니다." },
+        { title: "기획을 화면으로 구체화", text: "사용자 유형과 참고 서비스 분석을 바탕으로 메뉴 구조·이용 흐름·화면과 기능을 기획안으로 정리했습니다. 기획안 작성을 주도하고, 메인 일부·아티스트·재생·라이브러리 화면 개발에 참여했습니다." },
       ],
       insight: "음악 서비스의 편리함은 사용자가 자신의 취향으로 자연스럽게 이동하는 흐름에서 만들어진다고 생각합니다.",
       skills: [
@@ -244,35 +240,31 @@ const projects: Project[] = (
       title: "GOREON",
       type: "main",
       shortLine: "AI Commerce Platform",
-      tagline: "AI 상품 탐색과 PC 견적 경험을 연결한 커머스 플랫폼",
+      tagline: "사용 목적과 예산을 바탕으로 상품 선택을 돕는 쇼핑 서비스",
       period: "2026.03.30 ~ 2026.04.30",
       team: "팀 프로젝트 / 5인",
-      role: "개발 담당",
+      role: "개발팀장·메인 페이지 개발\n추천 조건 우선순위 제안",
       contribution:
         "GitHub 세팅 / 프로젝트 초기 세팅 / 라우터 구조 설정 / 공통 레이아웃 구성 / 헤더·푸터 / 메인 페이지 / 검색창·네비바 / 로그인 기능 / 배포 / 반응형 구현 / 기획 일부 참여 / 견적 리스트 페이지 디자인 / 조립 견적 페이지 디자인",
-      description:
-        "숙련자와 초보자가 제일 많이 나뉘는 곳이 전문성을 요구하는 사이트라고 생각됩니다. 구입에 어려움이 없도록 AI 채팅을 통해 원하는 결과를 찾고, 구입할 수 있게 자연스러운 연결을 구현한 사이트입니다. 리액트 그리고 다양한 툴들을 사용하게 되는 시작이었고, 팀원들에게 도움을 정말 많이 받았습니다. 개발 담당이었지만 저보다 더 잘 아는 그리고 부담감 없이 도와주는 팀원들에게 많이 배웠습니다. 이전의 팀프로젝트 경험이 협업에 더욱 도움이 될 수 있었던 것 같습니다.",
+      description: "",
       highlights: [
         {
           label: "문제",
-          text: "전문성이 필요한 PC 구매 과정에서 초보자도 원하는 상품과 견적을 어렵지 않게 탐색할 수 있어야 했습니다.",
+          text: "복잡한 상품 정보 속\n나에게 맞는 선택 기준의 어려움",
         },
         {
-          label: "맡은 역할",
-          text: "타 사이트 조사와 UI 리서치, 앱 개발 준비 약 90%, 메인 페이지 및 세부 UI 구현을 맡았습니다.",
+          label: "접근",
+          text: "자연어로 조건을 입력하고\n추천 상품을 살펴보는 흐름",
         },
         {
-          label: "구현",
-          text: "리서치 내용을 디자인 기준으로 정리하고, 프로젝트 초기 구조와 공통 레이아웃, 메인 페이지와 세부 화면을 구현했습니다.",
+          label: "역할",
+          text: "개발팀장·메인 페이지 개발\n추천 조건 우선순위 제안",
         },
-        {
-          label: "결과/배운 점",
-          text: "조사 단계의 기준을 실제 화면까지 연결하며, 팀 개발에서 사전 구조 설계와 세부 완성도의 중요성을 확인했습니다.",
-        },
-        {
-          label: "인사이트",
-          text: "복잡한 커머스 서비스일수록 사용자가 이해해야 할 정보보다 먼저 결정할 수 있는 흐름을 설계하는 일이 중요하다고 생각합니다.",
-        },
+      ],
+      designIntent: [
+        { title: "사용자의 조건에서 시작", text: "팀은 사양을 잘 모르는 사용자도 원하는 제품을 찾을 수 있도록 자연어 기반 탐색을 구성했습니다. 사용 목적과 예산을 입력하고, 추천 결과에서 상품 상세 정보로 이어지는 흐름입니다." },
+        { title: "추천 조건의 우선순위", text: "여러 조건이 섞인 요청에서 무엇을 먼저 반영할지 고민했습니다. 가격 조건을 먼저 고려하는 방향을 제안하고, 팀원과 논의하며 상품 종류·세부 키워드의 적용 순서를 구체화했습니다." },
+        { title: "역할을 나누고 결과를 점검", text: "개발팀장으로 메인 페이지 개발을 맡았습니다. AI 입력·결과 화면과 조건 해석·추천 로직은 담당 팀원이 구현했으며, 추천 결과가 요청 조건에 맞는지 함께 점검했습니다." },
       ],
       insight: "복잡한 커머스 서비스일수록 사용자가 먼저 결정할 수 있는 흐름이 중요하다고 생각합니다.",
       skills: [
@@ -444,7 +436,7 @@ const projects: Project[] = (
           text: "평가와 완성에 대한 집착, 글쓰기에 대한 불안이 커지는 환경에서 자기만의 글을 부담 없이 완성할 수 있는 경험이 필요했습니다.",
         },
         {
-          label: "맡은 역할",
+          label: "역할",
           text: "기획, 디자인, 구현 전 과정을 100% 개인 작업으로 진행하고 있습니다.",
         },
         {
@@ -515,13 +507,18 @@ const projects: Project[] = (
           text: "읽을 책이 정해지지 않은\n사용자의 탐색 방법 고민",
         },
         {
-          label: "해결",
+          label: "접근",
           text: "첫 화면 상단에\n관심 조건별 도서 탐색 배치",
         },
         {
           label: "역할",
           text: "개인 프로젝트\n기획·디자인·개발 전 과정",
         },
+      ],
+      designIntent: [
+        { title: "사용자 가정", text: "읽을 책이 정해지지 않은 사용자도 탐색을 시작할 수 있어야 한다고 생각했습니다." },
+        { title: "배치 판단", text: "책 제목을 몰라도 관심 조건으로 탐색할 수 있도록, 조건 선택 영역을 첫 화면 상단에 배치했습니다." },
+        { title: "익숙함 유지", text: "다른 온라인 서점의 메뉴와 도서 소개 구성을 참고해, 새로운 기능도 익숙한 흐름 안에서 이용하도록 구성했습니다." },
       ],
       insight: "리디자인은 사용자가 처음부터 편하게 탐색할 수 있는 순서를 다시 만드는 일이라고 생각합니다.",
       skills: [
@@ -762,6 +759,10 @@ export default function Projects() {
   const isLongKoreanTitle =
     selectedProject?.id === "ypbooks" || selectedProject?.id === "hangeul";
   const isBookstoreDetail = selectedProject?.id === "ypbooks";
+  const isUnifiedDetail =
+    selectedProject?.id === "ypbooks" ||
+    selectedProject?.id === "mute" ||
+    selectedProject?.id === "goreon";
   const showBookstoreAnnotation = isBookstoreDetail && selectedPage?.name === "Main" && !brokenImages[previewImageKey];
 
   useEffect(() => {
@@ -1421,7 +1422,7 @@ export default function Projects() {
   const detailPanel = selectedProject ? (
     <article
       ref={detailPanelRef}
-      className={`${styles.detailPanel} ${isBookstoreDetail ? styles.bookstoreDetail : ""}`}
+      className={`${styles.detailPanel} ${isUnifiedDetail ? styles.bookstoreDetail : ""}`}
       style={
         isBookstoreDetail && bookstoreWidePanelMargin !== null
           ? ({
@@ -1433,7 +1434,7 @@ export default function Projects() {
       aria-label={isBookstoreDetail ? "영풍문고 프로젝트 상세" : undefined}
       onKeyDown={isBookstoreDetail ? handleBookstoreKeyDown : undefined}
     >
-      {isBookstoreDetail ? detailNumberRow : null}
+      {isUnifiedDetail ? detailNumberRow : null}
       <div
         ref={detailScrollRef}
         className={styles.detailContent}
@@ -1441,7 +1442,7 @@ export default function Projects() {
         role={isBookstoreDetail ? "region" : undefined}
         aria-label={isBookstoreDetail ? "영풍문고 상세 내용" : undefined}
       >
-        {!isBookstoreDetail ? detailNumberRow : null}
+        {!isUnifiedDetail ? detailNumberRow : null}
         <div className={styles.titleRow}>
           <h3
             className={`${styles.detailTitle} ${
@@ -1458,10 +1459,10 @@ export default function Projects() {
           <ul className={styles.detailMetaList}>
             {selectedProject.period ? <li>{selectedProject.period}</li> : null}
             {selectedProject.team ? <li>{selectedProject.team}</li> : null}
-            {!isBookstoreDetail ? <li>{getProjectRoleText(selectedProject)}</li> : null}
+            {!isUnifiedDetail ? <li>{getProjectRoleText(selectedProject)}</li> : null}
           </ul>
         </div>
-        {!isBookstoreDetail ? <div className={styles.summaryRow} data-summary-state={summaryState}>
+        {!isUnifiedDetail ? <div className={styles.summaryRow} data-summary-state={summaryState}>
           <div className={styles.summaryBox} data-summary-state={summaryState}>
             <button
               type="button"
@@ -1494,16 +1495,22 @@ export default function Projects() {
             />
           </div>
         </div> : null}
-        {isBookstoreDetail ? (
+        {isUnifiedDetail ? (
           <>
             <div id="ypbooks-middle-stage" className={styles.bookstoreMiddleStage} data-view={isDesignIntentOpen ? "intent" : "project"}>
               <div className={styles.bookstoreProjectScreen} aria-hidden={isDesignIntentOpen} inert={isDesignIntentOpen}>
                 <div className={styles.mediaRow} data-summary-state={summaryState}>
                   <div className={styles.detailMediaArea}>{previewFrame}</div>
                 </div>
-                {showBookstoreAnnotation ? (
-                  <p className={styles.bookstoreCaption}>① 관심 조건으로 읽을 책을 찾아보는 탐색 영역</p>
-                ) : null}
+                <p
+                  className={styles.bookstoreCaption}
+                  data-empty={!showBookstoreAnnotation}
+                  aria-hidden={!showBookstoreAnnotation}
+                >
+                  {showBookstoreAnnotation
+                    ? "① 관심 조건으로 읽을 책을 찾아보는 탐색 영역"
+                    : null}
+                </p>
                 <dl className={styles.bookstoreHighlights}>
                   {selectedProject.highlights?.map((highlight, index) => (
                     <div key={highlight.label} className={styles.bookstoreHighlight}>
@@ -1522,9 +1529,13 @@ export default function Projects() {
               </div>
               <section className={styles.bookstoreIntentScreen} aria-hidden={!isDesignIntentOpen}>
                 <ol className={styles.bookstoreIntentList}>
-                  <li><span className={styles.bookstoreIntentNumber}>01</span><h4>사용자 가정</h4><p>읽을 책이 정해지지 않은 사용자도 탐색을 시작할 수 있어야 한다고 생각했습니다.</p></li>
-                  <li><span className={styles.bookstoreIntentNumber}>02</span><h4>배치 판단</h4><p>책 제목을 몰라도 관심 조건으로 탐색할 수 있도록, 조건 선택 영역을 첫 화면 상단에 배치했습니다.</p></li>
-                  <li><span className={styles.bookstoreIntentNumber}>03</span><h4>익숙함 유지</h4><p>다른 온라인 서점의 메뉴와 도서 소개 구성을 참고해, 새로운 기능도 익숙한 흐름 안에서 이용하도록 구성했습니다.</p></li>
+                  {selectedProject.designIntent?.map((item, index) => (
+                    <li key={item.title}>
+                      <span className={styles.bookstoreIntentNumber}>{String(index + 1).padStart(2, "0")}</span>
+                      <h4>{item.title}</h4>
+                      <p>{item.text}</p>
+                    </li>
+                  ))}
                 </ol>
               </section>
             </div>
@@ -1555,7 +1566,7 @@ export default function Projects() {
                   style={getExpandedOverflowStyle(expandedOverflowHeights.pages)}
                 >
                   <div className={styles.pagesHeader}>
-                    <h4>Pages</h4>
+                    <h4>화면·자료</h4>
                   </div>
                   <div
                     className={styles.pagesContent}
@@ -1668,7 +1679,7 @@ export default function Projects() {
                   aria-label="project tech stack"
                   style={getExpandedOverflowStyle(expandedOverflowHeights.stacks)}
                 >
-                  <h4>STACK</h4>
+                  <h4>도구·기술</h4>
 
                   <div
                     className={styles.stackContent}

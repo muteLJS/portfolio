@@ -42,6 +42,7 @@ export type Project = {
   title: string;
   type: "main" | "sub";
   description: string;
+  designIntent?: ProjectDesignIntent[];
   insight: string;
   stacks: string[];
 };
@@ -55,6 +56,11 @@ export type ProjectPage = {
 
 export type ProjectHighlight = {
   label: string;
+  text: string;
+};
+
+export type ProjectDesignIntent = {
+  title: string;
   text: string;
 };
 
