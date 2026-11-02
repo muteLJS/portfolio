@@ -700,9 +700,6 @@ export default function Projects() {
   const [isPagesOpen, setIsPagesOpen] = useState(false);
   const [isStacksOpen, setIsStacksOpen] = useState(false);
   const [isDesignIntentOpen, setIsDesignIntentOpen] = useState(false);
-  const [bookstoreWidePanelMargin, setBookstoreWidePanelMargin] = useState<
-    number | null
-  >(null);
   const [expandedSummaryProjectId, setExpandedSummaryProjectId] = useState<
     string | null
   >(null);
@@ -785,55 +782,6 @@ export default function Projects() {
     });
     return () => {
       window.cancelAnimationFrame(frame);
-    };
-  }, [isBookstoreDetail]);
-
-  useEffect(() => {
-    if (!isBookstoreDetail) {
-      return;
-    }
-
-    const panel = detailPanelRef.current;
-    const role = document.querySelector<HTMLElement>("[data-brand-role]");
-    const leftPane = panel?.parentElement;
-    if (!panel || !role || !leftPane) return;
-
-    const updateWideAlignment = () => {
-      const viewportWidth = window.innerWidth;
-      const wideStart = 1456;
-      const targetWidth = 1920;
-
-      if (viewportWidth < wideStart) {
-        setBookstoreWidePanelMargin(null);
-        return;
-      }
-
-      const progress = Math.min(
-        1,
-        Math.max(0, (viewportWidth - wideStart) / (targetWidth - wideStart)),
-      );
-      const paneLeft = leftPane.getBoundingClientRect().left;
-      // Preserve the existing wide-screen interpolation, with the additional
-      // 12px desktop inset applied consistently at both endpoints.
-      const baseContentStart = paneLeft - 8;
-      const headerTarget = role.getBoundingClientRect().right + 36;
-      const contentStart =
-        baseContentStart + (headerTarget - baseContentStart) * progress;
-      const paddingLeft = Number.parseFloat(getComputedStyle(panel).paddingLeft) || 0;
-
-      setBookstoreWidePanelMargin(contentStart - paneLeft - paddingLeft);
-    };
-
-    const frame = window.requestAnimationFrame(updateWideAlignment);
-    const observer = new ResizeObserver(updateWideAlignment);
-    observer.observe(role);
-    observer.observe(leftPane);
-    window.addEventListener("resize", updateWideAlignment);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      observer.disconnect();
-      window.removeEventListener("resize", updateWideAlignment);
     };
   }, [isBookstoreDetail]);
 
@@ -1422,19 +1370,14 @@ export default function Projects() {
   const detailPanel = selectedProject ? (
     <article
       ref={detailPanelRef}
-      className={`${styles.detailPanel} ${isUnifiedDetail ? styles.bookstoreDetail : ""}`}
-      style={
-        isBookstoreDetail && bookstoreWidePanelMargin !== null
-          ? ({
-              "--bookstore-wide-panel-margin": `${bookstoreWidePanelMargin}px`,
-            } as CSSProperties)
-          : undefined
-      }
+      className={`${styles.detailPanel} ${styles.sharedDetail} ${isUnifiedDetail ? styles.bookstoreDetail : ""}`}
       aria-live="polite"
       aria-label={isBookstoreDetail ? "영풍문고 프로젝트 상세" : undefined}
       onKeyDown={isBookstoreDetail ? handleBookstoreKeyDown : undefined}
     >
-      {isUnifiedDetail ? detailNumberRow : null}
+      {isUnifiedDetail ? detailNumberRow : (
+        <div className={styles.sharedDesktopNumber}>{detailNumberRow}</div>
+      )}
       <div
         ref={detailScrollRef}
         className={styles.detailContent}
@@ -1442,7 +1385,9 @@ export default function Projects() {
         role={isBookstoreDetail ? "region" : undefined}
         aria-label={isBookstoreDetail ? "영풍문고 상세 내용" : undefined}
       >
-        {!isUnifiedDetail ? detailNumberRow : null}
+        {!isUnifiedDetail ? (
+          <div className={styles.sharedMobileNumber}>{detailNumberRow}</div>
+        ) : null}
         <div className={styles.titleRow}>
           <h3
             className={`${styles.detailTitle} ${

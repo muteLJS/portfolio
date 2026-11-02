@@ -56,6 +56,100 @@
   color: #17372f;
 }
 
+.sharedDesktopNumber {
+  display: contents;
+}
+
+.sharedMobileNumber {
+  display: none;
+}
+
+/* One desktop detail canvas: project-specific content changes inside it, not its origin. */
+@media (min-width: 641px) {
+  .projects[data-project-detail="hangeul"],
+  .projects[data-project-detail="landing"] {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
+  .projects[data-project-detail="hangeul"] .inner,
+  .projects[data-project-detail="landing"] .inner {
+    display: block;
+    height: auto;
+    padding-top: clamp(120px, 14vh, 150px);
+    overflow: visible;
+  }
+
+  .projects[data-project-detail="hangeul"] .leftPane,
+  .projects[data-project-detail="landing"] .leftPane {
+    min-height: 0;
+    height: auto;
+    align-items: flex-start;
+  }
+
+  .detailPanel.sharedDetail {
+    display: flex;
+    flex-direction: column;
+    width: min(640px, calc(100vw - 96px));
+    max-height: none;
+    margin: 0 0 0 14px;
+    padding: 0 0 0 2px;
+    overflow: visible;
+  }
+
+  .sharedDetail .numberRow {
+    width: 100%;
+    min-height: 32px;
+    align-items: center;
+    flex-shrink: 0;
+    margin-bottom: 12px;
+    padding-right: 14px;
+  }
+
+  .sharedDetail:not(.bookstoreDetail) .detailCloseButton {
+    position: static;
+    width: 32px;
+    height: 32px;
+    transform: none;
+  }
+
+  .sharedDetail:not(.bookstoreDetail) .detailContent {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    padding: 0 14px 12px 0;
+    overflow: visible;
+  }
+
+  .sharedDetail:not(.bookstoreDetail) .detailContent > * {
+    flex-shrink: 0;
+  }
+
+  .sharedDetail:not(.bookstoreDetail) .mediaRow,
+  .sharedDetail:not(.bookstoreDetail) .detailMediaArea {
+    width: 100%;
+    max-width: none;
+    min-height: 240px;
+  }
+
+  .sharedDetail:not(.bookstoreDetail) .mediaRow {
+    display: grid;
+    place-items: center;
+  }
+
+  .sharedDetail:not(.bookstoreDetail) .detailMediaArea {
+    display: grid;
+    place-items: center;
+  }
+
+  .sharedDetail:not(.bookstoreDetail) .previewFrame {
+    justify-self: center;
+    align-self: center;
+  }
+}
+
 .bookstoreDetail .detailContent {
   display: flex;
   flex-direction: column;
@@ -478,6 +572,14 @@
 }
 
 @media (max-width: 640px) {
+  .sharedDesktopNumber {
+    display: none;
+  }
+
+  .sharedMobileNumber {
+    display: block;
+  }
+
   .projects[data-project-detail="ypbooks"] {
     height: auto;
     overflow: visible;
@@ -531,7 +633,7 @@
 }
 
 @media (min-width: 1181px) {
-  .detailPanel.bookstoreDetail {
+  .detailPanel.bookstoreDetail:not(.sharedDetail) {
     margin-left: calc(var(--detail-content-offset) + 22px);
   }
 
@@ -576,7 +678,7 @@
 
 /* The measured header-role alignment eases in across wide desktop widths only. */
 @media (min-width: 1456px) {
-  .detailPanel.bookstoreDetail {
+  .detailPanel.bookstoreDetail:not(.sharedDetail) {
     margin-left: var(
       --bookstore-wide-panel-margin,
       calc(var(--detail-content-offset) + 22px)
@@ -586,7 +688,11 @@
 
 @media (min-width: 1456px) and (min-height: 820px) {
 
-  .projects[data-project-detail="ypbooks"] .inner {
+  .projects[data-project-detail="ypbooks"] .inner,
+  .projects[data-project-detail="mute"] .inner,
+  .projects[data-project-detail="goreon"] .inner,
+  .projects[data-project-detail="hangeul"] .inner,
+  .projects[data-project-detail="landing"] .inner {
     padding-top: clamp(92px, calc(14vh - 28px), 122px);
   }
 
