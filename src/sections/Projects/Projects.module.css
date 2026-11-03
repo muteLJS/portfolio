@@ -89,11 +89,15 @@
   }
 
   .detailPanel.sharedDetail {
+    /* Anchor the detail canvas to the shared left pane instead of adding a
+       viewport-independent inset. At 1363px this restores a 600px panel and
+       a 40px content edge; it reaches the 640px desktop cap at 1920px. */
+    --shared-detail-panel-width: clamp(600px, calc(503px + 7.14vw), 640px);
     display: flex;
     flex-direction: column;
-    width: min(640px, calc(100vw - 96px));
+    width: var(--shared-detail-panel-width);
     max-height: none;
-    margin: 0 0 0 14px;
+    margin: 0 0 0 clamp(-34px, calc(56.4px - 4.6833vw), -10px);
     padding: 0 0 0 2px;
     overflow: visible;
   }
@@ -147,6 +151,28 @@
   .sharedDetail:not(.bookstoreDetail) .previewFrame {
     justify-self: center;
     align-self: center;
+  }
+
+  .sharedDetail .bottomInfo {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* The three case studies reserve one image-and-caption stage. The artwork
+     stays at its natural ratio; only its containing stage is normalized. */
+  .bookstoreDetail .mediaRow,
+  .bookstoreDetail .detailMediaArea {
+    height: 241px;
+    min-height: 241px;
+  }
+
+  .bookstoreDetail .detailMediaArea {
+    display: grid;
+    place-items: center;
+  }
+
+  .bookstoreDetail .previewFrame {
+    min-height: 0;
   }
 }
 
@@ -528,6 +554,12 @@
   line-height: 1.65;
 }
 
+/* Row labels match the value text size on the right of the same row. */
+.bookstoreDetail .pagesBlock h4,
+.bookstoreDetail .detailStacks h4 {
+  font-size: 0.875rem;
+}
+
 .bookstoreDetail .stackIconList {
   flex-wrap: wrap;
   max-height: none;
@@ -640,7 +672,7 @@
   .bookstoreDetail .detailStacks {
     grid-template-rows: auto auto;
     align-items: start;
-    padding: 8px 0 12px;
+    padding: 8px 0 8px;
   }
 
   .bookstoreDetail .detailStacks > h4 {
