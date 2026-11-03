@@ -174,6 +174,108 @@
   .bookstoreDetail .previewFrame {
     min-height: 0;
   }
+
+  /* Keep the header fixed while the detail body, rather than the page, owns
+     overflow from expanded resource lists. */
+  .detailPanel.sharedDetail {
+    max-height: calc(100svh - 96px);
+    overflow: hidden;
+  }
+
+  .detailPanel.sharedDetail .detailContent {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scroll-padding-block: 12px;
+  }
+
+  .detailPanel.sharedDetail:not(.bookstoreDetail) .projectNumber {
+    transform: none;
+  }
+
+  /* The separator spans the shared content width; its row content has a
+     consistent 12px inset on every project. */
+  .detailPanel.sharedDetail .pagesBlock,
+  .detailPanel.sharedDetail .detailStacks {
+    grid-template-columns: 96px minmax(0, 1fr);
+    column-gap: 16px;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    padding-inline: 12px;
+  }
+
+  .detailPanel.sharedDetail .pagesBlock {
+    padding-block: 0 8px;
+  }
+
+  .detailPanel.sharedDetail .detailStacks {
+    padding-block: 10px 8px;
+  }
+
+  .detailPanel.sharedDetail .pagesHeader,
+  .detailPanel.sharedDetail .pagesHeader h4,
+  .detailPanel.sharedDetail .detailStacks > h4 {
+    align-self: start;
+  }
+
+  .detailPanel.sharedDetail .pagesBlock::after,
+  .detailPanel.sharedDetail .detailStacks::after {
+    bottom: 0;
+  }
+
+  .detailPanel.sharedDetail .inlineOverflowRow,
+  .detailPanel.sharedDetail .pageQuickList {
+    overflow: visible;
+  }
+
+  .detailPanel.sharedDetail .expandedOverflowShell {
+    position: static;
+    width: 100%;
+    height: 0;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .detailPanel.sharedDetail .expandedOverflowShell[data-expanded="true"] {
+    height: auto;
+  }
+
+  .detailPanel.sharedDetail .bottomInfo[data-expanded-type="pages"] .detailStacks,
+  .detailPanel.sharedDetail .bottomInfo[data-expanded-type="stacks"] .pagesBlock {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .pageListMeasure {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: inline-flex;
+    width: 0;
+    height: 0;
+    gap: 0;
+    overflow: hidden;
+    contain: layout paint;
+    visibility: hidden;
+    white-space: nowrap;
+    pointer-events: none;
+    font-size: 0.76rem;
+    font-weight: 430;
+    line-height: 1.4;
+  }
+
+  .pageListMeasure [data-page-measure="separator"] {
+    margin: 0 8px;
+  }
+
+  .pageListMeasure > span:last-child {
+    margin-left: 4px;
+  }
 }
 
 .bookstoreDetail .detailContent {

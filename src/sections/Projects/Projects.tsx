@@ -699,6 +699,9 @@ export default function Projects() {
   } | null>(null);
   const [isPagesOpen, setIsPagesOpen] = useState(false);
   const [isStacksOpen, setIsStacksOpen] = useState(false);
+  const [pagePreviewLimit, setPagePreviewLimit] = useState<number | null>(
+    null,
+  );
   const [isDesignIntentOpen, setIsDesignIntentOpen] = useState(false);
   const [expandedSummaryProjectId, setExpandedSummaryProjectId] = useState<
     string | null
@@ -723,6 +726,9 @@ export default function Projects() {
   const summaryRef = useRef<HTMLSpanElement | null>(null);
   const pagesOverflowRef = useRef<HTMLDivElement | null>(null);
   const stacksOverflowRef = useRef<HTMLDivElement | null>(null);
+  const pagesContentRef = useRef<HTMLDivElement | null>(null);
+  const pageMeasureRef = useRef<HTMLDivElement | null>(null);
+  const pageMoreMeasureRef = useRef<HTMLSpanElement | null>(null);
   const summaryCloseTimerRef = useRef<number | null>(null);
   const wasInProjectsViewRef = useRef(false);
   const selectedIndex = selectedProject
@@ -826,9 +832,12 @@ export default function Projects() {
       ? "expanded"
       : "collapsed";
   const hasPlanningDocument = Boolean(selectedProject?.planning?.pdfUrl);
-  const pagePreviewLimit = hasPlanningDocument ? 5 : 6;
-  const visiblePages = validPages.slice(0, pagePreviewLimit);
-  const overflowPages = validPages.slice(pagePreviewLimit);
+  const resolvedPagePreviewLimit = Math.min(
+    pagePreviewLimit ?? validPages.length,
+    validPages.length,
+  );
+  const visiblePages = validPages.slice(0, resolvedPagePreviewLimit);
+  const overflowPages = validPages.slice(resolvedPagePreviewLimit);
   const hiddenPageCount = selectedProject
     ? Math.max(validPages.length - visiblePages.length, 0)
     : 0;
@@ -894,6 +903,7 @@ export default function Projects() {
     setImagePreview(null);
     setIsPagesOpen(false);
     setIsStacksOpen(false);
+    setPagePreviewLimit(null);
     resetSummaryState();
   };
 
@@ -922,17 +932,11 @@ export default function Projects() {
     }
 
     setIsPlanningOpen(true);
-    setIsPagesOpen(false);
-    setIsStacksOpen(false);
-    resetSummaryState();
   };
 
   const handlePageClick = (pageName: string) => {
     setSelectedPageName(pageName);
     setIsPlanningOpen(false);
-    setIsPagesOpen(false);
-    setIsStacksOpen(false);
-    resetSummaryState();
   };
 
   useEffect(() => {
@@ -1149,6 +1153,68 @@ export default function Projects() {
       window.removeEventListener("resize", measure);
     };
   }, [selectedProject?.id, overflowPages.length, overflowStacks.length]);
+
+  useEffect(() => {
+    const content = pagesContentRef.current;
+    const measureRoot = pageMeasureRef.current;
+
+    if (!content || !measureRoot) {
+      return;
+    }
+
+    const measure = () => {
+      const pageWidths = Array.from(
+        measureRoot.querySelectorAll<HTMLElement>('[data-page-measure="page"]'),
+      ).map((item) => item.getBoundingClientRect().width);
+      const planningWidth = measureRoot.querySelector<HTMLElement>(
+        '[data-page-measure="planning"]',
+      )?.getBoundingClientRect().width ?? 0;
+      const separator = measureRoot.querySelector<HTMLElement>(
+        '[data-page-measure="separator"]',
+      );
+      const separatorStyle = separator ? window.getComputedStyle(separator) : null;
+      const separatorWidth = separator
+        ? separator.getBoundingClientRect().width +
+          Number.parseFloat(separatorStyle?.marginLeft ?? "0") +
+          Number.parseFloat(separatorStyle?.marginRight ?? "0")
+        : 0;
+      const moreWidth = pageMoreMeasureRef.current?.getBoundingClientRect().width ?? 0;
+      const fitCount = (available: number) => {
+        let used = planningWidth;
+        let count = 0;
+
+        for (const width of pageWidths) {
+          const next = used + (used > 0 ? separatorWidth : 0) + width;
+          if (next > available) break;
+          used = next;
+          count += 1;
+        }
+
+        return count;
+      };
+
+      const available = content.clientWidth;
+      let nextLimit = fitCount(available);
+
+      if (nextLimit < pageWidths.length) {
+        nextLimit = fitCount(Math.max(0, available - moreWidth - 4));
+      }
+
+      setPagePreviewLimit((current) =>
+        current === nextLimit ? current : nextLimit,
+      );
+    };
+
+    const frame = window.requestAnimationFrame(measure);
+    const observer = new ResizeObserver(measure);
+    observer.observe(content);
+    void document.fonts.ready.then(measure).catch(() => undefined);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [hasPlanningDocument, selectedProject?.id, validPages.length]);
 
   const getExpandedOverflowStyle = (height: number) =>
     ({
@@ -1373,7 +1439,7 @@ export default function Projects() {
       className={`${styles.detailPanel} ${styles.sharedDetail} ${isUnifiedDetail ? styles.bookstoreDetail : ""}`}
       aria-live="polite"
       aria-label={isBookstoreDetail ? "영풍문고 프로젝트 상세" : undefined}
-      onKeyDown={isBookstoreDetail ? handleBookstoreKeyDown : undefined}
+      onKeyDown={handleBookstoreKeyDown}
     >
       {isUnifiedDetail ? detailNumberRow : (
         <div className={styles.sharedDesktopNumber}>{detailNumberRow}</div>
@@ -1381,9 +1447,10 @@ export default function Projects() {
       <div
         ref={detailScrollRef}
         className={styles.detailContent}
-        tabIndex={isBookstoreDetail ? 0 : undefined}
-        role={isBookstoreDetail ? "region" : undefined}
-        aria-label={isBookstoreDetail ? "영풍문고 상세 내용" : undefined}
+        tabIndex={0}
+        role="region"
+        aria-label={`${selectedProjectDisplayTitle} 상세 내용`}
+        onWheelCapture={(event) => event.stopPropagation()}
       >
         {!isUnifiedDetail ? (
           <div className={styles.sharedMobileNumber}>{detailNumberRow}</div>
@@ -1514,6 +1581,7 @@ export default function Projects() {
                     <h4>화면·자료</h4>
                   </div>
                   <div
+                    ref={pagesContentRef}
                     className={styles.pagesContent}
                     data-expanded={isPagesOpen ? "true" : "false"}
                   >
@@ -1575,7 +1643,6 @@ export default function Projects() {
                           className={styles.overflowMoreButton}
                           onClick={() => {
                             setIsPagesOpen((value) => !value);
-                            setIsStacksOpen(false);
                           }}
                         >
                           {isPagesOpen
@@ -1614,6 +1681,24 @@ export default function Projects() {
                           </li>
                         ))}
                       </ul>
+                    </div>
+                    <div
+                      ref={pageMeasureRef}
+                      className={styles.pageListMeasure}
+                      aria-hidden="true"
+                    >
+                      {hasPlanningDocument ? (
+                        <span data-page-measure="planning">
+                          {selectedProject.planning?.title}
+                        </span>
+                      ) : null}
+                      <span data-page-measure="separator">/</span>
+                      {validPages.map((page) => (
+                        <span key={page.name} data-page-measure="page">
+                          {page.name}
+                        </span>
+                      ))}
+                      <span ref={pageMoreMeasureRef}>+99</span>
                     </div>
                   </div>
                 </section>
@@ -1661,7 +1746,6 @@ export default function Projects() {
                           aria-controls={isBookstoreDetail ? "ypbooks-stack-extra" : undefined}
                           aria-label={isBookstoreDetail ? (isStacksOpen ? "기술 스택 접기" : "기술 스택 더 보기") : undefined}
                           onClick={() => {
-                            setIsPagesOpen(false);
                             setIsStacksOpen((value) => !value);
                           }}
                         >
