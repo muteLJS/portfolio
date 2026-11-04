@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 
 import ProjectBranchScene from "./ProjectBranchScene";
@@ -10,6 +10,21 @@ import styles from "./Projects.module.css";
 
 const getProjectDisplayTitle = (project: Project) =>
   project.id === "landing" ? "랜딩페이지" : project.title;
+
+const getPageDisplayName = (project: Project, pageName: string) =>
+  project.id === "hangeul" && pageName === "Main" ? "메인 화면" : pageName;
+
+const subscribeToDesktopDetail = (onChange: () => void) => {
+  const query = window.matchMedia("(min-width: 641px)");
+  query.addEventListener("change", onChange);
+
+  return () => query.removeEventListener("change", onChange);
+};
+
+const getDesktopDetailSnapshot = () =>
+  window.matchMedia("(min-width: 641px)").matches;
+
+const getDesktopDetailServerSnapshot = () => false;
 
 const getProjectPreviewType = (project: Project | null) => {
   if (!project) {
@@ -422,39 +437,44 @@ const projects: Project[] = (
       title: "한-글",
       type: "main",
       shortLine: "Writing Growth Service",
-      tagline: "읽고 생각해 쓰는 힘을 위한 에듀테크 서비스",
+      tagline: "내 생각을 글로 쓰고, 내 뜻에 맞게 다듬는 한국어 글쓰기 서비스",
       period: "2026.05.01 ~ 진행 중",
       team: "개인 프로젝트",
       projectNature:
         "에듀테크 서비스 / 글쓰기 성장 서비스 / 개인 기준 기반 학습 플랫폼",
       role: "기획 / 디자인 / 구현",
-      description:
-        "다양한 프로젝트를 경험한 후 기획부터 디자인, 구현한 에듀테크 서비스입니다. 현재 시장 조사, 그리고 만들어야 할 서비스의 시장성, 현대 사회의 문제 등을 고려하여 만들어낸 서비스로, 최근 AI의 도움을 통해 발전이 이루어지지만 한 가지 허점, 글을 직접 읽고, 생각해서 작성하는 사고적 능력이 부족해지는 부분이 있는 것을 보완하고자 기획하였습니다. 에듀테크 서비스의 목적을 이룸과 동시에 글, 그리고 문장에는 절대적인 평가기준이 없다는 것을 고려하여 현재 사용되고 있는 에듀테크 앱들에서 참고하여 서비스를 제공하고자 하였고, 그에 맞는 디자인과 기능을 추가함으로서 사용자들로 하여금 더욱 쉽고 편하게 그리고 목적에 맞게 이용할 수 있도록 하였습니다.",
+      description: "글에 점수를 매기지 않고, 쓴 사람이 원하는 표현을 찾도록 조언합니다.",
       highlights: [
         {
           label: "문제",
-          text: "평가와 완성에 대한 집착, 글쓰기에 대한 불안이 커지는 환경에서 자기만의 글을 부담 없이 완성할 수 있는 경험이 필요했습니다.",
+          text: "생각을 표현하는 일보다 글이 몇 점인지에 집중하게 되는 평가 방식",
+        },
+        {
+          label: "접근",
+          text: "글에 점수를 매기지 않고, 쓴 사람이 원하는 표현을 찾도록 조언",
         },
         {
           label: "역할",
-          text: "기획, 디자인, 구현 전 과정을 100% 개인 작업으로 진행하고 있습니다.",
-        },
-        {
-          label: "구현",
-          text: "글쓰기, 배움, 기록, 자기개발의 흐름을 설계하고, 최소한의 학습 피드백 외에는 평가 중심 요소를 배제한 에듀테크 서비스를 기획했습니다.",
-        },
-        {
-          label: "결과/배운 점",
-          text: "서비스 기획안과 홈 화면, 한이 캐릭터 디자인 가이드를 완성했으며 현재 구현을 준비하고 있습니다.",
-        },
-        {
-          label: "인사이트",
-          text: "성장을 돕는 서비스는 정답을 제시하기보다 사용자가 자신의 언어와 기록을 계속 이어갈 수 있게 해야 한다고 생각합니다.",
+          text: "개인 프로젝트 / 서비스 기획·화면 설계·구현",
         },
       ],
-      insight: "성장을 돕는 서비스는 사용자가 자신의 언어와 기록을 계속 이어갈 수 있게 해야 한다고 생각합니다.",
-      skills: ["추후 정리"],
-      stacks: ["추후 정리"],
+      designIntent: [
+        {
+          title: "쓰면서 알게 되는 마음",
+          text: "저도 힘든데 무엇이 힘든지 설명하기 어려운 때가 있었습니다. 그 경험에서 ‘답을 듣기 전에, 내가 하고 싶은 말부터 써 볼 수는 없을까?’라는 질문이 생겼습니다. 한-글은 아직 정리되지 않은 생각도 자기 말로 써 볼 수 있는 공간으로 기획했습니다.",
+        },
+        {
+          title: "글의 가치는 누가 정할까",
+          text: "누군가에게 100점인 글이 다른 사람에게는 10점일 수 있습니다. 같은 글도 시간이 흐르고 시대가 달라지면 다르게 읽힙니다. 글쓰기를 배우는 공간이라 해도, 앱이 하나의 점수로 그 글의 가치를 정할 수는 없다고 생각했습니다.",
+        },
+        {
+          title: "어디까지 고칠지는 쓴 사람의 몫",
+          text: "한-글에서 조언의 목적은 더 높은 점수를 받는 문장을 만드는 것이 아닙니다. 쓴 사람이 ‘내가 하고 싶었던 말이 이게 맞나?’ 하고 돌아볼 수 있도록 돕는 것입니다. 표현을 바꿀지, 처음 쓴 문장 그대로 남길지는 사용자가 정하도록 기획했습니다.",
+        },
+      ],
+      insight: "",
+      skills: [],
+      stacks: [],
       image: "/img/han-geul_beta_img/main.png",
       link: "/projects/hangeul",
       pages: [
@@ -684,6 +704,11 @@ const getProjectRoleText = (project: Project) =>
   "";
 
 export default function Projects() {
+  const isDesktopDetailViewport = useSyncExternalStore(
+    subscribeToDesktopDetail,
+    getDesktopDetailSnapshot,
+    getDesktopDetailServerSnapshot,
+  );
   const [selectedProject, setSelectedProject] = useState<Project | null>(
     initialDebugProject,
   );
@@ -765,7 +790,10 @@ export default function Projects() {
   const isUnifiedDetail =
     selectedProject?.id === "ypbooks" ||
     selectedProject?.id === "mute" ||
-    selectedProject?.id === "goreon";
+    selectedProject?.id === "goreon" ||
+    (selectedProject?.id === "hangeul" && isDesktopDetailViewport);
+  const shouldShowStacks =
+    selectedProject?.id !== "hangeul" && (selectedProject?.stacks.length ?? 0) > 0;
   const showBookstoreAnnotation = isBookstoreDetail && selectedPage?.name === "Main" && !brokenImages[previewImageKey];
 
   useEffect(() => {
@@ -1345,6 +1373,9 @@ export default function Projects() {
               height={1254}
               sizes="180px"
             />
+            <span className={styles.previewHangeulGuideLabel}>
+              한이 캐릭터 디자인 가이드
+            </span>
           </button>
         ) : null}
         {previewType === "responsive" &&
@@ -1449,6 +1480,7 @@ export default function Projects() {
     <article
       ref={detailPanelRef}
       className={`${styles.detailPanel} ${styles.sharedDetail} ${isUnifiedDetail ? styles.bookstoreDetail : ""}`}
+      data-project-id={selectedProject.id}
       aria-live="polite"
       aria-label={isBookstoreDetail ? "영풍문고 프로젝트 상세" : undefined}
       onKeyDown={handleBookstoreKeyDown}
@@ -1521,7 +1553,7 @@ export default function Projects() {
         </div> : null}
         {isUnifiedDetail ? (
           <>
-            <div id="ypbooks-middle-stage" className={styles.bookstoreMiddleStage} data-view={isDesignIntentOpen ? "intent" : "project"}>
+            <div id="project-middle-stage" className={styles.bookstoreMiddleStage} data-view={isDesignIntentOpen ? "intent" : "project"}>
               <div className={styles.bookstoreProjectScreen} data-caption={showBookstoreAnnotation ? "true" : "false"} aria-hidden={isDesignIntentOpen} inert={isDesignIntentOpen}>
                 <div className={styles.mediaRow} data-summary-state={summaryState}>
                   <div className={styles.detailMediaArea}>{previewFrame}</div>
@@ -1563,12 +1595,18 @@ export default function Projects() {
                 </ol>
               </section>
             </div>
-            <button type="button" className={styles.bookstoreIntentToggle} aria-expanded={isDesignIntentOpen} aria-controls="ypbooks-middle-stage" onClick={() => setIsDesignIntentOpen((open) => !open)}>
-              {isDesignIntentOpen ? "← 프로젝트 화면 보기" : "설계 의도 보기 →"}
+            <button type="button" className={styles.bookstoreIntentToggle} aria-expanded={isDesignIntentOpen} aria-controls="project-middle-stage" onClick={() => setIsDesignIntentOpen((open) => !open)}>
+              {isDesignIntentOpen
+                ? "← 프로젝트 화면 보기"
+                : selectedProject.id === "hangeul"
+                  ? "왜 글에 점수를 매기지 않았을까? →"
+                  : "설계 의도 보기 →"}
             </button>
-            <a className={styles.bookstoreSiteLink} href={selectedProject.siteUrl} target="_blank" rel="noreferrer">
-              사이트 보기 <span aria-hidden="true">↗</span>
-            </a>
+            {selectedProject.siteUrl ? (
+              <a className={styles.bookstoreSiteLink} href={selectedProject.siteUrl} target="_blank" rel="noreferrer">
+                사이트 보기 <span aria-hidden="true">↗</span>
+              </a>
+            ) : null}
           </>
         ) : (
           <div className={styles.mediaRow} data-summary-state={summaryState}>
@@ -1642,7 +1680,7 @@ export default function Projects() {
                                 data-active={selectedPage?.name === page.name}
                                 onClick={() => handlePageClick(page.name)}
                               >
-                                {page.name}
+                                {getPageDisplayName(selectedProject, page.name)}
                               </button>
                               {itemIndex < pageListItemCount - 1 ? (
                                 <span className={styles.inlineSeparator}>
@@ -1693,7 +1731,7 @@ export default function Projects() {
                               data-active={selectedPage?.name === page.name}
                               onClick={() => handlePageClick(page.name)}
                             >
-                              {page.name}
+                              {getPageDisplayName(selectedProject, page.name)}
                             </button>
                             {index < overflowPages.length - 1 ? (
                               <span className={styles.inlineSeparator}>/</span>
@@ -1726,7 +1764,7 @@ export default function Projects() {
                               data-page-measure="label"
                               data-active={selectedPage?.name === page.name}
                             >
-                              {page.name}
+                              {getPageDisplayName(selectedProject, page.name)}
                             </span>
                             <span className={styles.inlineSeparator}>/</span>
                           </li>
@@ -1742,7 +1780,7 @@ export default function Projects() {
                   </div>
                 </section>
 
-                <section
+                {shouldShowStacks ? <section
                   className={styles.detailStacks}
                   data-expanded={isStacksOpen ? "true" : "false"}
                   aria-label="project tech stack"
@@ -1826,7 +1864,7 @@ export default function Projects() {
                       </ul>
                     </div>
                   </div>
-                </section>
+                </section> : null}
             </>
           </div>
         </div>
