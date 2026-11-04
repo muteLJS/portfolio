@@ -8,8 +8,7 @@ import ProjectBranchScene from "./ProjectBranchScene";
 import type { Project } from "./ProjectBranchScene";
 import styles from "./Projects.module.css";
 
-const getProjectDisplayTitle = (project: Project) =>
-  project.id === "landing" ? "랜딩페이지" : project.title;
+const getProjectDisplayTitle = (project: Project) => project.title;
 
 const getPageDisplayName = (project: Project, pageName: string) =>
   project.id === "hangeul" && pageName === "Main" ? "메인 화면" : pageName;
@@ -602,32 +601,48 @@ const projects: Project[] = (
     },
     {
       id: "landing",
-      title: "랜딩페이지 : ON하면 혜택이 온다",
+      title: "URFit",
       type: "sub",
-      shortLine: "Landing UI Study",
-      tagline: "첫 개인 페이지로 구현 기준을 익힌 랜딩페이지",
-      period: "2025.12.04 ~ 2025.12.22",
-      team: "개인 프로젝트",
-      description:
-        "첫 개인 페이지로 부족함이 많이 보이지만, 배운 기술을 최대한 활용해서 동일하게 구현하기 위해 노력한 페이지입니다. 다양한 시선에서 볼 수 있게 되는 시작이었습니다.",
-      insight: "",
-      skills: ["HTML", "CSS", "Photoshop", "Illustrator"],
-      stacks: ["HTML", "CSS", "Photoshop", "Illustrator"],
-      deploy: "Dothome",
-      image: "/img/projects/landing-main.png",
-      link: "/projects/landing",
-      siteUrl: "https://ajrqh10301.dothome.co.kr/",
-      pages: [
+      shortLine: "AI Wardrobe",
+      tagline: "내 옷으로 코디를 추천받고, 갈아입기 전에 내 모습으로 비교하는 AI 옷장",
+      period: "2026.06–07",
+      team: "4인 해커톤",
+      description: "",
+      highlights: [
         {
-          name: "Main",
-          image: null,
-          previewImage: "/img/web_imgs/landing/main.png",
-          externalUrl: "https://ajrqh10301.dothome.co.kr/",
+          label: "문제",
+          text: "출근이나 약속을 앞두고 옷을 고르며 여러 번 갈아입는 수고",
         },
-        { name: "Event", image: null },
-        { name: "Benefit", image: null },
-        { name: "Guide", image: null },
+        {
+          label: "접근",
+          text: "내 옷으로 코디를 추천받고, 착용 모습을 비교한 뒤 룩 저장",
+        },
+        {
+          label: "역할",
+          text: "서비스 기획 전반 담당 · 서비스 문구는 팀과 공동 결정",
+        },
       ],
+      designIntent: [
+        {
+          title: "옷을 고르는 시간과 갈아입는 수고",
+          text: "출근 전이나 중요한 약속 전날에는 입을 옷을 골라 놓고도 조합이 마음에 들지 않아 다시 갈아입곤 합니다. 저는 옷을 고르는 시간뿐 아니라, 여러 벌을 직접 입고 벗는 수고도 줄이고 싶었습니다.",
+        },
+        {
+          title: "추천은 후보를 좁히고, 피팅은 결정을 돕도록",
+          text: "추천만으로는 그 조합이 내게 어떻게 보일지 판단하기 어렵습니다. 그래서 내 옷장에서 코디를 추천받거나 직접 고른 뒤, 내 사진으로 착용 모습을 비교하는 흐름을 기획했습니다. 마음에 든 조합은 저장해 다음 약속 때도 꺼내 볼 수 있도록 했습니다.",
+        },
+        {
+          title: "다시 검증하고 싶은 것",
+          text: "해커톤에서는 추천과 가상 피팅을 구현하는 데 집중했습니다. 돌아보면 옷을 등록하고 결과를 기다리는 시간까지 포함해 실제로 준비가 쉬워졌는지는 확인하지 못했습니다. 다시 기획한다면 평소 방식과 비교해 옷을 결정하는 시간과 실제로 갈아입은 횟수를 함께 확인하겠습니다.",
+        },
+      ],
+      insight: "",
+      skills: [],
+      stacks: [],
+      image: "",
+      link: "/projects/urfit",
+      siteUrl: "https://urfit-ljs.vercel.app/",
+      pages: [],
       leaf: {
         asset: "/img/branch/project-leaf-small-02.png",
         left: "45.1%",
@@ -791,9 +806,12 @@ export default function Projects() {
     selectedProject?.id === "ypbooks" ||
     selectedProject?.id === "mute" ||
     selectedProject?.id === "goreon" ||
+    selectedProject?.id === "landing" ||
     (selectedProject?.id === "hangeul" && isDesktopDetailViewport);
   const shouldShowStacks =
     selectedProject?.id !== "hangeul" && (selectedProject?.stacks.length ?? 0) > 0;
+  const shouldShowProjectPreview =
+    selectedProject?.id !== "landing" || Boolean(previewImage);
   const showBookstoreAnnotation = isBookstoreDetail && selectedPage?.name === "Main" && !brokenImages[previewImageKey];
 
   useEffect(() => {
@@ -860,6 +878,7 @@ export default function Projects() {
       ? "expanded"
       : "collapsed";
   const hasPlanningDocument = Boolean(selectedProject?.planning?.pdfUrl);
+  const shouldShowPages = hasPlanningDocument || validPages.length > 0;
   const resolvedPagePreviewLimit = Math.min(
     pagePreviewLimit ?? validPages.length,
     validPages.length,
@@ -1555,18 +1574,20 @@ export default function Projects() {
           <>
             <div id="project-middle-stage" className={styles.bookstoreMiddleStage} data-view={isDesignIntentOpen ? "intent" : "project"}>
               <div className={styles.bookstoreProjectScreen} data-caption={showBookstoreAnnotation ? "true" : "false"} aria-hidden={isDesignIntentOpen} inert={isDesignIntentOpen}>
-                <div className={styles.mediaRow} data-summary-state={summaryState}>
-                  <div className={styles.detailMediaArea}>{previewFrame}</div>
-                </div>
-                <p
-                  className={styles.bookstoreCaption}
-                  data-empty={!showBookstoreAnnotation}
-                  aria-hidden={!showBookstoreAnnotation}
-                >
-                  {showBookstoreAnnotation
-                    ? "① 관심 조건으로 읽을 책을 찾아보는 탐색 영역"
-                    : null}
-                </p>
+                {shouldShowProjectPreview ? <>
+                  <div className={styles.mediaRow} data-summary-state={summaryState}>
+                    <div className={styles.detailMediaArea}>{previewFrame}</div>
+                  </div>
+                  <p
+                    className={styles.bookstoreCaption}
+                    data-empty={!showBookstoreAnnotation}
+                    aria-hidden={!showBookstoreAnnotation}
+                  >
+                    {showBookstoreAnnotation
+                      ? "① 관심 조건으로 읽을 책을 찾아보는 탐색 영역"
+                      : null}
+                  </p>
+                </> : null}
                 <dl className={styles.bookstoreHighlights}>
                   {selectedProject.highlights?.map((highlight, index) => (
                     <div key={highlight.label} className={styles.bookstoreHighlight}>
@@ -1600,11 +1621,13 @@ export default function Projects() {
                 ? "← 프로젝트 화면 보기"
                 : selectedProject.id === "hangeul"
                   ? "왜 글에 점수를 매기지 않았을까? →"
-                  : "설계 의도 보기 →"}
+                  : selectedProject.id === "landing"
+                    ? "왜 추천에 가상 피팅을 연결했을까? →"
+                    : "설계 의도 보기 →"}
             </button>
             {selectedProject.siteUrl ? (
               <a className={styles.bookstoreSiteLink} href={selectedProject.siteUrl} target="_blank" rel="noreferrer">
-                사이트 보기 <span aria-hidden="true">↗</span>
+                {selectedProject.id === "landing" ? "서비스 열기 · 로그인 필요" : "사이트 보기"} <span aria-hidden="true">↗</span>
               </a>
             ) : null}
           </>
@@ -1625,7 +1648,7 @@ export default function Projects() {
         >
           <div className={styles.detailMetaArea}>
             <>
-                <section
+                {shouldShowPages ? <section
                   className={styles.pagesBlock}
                   data-expanded={isPagesOpen ? "true" : "false"}
                   aria-label="project pages"
@@ -1778,7 +1801,7 @@ export default function Projects() {
                       </span>
                     </div>
                   </div>
-                </section>
+                </section> : null}
 
                 {shouldShowStacks ? <section
                   className={styles.detailStacks}
