@@ -6,12 +6,16 @@ const sectionIds = ["hero", "about", "projects", "contact"] as const;
 const wheelThreshold = 28;
 const touchThreshold = 42;
 const scrollLockMs = 920;
+// After an inner region reaches its edge, trailing wheel momentum is absorbed
+// for this long before the next wheel gesture may change section.
+const regionHandoffMs = 450;
 const clampIndex = (value: number, max: number) => Math.min(Math.max(value, 0), max);
 
 export default function OneScrollController() {
   const activeIndexRef = useRef(0);
   const lockedRef = useRef(false);
   const touchStartYRef = useRef<number | null>(null);
+  const regionScrollAtRef = useRef(0);
 
   useEffect(() => {
     const scrollContainer = document.querySelector<HTMLElement>("[data-scroll-container='true']");
@@ -28,21 +32,34 @@ export default function OneScrollController() {
       return;
     }
 
+    // The section containing the top of the viewport. A tall section stays
+    // current while it is being read, even past its midpoint.
+    const getCurrentIndex = () => {
+      const top = scrollContainer.scrollTop;
+      const containing = sections.findIndex(
+        (section) =>
+          top >= section.offsetTop - 2 &&
+          top < section.offsetTop + section.offsetHeight - 2,
+      );
+
+      if (containing !== -1) {
+        return containing;
+      }
+
+      return sections.reduce((nearest, section, index) => {
+        const currentDistance = Math.abs(section.offsetTop - top);
+        const nearestDistance = Math.abs(sections[nearest].offsetTop - top);
+
+        return currentDistance < nearestDistance ? index : nearest;
+      }, activeIndexRef.current);
+    };
+
     const syncActiveIndex = () => {
       if (lockedRef.current) {
         return;
       }
 
-      const nearestIndex = sections.reduce((nearest, section, index) => {
-        const currentDistance = Math.abs(section.offsetTop - scrollContainer.scrollTop);
-        const nearestDistance = Math.abs(
-          sections[nearest].offsetTop - scrollContainer.scrollTop,
-        );
-
-        return currentDistance < nearestDistance ? index : nearest;
-      }, activeIndexRef.current);
-
-      activeIndexRef.current = nearestIndex;
+      activeIndexRef.current = getCurrentIndex();
     };
 
     const releaseLock = () => {
@@ -84,17 +101,66 @@ export default function OneScrollController() {
       target instanceof HTMLElement &&
       Boolean(target.closest("a, button, input, textarea, select, [contenteditable='true']"));
 
-    // The bookstore case study grows in normal document flow. Do not skip its
-    // content with the one-wheel/one-section navigation used elsewhere.
-    const isReadingBookstore = () => {
-      const projects = document.getElementById("projects");
-      if (projects?.dataset.projectDetail !== "ypbooks") return false;
-      const top = scrollContainer.scrollTop;
-      return top >= projects.offsetTop - 2 && top < projects.offsetTop + projects.offsetHeight - 2;
+    const isEditableTarget = (target: EventTarget | null) =>
+      target instanceof HTMLElement &&
+      Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
+
+    // The inner scroll area (e.g. a project detail) that contains the target.
+    const getRegionElement = (target: EventTarget | null) => {
+      if (!(target instanceof Element)) return null;
+      const region = target.closest<HTMLElement>("[data-scroll-region]");
+      return region && scrollContainer.contains(region) ? region : null;
+    };
+
+    // The same region, but only while it actually overflows.
+    const getScrollRegion = (target: EventTarget | null) => {
+      const region = getRegionElement(target);
+      return region && region.scrollHeight > region.clientHeight + 1 ? region : null;
+    };
+
+    const regionCanScroll = (region: HTMLElement, direction: 1 | -1) =>
+      direction > 0
+        ? region.scrollTop + region.clientHeight < region.scrollHeight - 1
+        : region.scrollTop > 1;
+
+    // A section taller than the viewport (e.g. a case study on a narrow screen)
+    // is read with native scrolling until its edge comes into view.
+    const hasRoomInTallSection = (direction: 1 | -1) => {
+      const section = sections[getCurrentIndex()];
+      if (!section || section.offsetHeight <= scrollContainer.clientHeight + 2) {
+        return false;
+      }
+
+      const viewTop = scrollContainer.scrollTop;
+      const viewBottom = viewTop + scrollContainer.clientHeight;
+
+      return direction > 0
+        ? viewBottom < section.offsetTop + section.offsetHeight - 2
+        : viewTop > section.offsetTop + 2;
     };
 
     const handleWheel = (event: WheelEvent) => {
-      if (isReadingBookstore()) return;
+      if (event.deltaY === 0) return;
+      const direction = event.deltaY > 0 ? 1 : -1;
+      const region = getScrollRegion(event.target);
+
+      if (region) {
+        if (regionCanScroll(region, direction)) {
+          // The region scrolls natively; its overscroll-behavior keeps the
+          // remainder from chaining to the page.
+          regionScrollAtRef.current = performance.now();
+          return;
+        }
+
+        if (performance.now() - regionScrollAtRef.current < regionHandoffMs) {
+          event.preventDefault();
+          regionScrollAtRef.current = performance.now();
+          return;
+        }
+      }
+
+      if (hasRoomInTallSection(direction)) return;
+
       if (Math.abs(event.deltaY) < wheelThreshold) {
         return;
       }
@@ -105,12 +171,34 @@ export default function OneScrollController() {
         return;
       }
 
-      moveSection(event.deltaY > 0 ? 1 : -1);
+      moveSection(direction);
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isReadingBookstore()) return;
-      if (isInteractiveTarget(event.target)) {
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+      const target = event.target;
+      // Keys typed in overlays rendered outside the page (dialogs, lightboxes)
+      // never move the sections behind them.
+      if (
+        target instanceof Element &&
+        target !== document.body &&
+        !scrollContainer.contains(target)
+      ) {
+        return;
+      }
+
+      if (isEditableTarget(target)) return;
+
+      const regionElement = getRegionElement(target);
+      const region = getScrollRegion(target);
+      const isActivationKey = event.key === " " || event.key === "Enter";
+
+      // Outside an inner region, focused controls keep their native keys.
+      // Inside one (overflowing or not), only activation keys stay with the
+      // control; scroll keys scroll the region first, then change section,
+      // so the page never stops between two sections.
+      if (isInteractiveTarget(target) && (!regionElement || isActivationKey)) {
         return;
       }
 
@@ -118,6 +206,14 @@ export default function OneScrollController() {
       const previousKeys = ["ArrowUp", "PageUp"];
 
       if (![...nextKeys, ...previousKeys, "Home", "End"].includes(event.key)) {
+        return;
+      }
+
+      const direction: 1 | -1 =
+        nextKeys.includes(event.key) || event.key === "End" ? 1 : -1;
+
+      if (region && regionCanScroll(region, direction)) return;
+      if (event.key !== "Home" && event.key !== "End" && hasRoomInTallSection(direction)) {
         return;
       }
 
@@ -147,7 +243,6 @@ export default function OneScrollController() {
     };
 
     const handleTouchMove = (event: TouchEvent) => {
-      if (isReadingBookstore()) return;
       if (touchStartYRef.current === null) {
         return;
       }
@@ -159,6 +254,11 @@ export default function OneScrollController() {
       }
 
       const distance = touchStartYRef.current - currentY;
+      const direction = distance > 0 ? 1 : -1;
+      const region = getScrollRegion(event.target);
+
+      if (region && regionCanScroll(region, direction)) return;
+      if (hasRoomInTallSection(direction)) return;
 
       if (Math.abs(distance) < touchThreshold) {
         return;

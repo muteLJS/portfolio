@@ -792,7 +792,6 @@ export default function Projects() {
   }, [isBookstoreDetail]);
 
   const handleBookstoreKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
-    event.stopPropagation();
     const panel = detailPanelRef.current;
     const content = detailScrollRef.current;
     if (!panel || !content) return;
@@ -814,7 +813,8 @@ export default function Projects() {
       return;
     }
 
-    // Other navigation keys keep their native main-page scrolling behavior.
+    // Scroll keys reach OneScrollController, which scrolls this detail region
+    // first and only changes section once the region has reached its edge.
   };
   const currentProjectNumber = selectedProject
     ? String(selectedIndex + 1).padStart(2, "0")
@@ -905,6 +905,11 @@ export default function Projects() {
     setIsStacksOpen(false);
     setPagePreviewLimit(null);
     resetSummaryState();
+  };
+
+  const togglePagesList = () => {
+    setIsStacksOpen(false);
+    setIsPagesOpen((value) => !value);
   };
 
   const handleCloseDetail = () => {
@@ -1137,14 +1142,15 @@ export default function Projects() {
     const frame = window.requestAnimationFrame(measure);
     const observer = new ResizeObserver(measure);
 
-    if (pagesOverflowRef.current) {
-      observer.observe(pagesOverflowRef.current);
+    // Watch the lists themselves too: while a shell is collapsed its own box
+    // does not change when the list rewraps (font load, active weight).
+    for (const shell of [pagesOverflowRef.current, stacksOverflowRef.current]) {
+      if (!shell) continue;
+      observer.observe(shell);
+      if (shell.firstElementChild) observer.observe(shell.firstElementChild);
     }
 
-    if (stacksOverflowRef.current) {
-      observer.observe(stacksOverflowRef.current);
-    }
-
+    void document.fonts.ready.then(measure).catch(() => undefined);
     window.addEventListener("resize", measure);
 
     return () => {
@@ -1163,41 +1169,42 @@ export default function Projects() {
     }
 
     const measure = () => {
-      const pageWidths = Array.from(
-        measureRoot.querySelectorAll<HTMLElement>('[data-page-measure="page"]'),
-      ).map((item) => item.getBoundingClientRect().width);
-      const planningWidth = measureRoot.querySelector<HTMLElement>(
-        '[data-page-measure="planning"]',
-      )?.getBoundingClientRect().width ?? 0;
-      const separator = measureRoot.querySelector<HTMLElement>(
-        '[data-page-measure="separator"]',
-      );
-      const separatorStyle = separator ? window.getComputedStyle(separator) : null;
-      const separatorWidth = separator
-        ? separator.getBoundingClientRect().width +
-          Number.parseFloat(separatorStyle?.marginLeft ?? "0") +
-          Number.parseFloat(separatorStyle?.marginRight ?? "0")
-        : 0;
-      const moreWidth = pageMoreMeasureRef.current?.getBoundingClientRect().width ?? 0;
+      const list = measureRoot.querySelector<HTMLElement>("ul");
+      const row = content.firstElementChild as HTMLElement | null;
+
+      if (!list || !row) {
+        return;
+      }
+
+      // Right edge of every label (planning first), measured from a hidden copy
+      // of the list that uses the live classes: same font size, weight,
+      // active state and separators as the row the visitor sees.
+      const origin = list.getBoundingClientRect().left;
+      const labelEdges = Array.from(
+        list.querySelectorAll<HTMLElement>('[data-page-measure="label"]'),
+      ).map((label) => label.getBoundingClientRect().right - origin);
+      const planningCount = hasPlanningDocument ? 1 : 0;
+      const moreWidth =
+        pageMoreMeasureRef.current?.getBoundingClientRect().width ?? 0;
+      const rowGap =
+        Number.parseFloat(window.getComputedStyle(row).columnGap) || 0;
+
       const fitCount = (available: number) => {
-        let used = planningWidth;
         let count = 0;
 
-        for (const width of pageWidths) {
-          const next = used + (used > 0 ? separatorWidth : 0) + width;
-          if (next > available) break;
-          used = next;
+        for (const edge of labelEdges) {
+          if (edge > available + 0.5) break;
           count += 1;
         }
 
-        return count;
+        return Math.max(0, count - planningCount);
       };
 
-      const available = content.clientWidth;
+      const available = row.clientWidth;
       let nextLimit = fitCount(available);
 
-      if (nextLimit < pageWidths.length) {
-        nextLimit = fitCount(Math.max(0, available - moreWidth - 4));
+      if (nextLimit < labelEdges.length - planningCount) {
+        nextLimit = fitCount(Math.max(0, available - moreWidth - rowGap));
       }
 
       setPagePreviewLimit((current) =>
@@ -1214,7 +1221,12 @@ export default function Projects() {
       window.cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [hasPlanningDocument, selectedProject?.id, validPages.length]);
+  }, [
+    hasPlanningDocument,
+    selectedProject?.id,
+    validPages.length,
+    selectedPage?.name,
+  ]);
 
   const getExpandedOverflowStyle = (height: number) =>
     ({
@@ -1450,7 +1462,7 @@ export default function Projects() {
         tabIndex={0}
         role="region"
         aria-label={`${selectedProjectDisplayTitle} 상세 내용`}
-        onWheelCapture={(event) => event.stopPropagation()}
+        data-scroll-region=""
       >
         {!isUnifiedDetail ? (
           <div className={styles.sharedMobileNumber}>{detailNumberRow}</div>
@@ -1510,7 +1522,7 @@ export default function Projects() {
         {isUnifiedDetail ? (
           <>
             <div id="ypbooks-middle-stage" className={styles.bookstoreMiddleStage} data-view={isDesignIntentOpen ? "intent" : "project"}>
-              <div className={styles.bookstoreProjectScreen} aria-hidden={isDesignIntentOpen} inert={isDesignIntentOpen}>
+              <div className={styles.bookstoreProjectScreen} data-caption={showBookstoreAnnotation ? "true" : "false"} aria-hidden={isDesignIntentOpen} inert={isDesignIntentOpen}>
                 <div className={styles.mediaRow} data-summary-state={summaryState}>
                   <div className={styles.detailMediaArea}>{previewFrame}</div>
                 </div>
@@ -1566,7 +1578,11 @@ export default function Projects() {
         <div
           className={styles.bottomInfo}
           data-expanded-type={
-            isPagesOpen ? "pages" : isStacksOpen ? "stacks" : "none"
+            isPagesOpen
+              ? "pages"
+              : isStacksOpen
+                ? "stacks"
+                : "none"
           }
         >
           <div className={styles.detailMetaArea}>
@@ -1641,9 +1657,13 @@ export default function Projects() {
                         <button
                           type="button"
                           className={styles.overflowMoreButton}
-                          onClick={() => {
-                            setIsPagesOpen((value) => !value);
-                          }}
+                          aria-expanded={isPagesOpen}
+                          aria-label={
+                            isPagesOpen
+                              ? "화면 목록 접기"
+                              : `화면 ${hiddenPageCount}개 더 보기`
+                          }
+                          onClick={togglePagesList}
                         >
                           {isPagesOpen
                             ? `-${hiddenPageCount}`
@@ -1687,18 +1707,37 @@ export default function Projects() {
                       className={styles.pageListMeasure}
                       aria-hidden="true"
                     >
-                      {hasPlanningDocument ? (
-                        <span data-page-measure="planning">
-                          {selectedProject.planning?.title}
-                        </span>
-                      ) : null}
-                      <span data-page-measure="separator">/</span>
-                      {validPages.map((page) => (
-                        <span key={page.name} data-page-measure="page">
-                          {page.name}
-                        </span>
-                      ))}
-                      <span ref={pageMoreMeasureRef}>+99</span>
+                      <ul className={styles.pageQuickList}>
+                        {hasPlanningDocument ? (
+                          <li className={styles.pageListItem}>
+                            <span
+                              className={styles.pageTextButton}
+                              data-page-measure="label"
+                            >
+                              {selectedProject.planning?.title}
+                            </span>
+                            <span className={styles.inlineSeparator}>/</span>
+                          </li>
+                        ) : null}
+                        {validPages.map((page) => (
+                          <li key={page.name} className={styles.pageListItem}>
+                            <span
+                              className={styles.pageTextButton}
+                              data-page-measure="label"
+                              data-active={selectedPage?.name === page.name}
+                            >
+                              {page.name}
+                            </span>
+                            <span className={styles.inlineSeparator}>/</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <span
+                        ref={pageMoreMeasureRef}
+                        className={styles.overflowMoreButton}
+                      >
+                        +99
+                      </span>
                     </div>
                   </div>
                 </section>
@@ -1742,10 +1781,11 @@ export default function Projects() {
                         <button
                           type="button"
                           className={styles.overflowMoreButton}
-                          aria-expanded={isBookstoreDetail ? isStacksOpen : undefined}
+                          aria-expanded={isStacksOpen}
                           aria-controls={isBookstoreDetail ? "ypbooks-stack-extra" : undefined}
                           aria-label={isBookstoreDetail ? (isStacksOpen ? "기술 스택 접기" : "기술 스택 더 보기") : undefined}
                           onClick={() => {
+                            setIsPagesOpen(false);
                             setIsStacksOpen((value) => !value);
                           }}
                         >

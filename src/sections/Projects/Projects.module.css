@@ -8,6 +8,20 @@
   background: #eef1df url("/img/background/project-background.png") center /
     cover no-repeat;
   color: #1c302c;
+
+  /* Detail canvas geometry, shared by every project detail and tuned by
+     viewport height further below. */
+  --detail-top: clamp(120px, 14vh, 150px);
+  --detail-bottom-gap: 16px;
+  --detail-gap: 12px;
+  --detail-number-gap: 12px;
+  --detail-content-pb: 12px;
+  --detail-title-gap: 8px;
+  /* Key colour: a clearer leaf green for the project number, its bar and the
+     설계 의도 numbers (≈4.5:1 on the beige veil, 5.7:1 on the sky). */
+  --accent: #2b6436;
+  --stage-gap: 12px;
+  --highlights-mt: 0px;
 }
 
 /* The case-study details use a naturally sized editorial layout. */
@@ -24,7 +38,7 @@
 .projects[data-project-detail="goreon"] .inner {
   display: block;
   height: auto;
-  padding-top: clamp(120px, 14vh, 150px);
+  padding-top: var(--detail-top);
   padding-bottom: 20px;
 }
 
@@ -38,7 +52,9 @@
 
 .projects[data-project-detail="ypbooks"] .backgroundVeil,
 .projects[data-project-detail="mute"] .backgroundVeil,
-.projects[data-project-detail="goreon"] .backgroundVeil {
+.projects[data-project-detail="goreon"] .backgroundVeil,
+.projects[data-project-detail="hangeul"] .backgroundVeil,
+.projects[data-project-detail="landing"] .backgroundVeil {
   background: linear-gradient(90deg, rgba(255, 250, 235, 0.66) 0%, rgba(255, 250, 235, 0.60) 43%, rgba(255, 250, 235, 0) 64%);
 }
 
@@ -77,7 +93,7 @@
   .projects[data-project-detail="landing"] .inner {
     display: block;
     height: auto;
-    padding-top: clamp(120px, 14vh, 150px);
+    padding-top: var(--detail-top);
     overflow: visible;
   }
 
@@ -107,7 +123,7 @@
     min-height: 32px;
     align-items: center;
     flex-shrink: 0;
-    margin-bottom: 12px;
+    margin-bottom: var(--detail-number-gap);
     padding-right: 14px;
   }
 
@@ -121,9 +137,9 @@
   .sharedDetail:not(.bookstoreDetail) .detailContent {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--detail-gap);
     width: 100%;
-    padding: 0 14px 12px 0;
+    padding: 0 14px var(--detail-content-pb) 0;
     overflow: visible;
   }
 
@@ -178,7 +194,7 @@
   /* Keep the header fixed while the detail body, rather than the page, owns
      overflow from expanded resource lists. */
   .detailPanel.sharedDetail {
-    max-height: calc(100svh - 96px);
+    max-height: calc(100svh - var(--detail-top) - var(--detail-bottom-gap));
     overflow: hidden;
   }
 
@@ -208,12 +224,15 @@
     padding-inline: 12px;
   }
 
+  /* Every divider sits 14px from the text on each side, matching the gap
+     above 도구·기술 (10px padding + line-box leading). The bottom padding is
+     1px larger because the divider line occupies its last pixel. */
   .detailPanel.sharedDetail .pagesBlock {
-    padding-block: 0 8px;
+    padding-block: 0 11px;
   }
 
   .detailPanel.sharedDetail .detailStacks {
-    padding-block: 10px 8px;
+    padding-block: 10px 11px;
   }
 
   .detailPanel.sharedDetail .pagesHeader,
@@ -236,53 +255,80 @@
     position: static;
     width: 100%;
     height: 0;
-    margin-top: 6px;
+    margin-top: 0;
     overflow: hidden;
+    transition:
+      height var(--row-swap-ms) var(--row-swap-ease),
+      margin-top var(--row-swap-ms) var(--row-swap-ease);
   }
 
+  /* Grows to the measured list height so it slides open instead of jumping. */
   .detailPanel.sharedDetail .expandedOverflowShell[data-expanded="true"] {
-    height: auto;
+    height: var(--expanded-overflow-height, auto);
+  }
+
+  /* Row swap: only one row's list is open at a time, and the other row folds
+     away so the detail never needs an inner scrollbar. Each row's max-height
+     is its exact height in every state, so the folding row and the opening
+     list move together with the same timing — no gap, no overlap. */
+  .detailPanel.sharedDetail .bottomInfo {
+    --row-line: calc(1.65 * 0.875rem);
+    --row-swap-ms: 360ms;
+    --row-swap-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .detailPanel.sharedDetail .bottomInfo .pagesBlock,
+  .detailPanel.sharedDetail .bottomInfo .detailStacks {
+    overflow: hidden;
+    visibility: visible;
+    opacity: 1;
+    transition:
+      max-height var(--row-swap-ms) var(--row-swap-ease),
+      padding var(--row-swap-ms) var(--row-swap-ease),
+      opacity 220ms ease 100ms,
+      visibility 0s linear 0s;
+  }
+
+  .detailPanel.sharedDetail .bottomInfo .pagesBlock {
+    max-height: calc(var(--row-line) + 11px);
+  }
+
+  .detailPanel.sharedDetail .bottomInfo .detailStacks {
+    max-height: calc(var(--row-line) + 21px);
+  }
+
+  .detailPanel.sharedDetail .bottomInfo[data-expanded-type="pages"] .pagesBlock {
+    max-height: calc(var(--row-line) + 11px + 4px + var(--expanded-overflow-height, 240px));
+  }
+
+  /* 도구·기술 moves up into the 화면·자료 slot: its label lands on the same
+     line the 화면·자료 label used. */
+  .detailPanel.sharedDetail .bottomInfo[data-expanded-type="stacks"] .detailStacks {
+    max-height: calc(var(--row-line) + 11px + 4px + var(--expanded-overflow-height, 240px));
+    padding-top: 0;
   }
 
   .detailPanel.sharedDetail .bottomInfo[data-expanded-type="pages"] .detailStacks,
   .detailPanel.sharedDetail .bottomInfo[data-expanded-type="stacks"] .pagesBlock {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .pageListMeasure {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: inline-flex;
-    width: 0;
-    height: 0;
-    gap: 0;
-    overflow: hidden;
-    contain: layout paint;
+    max-height: 0;
+    padding-block: 0;
+    opacity: 0;
     visibility: hidden;
-    white-space: nowrap;
     pointer-events: none;
-    font-size: 0.76rem;
-    font-weight: 430;
-    line-height: 1.4;
+    transition:
+      max-height var(--row-swap-ms) var(--row-swap-ease),
+      padding var(--row-swap-ms) var(--row-swap-ease),
+      opacity 120ms ease,
+      visibility 0s linear var(--row-swap-ms);
   }
 
-  .pageListMeasure [data-page-measure="separator"] {
-    margin: 0 8px;
-  }
-
-  .pageListMeasure > span:last-child {
-    margin-left: 4px;
-  }
 }
 
 .bookstoreDetail .detailContent {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 0 14px 12px 0;
+  gap: var(--detail-gap);
+  padding: 0 14px var(--detail-content-pb) 0;
   overflow: visible;
   scroll-padding-block: 12px;
   overflow-anchor: none;
@@ -296,7 +342,7 @@
   width: 100%;
   align-items: center;
   flex-shrink: 0;
-  margin-bottom: 12px;
+  margin-bottom: var(--detail-number-gap);
   padding-right: 14px;
 }
 
@@ -416,7 +462,7 @@
 .bookstoreProjectScreen {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--stage-gap);
   min-width: 0;
   transition: opacity 160ms ease, visibility 0s linear 160ms;
 }
@@ -474,7 +520,7 @@
 .bookstoreIntentNumber {
   display: block;
   margin: 0 0 5px;
-  color: rgba(23, 55, 47, 0.62);
+  color: var(--accent);
   font-size: 0.76rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -506,13 +552,23 @@
   }
 
   .bookstoreDetail .titleRow {
-    margin-bottom: 8px;
+    margin-bottom: var(--detail-title-gap);
   }
 
+  /* The 설계 의도 list sits in the vertical centre of the stage, so a short
+     list (영풍문고, GOREON) no longer hangs from the top while a long one
+     (MUTE) fills it. Auto margins keep an over-tall list from being cut at
+     the top. */
   .bookstoreIntentScreen {
     inset: 0;
+    display: flex;
+    flex-direction: column;
     box-sizing: border-box;
-    padding-top: 32px;
+    padding-block: 16px;
+  }
+
+  .bookstoreIntentScreen > .bookstoreIntentList {
+    margin-block: auto;
   }
 
   .bookstoreIntentList li {
@@ -544,7 +600,7 @@
     grid-row: 2;
   }
 
-  .bookstoreDetail .pagesHeader {
+  .sharedDetail .pagesHeader {
     align-self: center;
   }
 
@@ -631,61 +687,88 @@
   margin-top: 6px;
 }
 
-.bookstoreDetail .pagesBlock,
-.bookstoreDetail .detailStacks {
+.sharedDetail .pagesBlock,
+.sharedDetail .detailStacks {
   max-width: none;
   max-height: none;
   grid-template-columns: 96px minmax(0, 1fr);
   column-gap: 16px;
 }
 
-.bookstoreDetail .pagesBlock h4,
-.bookstoreDetail .detailStacks h4,
-.bookstoreDetail .pageTextButton,
-.bookstoreDetail .stackTextItem,
-.bookstoreDetail .overflowMoreButton,
-.bookstoreDetail .inlineSeparator {
+.sharedDetail .pagesBlock h4,
+.sharedDetail .detailStacks h4,
+.sharedDetail .pageTextButton,
+.sharedDetail .stackTextItem,
+.sharedDetail .overflowMoreButton,
+.sharedDetail .inlineSeparator {
   color: #17372f;
   opacity: 1;
 }
 
-.bookstoreDetail .pageTextButton,
-.bookstoreDetail .stackTextItem,
-.bookstoreDetail .overflowMoreButton {
+.sharedDetail .pageTextButton,
+.sharedDetail .stackTextItem,
+.sharedDetail .overflowMoreButton {
   font-size: 0.875rem;
   line-height: 1.65;
 }
 
 /* Row labels match the value text size on the right of the same row. */
-.bookstoreDetail .pagesBlock h4,
-.bookstoreDetail .detailStacks h4 {
+.sharedDetail .pagesBlock h4,
+.sharedDetail .detailStacks h4 {
   font-size: 0.875rem;
+  white-space: nowrap;
 }
 
-.bookstoreDetail .stackIconList {
+.sharedDetail .stackIconList {
   flex-wrap: wrap;
   max-height: none;
   row-gap: 4px;
 }
 
-.bookstoreDetail .expandedOverflowShell {
+.sharedDetail .expandedOverflowShell {
   position: static;
 }
 
-.bookstoreDetail .expandedOverflowShell[data-expanded="true"] {
-  margin-top: 8px;
+.sharedDetail .expandedOverflowShell[data-expanded="true"] {
+  /* Same as the list's own row-gap, so line 1 → 2 equals line 2 → 3. */
+  margin-top: 4px;
 }
 
-.bookstoreDetail .pagesBlock::after,
-.bookstoreDetail .detailStacks::after {
+.sharedDetail .pagesBlock::after,
+.sharedDetail .detailStacks::after {
   bottom: 0;
   background: rgba(23, 55, 47, 0.3);
 }
 
-.bookstoreDetail .pageTextButton[data-active="true"] {
+.sharedDetail .pageTextButton[data-active="true"] {
   color: #17372f;
+  font-weight: 650;
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+/* Stronger strokes so the 14px items read clearly over the photo. */
+.sharedDetail .pageTextButton,
+.sharedDetail .stackTextItem,
+.sharedDetail .overflowMoreButton {
+  font-weight: 500;
+}
+
+.sharedDetail .projectNumber {
+  grid-template-columns: auto auto auto;
+  width: auto;
+  column-gap: 0.3em;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sharedDetail .currentNumber {
+  color: var(--accent);
+}
+
+.sharedDetail .projectNumber::after {
+  width: 1.25em;
+  background: var(--accent);
 }
 
 .bookstoreDetail:focus-visible,
@@ -759,9 +842,10 @@
     font-size: 1rem;
   }
 
-  .bookstoreDetail .pagesBlock,
-  .bookstoreDetail .detailStacks {
-    grid-template-columns: 56px minmax(0, 1fr);
+  .sharedDetail .pagesBlock,
+  .sharedDetail .detailStacks {
+    /* Fits the 14px "화면·자료" label (≈58px) on one line. */
+    grid-template-columns: 64px minmax(0, 1fr);
     column-gap: 12px;
   }
 }
@@ -771,34 +855,34 @@
     margin-left: calc(var(--detail-content-offset) + 22px);
   }
 
-  .bookstoreDetail .detailStacks {
+  .sharedDetail .detailStacks {
     grid-template-rows: auto auto;
     align-items: start;
     padding: 8px 0 8px;
   }
 
-  .bookstoreDetail .detailStacks > h4 {
+  .sharedDetail .detailStacks > h4 {
     align-self: center;
   }
 
-  .bookstoreDetail .detailStacks > .stackContent {
+  .sharedDetail .detailStacks > .stackContent {
     display: contents;
   }
 
-  .bookstoreDetail .detailStacks .inlineOverflowRow {
+  .sharedDetail .detailStacks .inlineOverflowRow {
     grid-column: 2;
     grid-row: 1;
     align-self: center;
     align-items: center;
   }
 
-  .bookstoreDetail .detailStacks .expandedOverflowShell {
+  .sharedDetail .detailStacks .expandedOverflowShell {
     grid-column: 2;
     grid-row: 2;
     align-self: start;
   }
 
-  .bookstoreDetail .overflowMoreButton {
+  .sharedDetail .overflowMoreButton {
     transform: none;
   }
 }
@@ -821,17 +905,21 @@
 }
 
 @media (min-width: 1456px) and (min-height: 820px) {
+  .projects {
+    --detail-top: clamp(92px, calc(14vh - 28px), 122px);
+    --highlights-mt: 28px;
+  }
 
   .projects[data-project-detail="ypbooks"] .inner,
   .projects[data-project-detail="mute"] .inner,
   .projects[data-project-detail="goreon"] .inner,
   .projects[data-project-detail="hangeul"] .inner,
   .projects[data-project-detail="landing"] .inner {
-    padding-top: clamp(92px, calc(14vh - 28px), 122px);
+    padding-top: var(--detail-top);
   }
 
   .bookstoreHighlights {
-    margin-top: 28px;
+    margin-top: var(--highlights-mt);
   }
 }
 
@@ -3626,5 +3714,128 @@
 
   .branchPosition[data-phase="projects"] {
     opacity: 1;
+  }
+}
+
+/* Hidden ruler for the 화면·자료 row. It renders the real list classes so the
+   fit calculation uses the same font, weight and separators as the live row.
+   Kept outside media queries so it never shows on small screens. */
+.pageListMeasure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+  contain: layout paint;
+}
+
+.pageListMeasure .pageQuickList {
+  width: max-content;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+}
+
+.pageListMeasure .pageTextButton,
+.pageListMeasure .overflowMoreButton {
+  display: inline-block;
+  transform: none;
+}
+
+@media (min-width: 641px) {
+  /* The section never grows past the viewport: the capped panel plus the
+     top inset always fits inside its 100svh minimum height. */
+  .projects[data-project-detail] .inner {
+    padding-bottom: 0;
+  }
+
+  /* The 12px-based max-height made rows without a +N button 1.2px shorter
+     than rows with one; let the 14px line box set the row height. */
+  .detailPanel.sharedDetail .pageQuickList {
+    max-height: none;
+  }
+
+  /* Labels share the value line box so they sit on the first line's centre. */
+  .detailPanel.sharedDetail .pagesBlock h4,
+  .detailPanel.sharedDetail .detailStacks h4 {
+    line-height: 1.65;
+  }
+}
+
+/* Shorter desktop viewports: tighten vertical rhythm (never type size) so the
+   collapsed detail, including both info rows, fits on one screen. */
+@media (min-width: 641px) and (max-height: 980px) {
+  .projects {
+    --detail-top: clamp(96px, calc(14vh - 36px), 122px);
+    --detail-bottom-gap: 8px;
+    --detail-gap: 8px;
+    --detail-number-gap: 8px;
+    --detail-content-pb: 4px;
+    --detail-title-gap: 4px;
+    --stage-gap: 8px;
+  }
+
+  .bookstoreDetail .bookstoreSiteLink {
+    margin-top: 0;
+  }
+
+  .bookstoreDetail .bookstoreIntentToggle,
+  .bookstoreDetail .bookstoreSiteLink {
+    padding: 2px 0;
+  }
+
+  /* Room for an expanded list without an inner scrollbar: spacing and icon
+     circles tighten; text sizes stay the same. */
+
+  .bookstoreIcon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .bookstoreHighlight dt {
+    gap: 6px;
+  }
+
+  .bookstoreHighlight dd {
+    margin-top: 4px;
+  }
+
+  .bookstoreDetail .bottomInfo {
+    margin-top: 2px;
+  }
+}
+
+@media (min-width: 1181px) {
+  /* Without a caption, the empty caption slot and the space above the icon
+     row join the preview stage and the artwork is centred in it. The stage
+     plus icon row keep their combined height, so the icon row stays aligned
+     across the three case studies. */
+  .bookstoreDetail .bookstoreProjectScreen[data-caption="false"] .bookstoreCaption {
+    display: none;
+  }
+
+  .bookstoreDetail .bookstoreProjectScreen[data-caption="false"] .mediaRow,
+  .bookstoreDetail .bookstoreProjectScreen[data-caption="false"] .detailMediaArea {
+    height: calc(241px + var(--stage-gap) + 1.65 * 0.875rem - 6px + var(--highlights-mt));
+    min-height: calc(241px + var(--stage-gap) + 1.65 * 0.875rem - 6px + var(--highlights-mt));
+  }
+
+  .bookstoreDetail .bookstoreProjectScreen[data-caption="false"] .bookstoreHighlights {
+    margin-top: 0;
+  }
+
+  .bookstoreDetail .bookstoreProjectScreen[data-caption="false"] .previewFrame {
+    align-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detailPanel.sharedDetail .expandedOverflowShell,
+  .detailPanel.sharedDetail .pagesBlock,
+  .detailPanel.sharedDetail .detailStacks {
+    transition: none;
   }
 }
