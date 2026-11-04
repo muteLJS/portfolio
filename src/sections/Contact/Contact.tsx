@@ -104,7 +104,7 @@ export default function Contact() {
           <Image
             className={styles.contactProfileImage}
             src="/img/profile/profile.png"
-            alt="이준성 프로필 사진"
+            alt="이진성 프로필 사진"
             fill
             sizes="(max-width: 760px) 58vw, 360px"
           />

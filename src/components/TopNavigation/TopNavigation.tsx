@@ -33,7 +33,7 @@ export default function TopNavigation() {
       >
         <span className={styles.brandName}>이진성</span>
         <span className={styles.brandRole} data-brand-role>
-          UX/UI Designer · Frontend Developer
+          UI/UX 기획자
         </span>
       </button>
 

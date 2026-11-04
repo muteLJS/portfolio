@@ -407,7 +407,7 @@ export default function ProjectBranchScene({
 
         <div
           className={styles.branchDebugHitLayer}
-          aria-label="Project hit area debug"
+          aria-label="프로젝트 선택"
         >
           {BRANCH_DEBUG_HIT_AREAS.map((hit) => {
             if (hit.type === "continue") {
@@ -472,7 +472,9 @@ export default function ProjectBranchScene({
                 key={hit.id}
                 className={styles.branchProjectLabel}
                 data-active={
-                  selectedProject?.id === project.id ? "true" : "false"
+                  !selectedProject || selectedProject.id === project.id
+                    ? "true"
+                    : "false"
                 }
                 data-project-id={hit.id}
                 style={

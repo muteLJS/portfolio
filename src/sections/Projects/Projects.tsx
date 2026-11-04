@@ -1955,9 +1955,7 @@ export default function Projects() {
                 여러 결과로 이어집니다.
               </h2>
               <p className={styles.sectionDescription}>
-                이어지는 과정 속에서,
-                <br />
-                새로운 형태들이 만들어집니다.
+                잎을 선택하면 프로젝트의 화면과 설계 과정을 볼 수 있습니다.
               </p>
             </div>
           )}
