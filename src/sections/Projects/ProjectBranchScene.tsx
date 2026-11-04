@@ -487,7 +487,11 @@ export default function ProjectBranchScene({
                 }
               >
                 <strong>
-                  {project.id === "landing" ? "랜딩페이지" : project.title}
+                  {project.id === "landing"
+                    ? "랜딩페이지"
+                    : project.id === "ypbooks"
+                      ? "영풍문고"
+                      : project.title}
                 </strong>
                 <em>
                   {String(
