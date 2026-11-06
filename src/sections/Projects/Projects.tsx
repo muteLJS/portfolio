@@ -10,8 +10,42 @@ import styles from "./Projects.module.css";
 
 const getProjectDisplayTitle = (project: Project) => project.title;
 
-const getPageDisplayName = (project: Project, pageName: string) =>
-  project.id === "hangeul" && pageName === "Main" ? "메인 화면" : pageName;
+const pageDisplayNameMap: Record<string, string> = {
+  "AI Chat": "AI 채팅",
+  "Artist Select": "아티스트 선택",
+  Best: "베스트셀러",
+  Board: "게시판",
+  "Book Detail": "도서 상세",
+  Cart: "장바구니",
+  Category: "카테고리",
+  Chart: "차트",
+  Feedback: "피드백",
+  Growth: "성장 기록",
+  Library: "라이브러리",
+  "Library Detail": "라이브러리 상세",
+  Login: "로그인",
+  Main: "메인 화면",
+  "My Page": "마이페이지",
+  Onboarding: "온보딩",
+  "Order List": "주문 내역",
+  Payment: "결제",
+  "PC Assembly": "PC 조립",
+  "PC Assembly Quote": "PC 조립 견적",
+  Personalization: "개인화 설정",
+  Player: "재생 화면",
+  Popup: "팝업",
+  "Product Detail": "상품 상세",
+  "Product List": "상품 목록",
+  Register: "회원가입",
+  Search: "검색",
+  "Search Result": "검색 결과",
+  Splash: "스플래시",
+  Wishlist: "찜 목록",
+  Writing: "글쓰기",
+};
+
+const getPageDisplayName = (pageName: string) =>
+  pageDisplayNameMap[pageName] ?? pageName;
 
 const subscribeToDesktopDetail = (onChange: () => void) => {
   const query = window.matchMedia("(min-width: 641px)");
@@ -1619,7 +1653,11 @@ export default function Projects() {
             <button type="button" className={styles.bookstoreIntentToggle} aria-expanded={isDesignIntentOpen} aria-controls="project-middle-stage" onClick={() => setIsDesignIntentOpen((open) => !open)}>
               {isDesignIntentOpen
                 ? "← 프로젝트 화면 보기"
-                : selectedProject.id === "hangeul"
+                : selectedProject.id === "ypbooks"
+                  ? "왜 첫 화면에 조건 탐색을 뒀을까?"
+                  : selectedProject.id === "goreon"
+                    ? "왜 추천 조건에서 예산을 먼저 봤을까?"
+                    : selectedProject.id === "hangeul"
                   ? "왜 글에 점수를 매기지 않았을까? →"
                   : selectedProject.id === "landing"
                     ? "왜 추천에 가상 피팅을 연결했을까? →"
@@ -1703,7 +1741,7 @@ export default function Projects() {
                                 data-active={selectedPage?.name === page.name}
                                 onClick={() => handlePageClick(page.name)}
                               >
-                                {getPageDisplayName(selectedProject, page.name)}
+                                {getPageDisplayName(page.name)}
                               </button>
                               {itemIndex < pageListItemCount - 1 ? (
                                 <span className={styles.inlineSeparator}>
@@ -1754,7 +1792,7 @@ export default function Projects() {
                               data-active={selectedPage?.name === page.name}
                               onClick={() => handlePageClick(page.name)}
                             >
-                              {getPageDisplayName(selectedProject, page.name)}
+                              {getPageDisplayName(page.name)}
                             </button>
                             {index < overflowPages.length - 1 ? (
                               <span className={styles.inlineSeparator}>/</span>
@@ -1787,7 +1825,7 @@ export default function Projects() {
                               data-page-measure="label"
                               data-active={selectedPage?.name === page.name}
                             >
-                              {getPageDisplayName(selectedProject, page.name)}
+                              {getPageDisplayName(page.name)}
                             </span>
                             <span className={styles.inlineSeparator}>/</span>
                           </li>
